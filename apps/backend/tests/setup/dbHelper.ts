@@ -203,10 +203,28 @@ export async function connectTestDb(): Promise<void> {
     return Promise.resolve(doc) as any;
   });
 
+  function matchesAssessmentFilter(a: any, filter: any): boolean {
+    if (filter?.userId && a.userId?.toString() !== filter.userId?.toString()) {
+      return false;
+    }
+    if (filter?._id && a._id?.toString() !== filter._id?.toString()) {
+      return false;
+    }
+    if (filter?.completedAt) {
+      const aTime = new Date(a.completedAt).getTime();
+      if (filter.completedAt.$gte && aTime < new Date(filter.completedAt.$gte).getTime()) {
+        return false;
+      }
+      if (filter.completedAt.$lte && aTime > new Date(filter.completedAt.$lte).getTime()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   jest.spyOn(Assessment, 'findOne').mockImplementation((filter: any) => {
-    const userIdStr = filter?.userId?.toString();
     const matches = mockAssessments
-      .filter((a) => !userIdStr || a.userId?.toString() === userIdStr)
+      .filter((a) => matchesAssessmentFilter(a, filter))
       .sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime());
 
     const result = matches[0] || null;
@@ -218,26 +236,35 @@ export async function connectTestDb(): Promise<void> {
   });
 
   jest.spyOn(Assessment, 'countDocuments').mockImplementation((filter: any) => {
-    const userIdStr = filter?.userId?.toString();
-    const count = mockAssessments.filter(
-      (a) => !userIdStr || a.userId?.toString() === userIdStr
-    ).length;
+    const count = mockAssessments.filter((a) => matchesAssessmentFilter(a, filter)).length;
     return Promise.resolve(count) as any;
   });
 
   (jest.spyOn(Assessment, 'find') as any).mockImplementation((filter: any) => {
-    const userIdStr = filter?.userId?.toString();
+    let sortDirection = -1; // default descending
+
     const getMatches = () => {
       return [...mockAssessments]
-        .filter((a) => !userIdStr || a.userId?.toString() === userIdStr)
-        .sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime());
+        .filter((a) => matchesAssessmentFilter(a, filter))
+        .sort((a, b) =>
+          sortDirection === 1
+            ? a.completedAt.getTime() - b.completedAt.getTime()
+            : b.completedAt.getTime() - a.completedAt.getTime()
+        );
     };
 
     let skipCount = 0;
     let limitCount = 50;
 
     const queryObj: any = {
-      sort: () => queryObj,
+      sort: (sortSpec: any) => {
+        if (sortSpec?.completedAt === 1) {
+          sortDirection = 1;
+        } else if (sortSpec?.completedAt === -1) {
+          sortDirection = -1;
+        }
+        return queryObj;
+      },
       skip: (count: number) => {
         skipCount = count;
         return queryObj;

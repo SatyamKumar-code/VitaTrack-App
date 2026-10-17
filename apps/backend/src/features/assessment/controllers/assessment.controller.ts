@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Types } from 'mongoose';
 import { AssessmentService } from '../services/assessment.service';
 import { AssessmentSubmissionSchema } from '../validators/assessment.validation';
 import { ZodError } from 'zod';
@@ -99,7 +100,8 @@ export class AssessmentController {
 
   /**
    * GET /api/v1/assessments/history
-   * Retrieves chronological assessment history with pagination
+   * Retrieves chronological assessment history with pagination, date filters, and summary metrics
+   * Reference: TASK-P6-01
    */
   public static async getAssessmentHistory(
     req: Request,
@@ -118,13 +120,75 @@ export class AssessmentController {
 
       const page = parseInt(req.query.page as string, 10) || 1;
       const limit = parseInt(req.query.limit as string, 10) || 10;
+      const startDate = req.query.startDate as string | undefined;
+      const endDate = req.query.endDate as string | undefined;
 
-      const history = await AssessmentService.getAssessmentHistory(userId, page, limit);
+      const history = await AssessmentService.getAssessmentHistory(userId, {
+        page,
+        limit,
+        startDate,
+        endDate
+      });
 
       res.status(200).json({
         success: true,
+        summary: history.summary,
         pagination: history.pagination,
         data: history.data
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/v1/assessments/:id
+   * Retrieves a specific assessment by ID for the authorized patient
+   */
+  public static async getAssessmentById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: { message: 'Authentication required.', statusCode: 401 }
+        });
+        return;
+      }
+
+      const { id } = req.params;
+      if (!Types.ObjectId.isValid(id)) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Invalid assessment ID format.', statusCode: 400 }
+        });
+        return;
+      }
+
+      const assessment = await AssessmentService.getAssessmentById(userId, id);
+      if (!assessment) {
+        res.status(404).json({
+          success: false,
+          error: { message: 'Assessment record not found.', statusCode: 404 }
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        data: {
+          assessmentId: assessment._id.toString(),
+          timestamp: assessment.completedAt.toISOString(),
+          symptoms: assessment.symptoms,
+          sunExposure: assessment.sunExposure,
+          dietaryHabits: assessment.dietaryHabits,
+          results: assessment.scoringResults,
+          aiExplanation: assessment.aiExplanation
+        }
       });
     } catch (error) {
       next(error);

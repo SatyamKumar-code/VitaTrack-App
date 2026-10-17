@@ -65,6 +65,13 @@ export default function RootLayout() {
               headerShown: false
             }}
           />
+          <Stack.Screen
+            name="history"
+            options={{
+              title: 'Assessment History & Reports',
+              headerShown: false
+            }}
+          />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>

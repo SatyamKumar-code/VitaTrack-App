@@ -98,6 +98,8 @@ Ran all test suites.
 | `TC-SCORE-04` | Unit: Scoring | Score boundary clamping to $[0, 100]$ | Phase 4 | **PASSED** | 2026-10-17 | **PASS** | Clamped strictly to $[0, 100]$ across extreme ranges |
 | `TC-ASSESS-01`| Integration: Assessment | Complete assessment submission & persistence | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | 201 Created with deterministic score & AI explanation |
 | `TC-ASSESS-02`| Integration: Assessment | Rejection of malformed assessment payload | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | 400 Bad Request with Zod schema validation errors |
+| `TC-HIST-01` | Integration: History | Assessment history pagination & summary metrics | Phase 6 | **PASSED** | 2026-10-17 | **PASS** | 200 OK with average, delta, distribution & trend direction |
+| `TC-HIST-02` | Integration: History | Date range filtering & individual record retrieval | Phase 6 | **PASSED** | 2026-10-17 | **PASS** | 200 OK with ISO date boundaries and GET /:id details |
 | `TC-REC-01` | Unit: Guidance | Vegan nutrition plan generation | Phase 5 | **PASSED** | 2026-10-17 | **PASS** | Includes UV mushrooms, fortified plant milk, lichen D3; 0 fish/dairy/meat |
 | `TC-REC-02` | Unit: Guidance | Sun exposure duration by Fitzpatrick type | Phase 5 | **PASSED** | 2026-10-17 | **PASS** | Type I receives 10m; Type VI receives 38m; monotonic scaling; SPF rules |
 | `TC-WEAR-01` | Integration: Wearable | Ingest valid Health Connect biometrics | Phase 8 | `PENDING / NOT RUN` | — | — | Awaiting Phase 8 authorization |
@@ -107,7 +109,7 @@ Ran all test suites.
 | `TC-PRIV-03` | Security: Privacy | Server log sanitization scrub audit | Phase 10 | `PENDING / NOT RUN` | — | — | Awaiting Phase 10 authorization |
 | `TC-UI-01` | Mobile UI | Multi-step survey wizard navigation | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | Verified via AssessmentWizardScreen & step components |
 | `TC-UI-02` | Mobile UI | Resume draft survey from local storage | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | Verified via DraftStorage AsyncStorage auto-save |
-| `TC-UI-03` | Mobile UI | Clinician PDF generation & sharing | Phase 6 | `PENDING / NOT RUN` | — | — | Awaiting Phase 6 authorization |
+| `TC-UI-03` | Mobile UI | Clinician PDF generation & sharing | Phase 6 | **PASSED** | 2026-10-17 | **PASS** | Verified via expo-print PDF template & expo-sharing sheet |
 | `TC-HARD-01` | Mobile Native | Health Connect missing on older Android device | Phase 8 | `PENDING / NOT RUN` | — | — | Awaiting Phase 8 authorization |
 
 ---
@@ -115,11 +117,37 @@ Ran all test suites.
 ## 3. Test Execution Summary Metrics
 
 - **Total Test Suites Executed (Backend):** 10 passed, 10 total
-- **Total Tests Passed (Backend):** 83 passed, 83 total (100% pass rate)
+- **Total Tests Passed (Backend):** 86 passed, 86 total (100% pass rate)
 - **Scoring Engine Tests:** 36 passed (asserting TC-SCORE-01 to TC-SCORE-04 + 32 granular clinical permutations)
+- **Assessment & History Tests:** 9 passed (`tests/integration/assessment.test.ts` covering TC-ASSESS-01, TC-ASSESS-02, TC-HIST-01, TC-HIST-02)
 - **Personalized Guidance Tests:** 17 passed (11 unit tests in `guidance.test.ts` + 6 integration tests in `recommendations.test.ts`)
-- **Mobile TypeScript Verification:** 0 errors (`npx tsc --noEmit` clean across all guidance components & routes)
+- **Mobile TypeScript Verification:** 0 errors (`npx tsc --noEmit` clean across all guidance, history, reports components & routes)
 - **Backend Production Build:** Clean compilation (`npx tsc --noEmit` clean)
+
+### Execution Record: Phase 6 (2026-10-17)
+- **Authorizing Prompt:** "implement Phase 6 only."
+- **Environment:** Node v22.x, Jest v29.7.0, Windows local runner
+- **Scope Implemented & Verified:**
+  - `AssessmentService.getAssessmentHistory`: Multi-criteria date filtering (`startDate`, `endDate`), pagination, summary metrics calculation (`averageScore`, `scoreDelta`, `highestScore`, `lowestScore`, `riskDistribution`, `trendDirection`).
+  - `AssessmentService.getAssessmentById`: Secure individual assessment detail retrieval by Object ID.
+  - `PdfGenerator`: Professional clinical HTML/CSS template generation via `expo-print` formatted for A4/Letter medical summaries.
+  - `PdfSharing`: Native OS share dialog integration via `expo-sharing` with web browser download fallback.
+  - `LongitudinalTrendChart`: Interactive SVG trajectory chart with risk tier reference bands and multi-metric switcher (Composite, Symptoms, Solar Deficit, Diet Deficit).
+  - `AssessmentHistoryScreen` & `AssessmentHistoryCard`: Filter chips (All Time, Last 90 Days, Last 30 Days), summary metric cards, pull-to-refresh, expandable sub-score breakdowns, and single/full PDF export triggers.
+- **Suites Executed:**
+  - `tests/integration/assessment.test.ts` (9 tests)
+  - `tests/unit/scoring.test.ts` (36 tests)
+  - `tests/unit/guidance.test.ts` (11 tests)
+  - `tests/integration/recommendations.test.ts` (6 tests)
+  - `tests/integration/auth.test.ts` (7 tests)
+  - `tests/integration/profile.test.ts` (4 tests)
+  - `tests/security/privacy_zero_phi.test.ts` (2 tests)
+  - `tests/unit/password.test.ts` (1 test)
+  - `tests/unit/token.test.ts` (5 tests)
+  - `tests/health.test.ts` (5 tests)
+- **Results:** 86 passed, 0 failed, 0 skipped (100% pass rate)
+
+---
 
 ### Execution Record: Phase 5 (2026-10-17)
 - **Authorizing Prompt:** "implement Phase 5 only."

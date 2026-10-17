@@ -15,7 +15,7 @@
 | **Phase 3** | Clinical Self-Assessment Questionnaire Engine | 6 | **COMPLETED** |
 | **Phase 4** | Deterministic Risk Scoring & AI Explainer Engine | 6 | **COMPLETED** |
 | **Phase 5** | Personalized Nutritional, Solar & Exercise Guidance | 5 | **COMPLETED** |
-| **Phase 6** | History, Trend Analytics & Clinician PDF Reports | 5 | `Planned` |
+| **Phase 6** | History, Trend Analytics & Clinician PDF Reports | 5 | **COMPLETED** |
 | **Phase 7** | Context-Aware Reminders & Notification System | 4 | `Planned` |
 | **Phase 8** | Smartwatch Integration via Android Health Connect | 6 | `Planned` |
 | **Phase 9** | Technical Admin Monitoring Dashboard (Zero-PHI) | 5 | `Planned` |
@@ -188,23 +188,23 @@
 
 ---
 
-## Phase 6: Assessment History, Trend Analytics & Health Reports (`Planned`)
+## Phase 6: Assessment History, Trend Analytics & Health Reports (**COMPLETED**)
 
-- [ ] **TASK-P6-01: Assessment History API**  
+- [x] **TASK-P6-01: Assessment History API**  
   *Description:* Implement `GET /api/v1/assessments/history` with pagination, date filters, and summary metrics.  
-  *Status:* `Planned`
-- [ ] **TASK-P6-02: Mobile Assessment History Screen**  
+  *Status:* **COMPLETED**
+- [x] **TASK-P6-02: Mobile Assessment History Screen**  
   *Description:* Build list view showing past completed assessments with date, score, risk badge, and quick details.  
-  *Status:* `Planned`
-- [ ] **TASK-P6-03: Visual Health Trend Charts**  
-  *Description:* Integrate charting library (`victory-native` or `react-native-gifted-charts`) to render score trajectories.  
-  *Status:* `Planned`
-- [ ] **TASK-P6-04: Clinician PDF Report Generator (Client-Side)**  
+  *Status:* **COMPLETED**
+- [x] **TASK-P6-03: Visual Health Trend Charts**  
+  *Description:* Integrate charting library (`react-native-svg`) to render score trajectories.  
+  *Status:* **COMPLETED**
+- [x] **TASK-P6-04: Clinician PDF Report Generator (Client-Side)**  
   *Description:* Use `expo-print` to render an HTML/CSS template into a clean, printable medical summary PDF.  
-  *Status:* `Planned`
-- [ ] **TASK-P6-05: Native Document Sharing Integration**  
+  *Status:* **COMPLETED**
+- [x] **TASK-P6-05: Native Document Sharing Integration**  
   *Description:* Integrate `expo-sharing` to allow users to save or share their generated PDF report via the OS share sheet.  
-  *Status:* `Planned`
+  *Status:* **COMPLETED**
 
 ---
 

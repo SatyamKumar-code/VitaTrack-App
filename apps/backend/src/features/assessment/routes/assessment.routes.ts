@@ -16,4 +16,7 @@ router.get('/latest', AssessmentController.getLatestAssessment);
 // GET /api/v1/assessments/history - Retrieve paginated history
 router.get('/history', AssessmentController.getAssessmentHistory);
 
+// GET /api/v1/assessments/:id - Retrieve individual assessment details
+router.get('/:id', AssessmentController.getAssessmentById);
+
 export const assessmentRouter = router;

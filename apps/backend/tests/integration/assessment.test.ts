@@ -152,23 +152,24 @@ describe('Assessment Integration API Suite (TASK-P3-01 & TASK-P3-02)', () => {
     expect(res.body.data.results).toBeDefined();
   });
 
-  it('GET /api/v1/assessments/history should return paginated assessment records', async () => {
+  it('GET /api/v1/assessments/history should return paginated assessment records with summary metrics', async () => {
     const token = await getAuthenticatedToken();
 
     // Submit 2 assessments
-    await request(app)
+    const firstRes = await request(app)
       .post('/api/v1/assessments')
       .set('Authorization', `Bearer ${token}`)
       .send(sampleAssessmentPayload);
 
-    await request(app)
+    const secondRes = await request(app)
       .post('/api/v1/assessments')
       .set('Authorization', `Bearer ${token}`)
       .send({
         ...sampleAssessmentPayload,
         symptoms: {
           ...sampleAssessmentPayload.symptoms,
-          fatigueLevel: 'severe'
+          fatigueLevel: 'severe',
+          bonePainLevel: 'severe'
         }
       });
 
@@ -184,5 +185,85 @@ describe('Assessment Integration API Suite (TASK-P3-01 & TASK-P3-02)', () => {
     expect(res.body.data[0]).toHaveProperty('compositeScore');
     expect(res.body.data[0]).toHaveProperty('riskTier');
     expect(res.body.data[0]).toHaveProperty('doctorAlert');
+    expect(res.body.data[0]).toHaveProperty('symptoms');
+    expect(res.body.data[0]).toHaveProperty('sunExposure');
+    expect(res.body.data[0]).toHaveProperty('dietaryHabits');
+
+    // Summary metrics validation (TASK-P6-01)
+    expect(res.body.summary).toBeDefined();
+    expect(res.body.summary.totalAssessments).toBe(2);
+    expect(typeof res.body.summary.averageScore).toBe('number');
+    expect(typeof res.body.summary.latestScore).toBe('number');
+    expect(typeof res.body.summary.earliestScore).toBe('number');
+    expect(typeof res.body.summary.scoreDelta).toBe('number');
+    expect(res.body.summary.riskDistribution).toBeDefined();
+    expect(['improving', 'worsening', 'stable', 'insufficient_data']).toContain(
+      res.body.summary.trendDirection
+    );
+  });
+
+  it('GET /api/v1/assessments/history should support date range filtering', async () => {
+    const token = await getAuthenticatedToken();
+
+    await request(app)
+      .post('/api/v1/assessments')
+      .set('Authorization', `Bearer ${token}`)
+      .send(sampleAssessmentPayload);
+
+    // Query with future range that matches nothing
+    const emptyRes = await request(app)
+      .get('/api/v1/assessments/history?startDate=2030-01-01T00:00:00Z&endDate=2030-12-31T23:59:59Z')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(emptyRes.status).toBe(200);
+    expect(emptyRes.body.data.length).toBe(0);
+    expect(emptyRes.body.summary.totalAssessments).toBe(0);
+
+    // Query with broad range that matches the record
+    const matchRes = await request(app)
+      .get('/api/v1/assessments/history?startDate=2020-01-01T00:00:00Z')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(matchRes.status).toBe(200);
+    expect(matchRes.body.data.length).toBe(1);
+    expect(matchRes.body.summary.totalAssessments).toBe(1);
+  });
+
+  it('GET /api/v1/assessments/:id should retrieve specific assessment details', async () => {
+    const token = await getAuthenticatedToken();
+
+    const createRes = await request(app)
+      .post('/api/v1/assessments')
+      .set('Authorization', `Bearer ${token}`)
+      .send(sampleAssessmentPayload);
+
+    const assessmentId = createRes.body.data.assessmentId;
+
+    const res = await request(app)
+      .get(`/api/v1/assessments/${assessmentId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.assessmentId).toBe(assessmentId);
+    expect(res.body.data.symptoms.fatigueLevel).toBe('moderate');
+    expect(res.body.data.results.compositeScore).toBeDefined();
+    expect(res.body.data.aiExplanation).toBeDefined();
+  });
+
+  it('GET /api/v1/assessments/:id should return 400 for malformed ID and 404 for unknown ID', async () => {
+    const token = await getAuthenticatedToken();
+
+    const badIdRes = await request(app)
+      .get('/api/v1/assessments/invalid-id-format')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(badIdRes.status).toBe(400);
+
+    const notFoundRes = await request(app)
+      .get('/api/v1/assessments/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(notFoundRes.status).toBe(404);
   });
 });

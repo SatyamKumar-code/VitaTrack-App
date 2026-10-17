@@ -24,7 +24,7 @@ export default function WelcomeScreen() {
           <Text style={styles.brandTitle}>VitaTrack</Text>
           <Text style={styles.brandTagline}>Vitamin D Self-Assessment & Solar Wellness</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>Phase 4 Risk Scoring &amp; AI Explainer Operational</Text>
+            <Text style={styles.badgeText}>Phase 6 History, Trends &amp; Clinician Reports Operational</Text>
           </View>
         </View>
 
@@ -40,7 +40,7 @@ export default function WelcomeScreen() {
                 {user.dietaryPreference}
               </Text>
 
-              {/* Phase 3 & 4 Primary CTAs */}
+              {/* Phase 3, 4, 5 & 6 Primary CTAs */}
               <TouchableOpacity
                 style={styles.primaryActionButton}
                 onPress={() => router.push('/assessment')}
@@ -56,6 +56,15 @@ export default function WelcomeScreen() {
               >
                 <Text style={styles.outlineActionButtonText}>
                   📊 View Latest Clinical Risk Results &rarr;
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.historyActionButton, { marginTop: 10, width: '100%' }]}
+                onPress={() => router.push('/history')}
+              >
+                <Text style={styles.historyActionButtonText}>
+                  📈 Longitudinal History, Trends &amp; Clinician Reports &rarr;
                 </Text>
               </TouchableOpacity>
 
@@ -105,6 +114,13 @@ export default function WelcomeScreen() {
 
         {/* System Architecture Status Cards */}
         <View style={styles.cardContainer}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Phase 6 History, Trends &amp; Clinician Reports Active</Text>
+            <Text style={styles.cardBody}>
+              Longitudinal assessment trajectory tracking, interactive SVG multi-metric trend charts, client-side printable Clinician PDF generator, and native share sheet integration fully operational.
+            </Text>
+          </View>
+
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Phase 5 Personalized Guidance Hub Active</Text>
             <Text style={styles.cardBody}>
@@ -282,6 +298,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 12,
     textAlign: 'center'
+  },
+  historyActionButton: {
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.primary.amber
+  },
+  historyActionButtonText: {
+    color: Colors.primary.amber,
+    fontSize: 13,
+    fontWeight: '700'
   },
   guidanceActionButton: {
     backgroundColor: '#0F766E',

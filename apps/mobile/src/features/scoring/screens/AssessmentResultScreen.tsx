@@ -157,6 +157,16 @@ export const AssessmentResultScreen: React.FC<AssessmentResultScreenProps> = ({ 
         {/* Action Buttons */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity
+            style={styles.historyBtn}
+            onPress={() => router.push('/history')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.historyBtnText}>
+              📈 View History, Trends &amp; Clinician Report &rarr;
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={styles.guidanceBtn}
             onPress={() => router.push('/guidance')}
             activeOpacity={0.8}
@@ -276,6 +286,24 @@ const styles = StyleSheet.create({
   actionsContainer: {
     marginTop: 20,
     gap: 12
+  },
+  historyBtn: {
+    backgroundColor: '#1E293B',
+    borderRadius: 14,
+    paddingVertical: 15,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: Colors.primary.amber,
+    shadowColor: Colors.primary.amber,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3
+  },
+  historyBtnText: {
+    color: Colors.primary.amber,
+    fontSize: 15,
+    fontWeight: '800'
   },
   guidanceBtn: {
     backgroundColor: Colors.clinical.teal,
