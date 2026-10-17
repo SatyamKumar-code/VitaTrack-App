@@ -1,9 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { useAuth } from '../src/features/auth/context/AuthContext';
 import { Colors } from '../src/shared/theme/colors';
 
 export default function WelcomeScreen() {
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -19,23 +24,69 @@ export default function WelcomeScreen() {
           <Text style={styles.brandTitle}>VitaSun</Text>
           <Text style={styles.brandTagline}>Vitamin D Self-Assessment & Solar Wellness</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>Phase 1 Foundation Operational</Text>
+            <Text style={styles.badgeText}>Phase 2 Auth & Profile Operational</Text>
           </View>
+        </View>
+
+        {/* Auth CTA Section */}
+        <View style={styles.authCtaContainer}>
+          {isAuthenticated && user ? (
+            <View style={styles.authenticatedCard}>
+              <Text style={styles.authenticatedGreeting}>
+                Welcome back, {user.fullName}!
+              </Text>
+              <Text style={styles.authenticatedSubtext}>
+                Logged in as {user.email} &bull; Skin {user.skinType.toUpperCase()} &bull;{' '}
+                {user.dietaryPreference}
+              </Text>
+              <TouchableOpacity
+                style={styles.profileButton}
+                onPress={() => router.push('/profile')}
+              >
+                <Text style={styles.profileButtonText}>Manage Health Baseline & Profile &rarr;</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.actionButtonGroup}>
+              <TouchableOpacity
+                style={styles.primaryActionButton}
+                onPress={() => router.push('/(auth)/onboarding')}
+              >
+                <Text style={styles.primaryActionButtonText}>Explore Onboarding Tour</Text>
+              </TouchableOpacity>
+
+              <View style={styles.dualButtonRow}>
+                <TouchableOpacity
+                  style={styles.outlineActionButton}
+                  onPress={() => router.push('/(auth)/login')}
+                >
+                  <Text style={styles.outlineActionButtonText}>Sign In</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.secondaryActionButton}
+                  onPress={() => router.push('/(auth)/register')}
+                >
+                  <Text style={styles.secondaryActionButtonText}>Create Account</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
 
         {/* System Architecture Status Cards */}
         <View style={styles.cardContainer}>
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Mobile Architecture</Text>
+            <Text style={styles.cardTitle}>Phase 2 Security & Vault Status</Text>
             <Text style={styles.cardBody}>
-              React Native + Expo SDK 52 + Expo Router configured with a strict Feature-Based directory structure.
+              Hardware Keystore token rotation (15m JWT / 7d refresh) &amp; Zero-PHI cryptographic profile management fully implemented and active.
             </Text>
           </View>
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Academic Research Origin</Text>
             <Text style={styles.cardBody}>
-              Designed by Satyam Kumar & Shilpi Shikha (Supervised by Dr. Hoshiyar Singh, VGU Jaipur).
+              Designed by Satyam Kumar &amp; Shilpi Shikha (Supervised by Dr. Hoshiyar Singh, VGU Jaipur).
             </Text>
           </View>
 
@@ -48,7 +99,7 @@ export default function WelcomeScreen() {
         </View>
 
         <Text style={styles.footerText}>
-          VitaSun Mobile Client &bull; Ready for Phase 2 Authorization
+          VitaSun Mobile Client &bull; Phase 2 Completed &amp; Verified
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -66,13 +117,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   emblemContainer: {
-    marginTop: 40,
-    marginBottom: 20
+    marginTop: 20,
+    marginBottom: 16
   },
   emblemRing: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: Colors.primary.glow,
     borderWidth: 2,
     borderColor: Colors.primary.amber,
@@ -80,11 +131,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   emblemText: {
-    fontSize: 42
+    fontSize: 38
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32
+    marginBottom: 24
   },
   brandTitle: {
     fontSize: 32,
@@ -99,7 +150,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   badge: {
-    marginTop: 12,
+    marginTop: 10,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 16,
@@ -112,46 +163,127 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.primary.amber
   },
+  authCtaContainer: {
+    width: '100%',
+    marginBottom: 24
+  },
+  actionButtonGroup: {
+    gap: 12
+  },
+  primaryActionButton: {
+    backgroundColor: Colors.primary.amber,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center'
+  },
+  primaryActionButtonText: {
+    color: '#0B0F19',
+    fontSize: 15,
+    fontWeight: '700'
+  },
+  dualButtonRow: {
+    flexDirection: 'row',
+    gap: 10
+  },
+  outlineActionButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: Colors.slate.cardBorder,
+    backgroundColor: Colors.slate.card,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center'
+  },
+  outlineActionButtonText: {
+    color: Colors.slate.textMain,
+    fontSize: 14,
+    fontWeight: '600'
+  },
+  secondaryActionButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: Colors.primary.amber,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center'
+  },
+  secondaryActionButtonText: {
+    color: Colors.primary.amber,
+    fontSize: 14,
+    fontWeight: '600'
+  },
+  authenticatedCard: {
+    backgroundColor: 'rgba(13, 148, 136, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(13, 148, 136, 0.35)',
+    borderRadius: 14,
+    padding: 16,
+    alignItems: 'center'
+  },
+  authenticatedGreeting: {
+    color: Colors.slate.textMain,
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 4
+  },
+  authenticatedSubtext: {
+    color: Colors.slate.textMuted,
+    fontSize: 12,
+    marginBottom: 12,
+    textAlign: 'center'
+  },
+  profileButton: {
+    backgroundColor: Colors.clinical.teal,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 18
+  },
+  profileButtonText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700'
+  },
   cardContainer: {
     width: '100%',
-    gap: 16,
-    marginBottom: 32
+    gap: 14,
+    marginBottom: 24
   },
   card: {
     backgroundColor: Colors.slate.card,
-    borderRadius: 16,
-    padding: 18,
+    borderRadius: 14,
+    padding: 16,
     borderWidth: 1,
     borderColor: Colors.slate.cardBorder
   },
   cardTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.primary.amber,
     marginBottom: 6
   },
   cardBody: {
-    fontSize: 13,
+    fontSize: 12,
     color: Colors.slate.textMuted,
-    lineHeight: 18
+    lineHeight: 17
   },
   disclaimerCard: {
     backgroundColor: 'rgba(13, 148, 136, 0.1)',
-    borderRadius: 16,
-    padding: 18,
+    borderRadius: 14,
+    padding: 16,
     borderWidth: 1,
     borderColor: 'rgba(13, 148, 136, 0.3)'
   },
   disclaimerTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: Colors.clinical.teal,
     marginBottom: 4
   },
   disclaimerBody: {
-    fontSize: 12,
+    fontSize: 11,
     color: Colors.slate.textMuted,
-    lineHeight: 17
+    lineHeight: 16
   },
   footerText: {
     fontSize: 11,

@@ -2,6 +2,22 @@
 
 All notable changes to the VitaTrack platform are documented in this file in adherence to the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-10-17
+
+### Added
+- **Phase 2 Implementation: Authentication Engine, Security Vault & User Profile:**
+  - **Backend Mongoose User Model:** Created `apps/backend/src/features/auth/models/user.model.ts` with bcrypt salt factor 12 pre-save hook, email normalization, compound index `(role, isActive)`, and password comparison method.
+  - **Single-Use Token Rotation & Vault:** Created `RefreshToken` Mongoose model with MongoDB TTL indexing, 256-bit cryptographic hex strings, family grouping, and automatic token reuse detection (session compromise revocation).
+  - **Auth & Profile API Endpoints:** Implemented `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, `POST /api/v1/auth/refresh-token`, `POST /api/v1/auth/logout`, `POST /api/v1/auth/forgot-password`, `GET /api/v1/users/profile`, and `PUT /api/v1/users/profile` with Zod validation.
+  - **Security Middleware:** Built `authenticate` middleware with JWT verification (15-minute access token expiry) and `tokenVersion` check for instant session revocation.
+  - **Mobile SecureStore Integration:** Implemented hardware-backed KeyStore/Keychain token persistence via `expo-secure-store` in `apps/mobile/src/shared/storage/secureStore.ts`.
+  - **Mobile Auth Context & State Provider:** Created `AuthContext` with automatic boot-time token hydration and background refresh.
+  - **Mobile Auth Screens & Navigation Flow:** Implemented `OnboardingScreen` (3-slide educational carousel), `LoginScreen`, `RegisterScreen` (demographic baseline, Fitzpatrick skin phototype cards, dietary orientation, medical flags), `ForgotPasswordScreen`, and route group `apps/mobile/app/(auth)/`.
+  - **Mobile Profile Management Screen:** Created `ProfileScreen` in `apps/mobile/src/features/profile/screens/ProfileScreen.tsx` with baseline editing, phototype cards, dietary selectors, and secure sign-out.
+  - **Automated Test Suites (24 Tests Passing):** Unit tests for bcrypt cost 12 and JWT tokens, integration tests for full auth and profile workflows, and security zero-PHI token audit.
+
+---
+
 ## [0.2.0] — 2026-10-17
 
 ### Added

@@ -5,6 +5,8 @@ import { config } from './core/config/env';
 import { errorHandler } from './core/middleware/errorHandler';
 import { DatabaseManager } from './core/database/mongooseConnection';
 import { logger } from './core/logger/logger';
+import { authRouter } from './features/auth/routes/auth.routes';
+import { userRouter } from './features/user/routes/user.routes';
 
 export function createApp(): Application {
   const app = express();
@@ -54,6 +56,10 @@ export function createApp(): Application {
   app.get(`${config.apiPrefix}/health`, (req: Request, res: Response) => {
     res.status(200).json(getHealthStatus());
   });
+
+  // Feature Routes (Phase 2: Authentication & User Profile)
+  app.use(`${config.apiPrefix}/auth`, authRouter);
+  app.use(`${config.apiPrefix}/users`, userRouter);
 
   // 404 Handler
   app.use((req: Request, res: Response) => {

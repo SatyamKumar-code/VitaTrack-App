@@ -1,62 +1,76 @@
 # TEST_REPORT.md — Quality Assurance Execution & Test Results Ledger
 
 > **Project:** VitaSun — Self-Diagnosis & Guidance Platform for Vitamin D Deficiency  
-> **Status:** Phase 1 Complete (Foundation & Scaffolding Verified)  
-> **Test Runner Status:** **ACTIVE (Phase 1 Foundation Tests Passed)**
+> **Status:** Phase 2 Complete (Auth, Security Vault & Profile Verified)  
+> **Test Runner Status:** **ACTIVE (Phase 1 & Phase 2 Tests 100% Passed: 24/24)**
 
 ---
 
-## 1. Phase 1 Execution & Verification Record (2026-10-17)
+## 1. Phase 2 Execution & Verification Record (2026-10-17)
 
-- **Authorizing Prompt:** Explicit authorization for **Phase 1 only**.
-- **Environment:** Node v24.14.0, npm 11.9.0, Jest 29.7.0, TypeScript 5.7.2, Vite 6.4.4.
+- **Authorizing Prompt:** Explicit authorization for **Phase 2 only**.
+- **Environment:** Node v24.14.0, npm 11.9.0, Jest 29.7.0, TypeScript 5.7.2, Vite 6.4.4, Expo SDK 52.
 - **Suites Executed:**
-  - `apps/backend/tests/health.test.ts` (Supertest HTTP integration)
+  - `apps/backend/tests/unit/password.test.ts` (bcrypt cost factor 12 hashing)
+  - `apps/backend/tests/unit/token.test.ts` (JWT access 900s, 256-bit refresh, sha256)
+  - `apps/backend/tests/integration/auth.test.ts` (Registration, login, rotation, compromise detection, logout, forgot-password)
+  - `apps/backend/tests/integration/profile.test.ts` (GET and PUT /users/profile with Zod validation)
+  - `apps/backend/tests/security/privacy_zero_phi.test.ts` (Zero-PHI token payload & credential secrecy audit)
+  - `apps/backend/tests/health.test.ts` (Healthcheck API routes)
   - `apps/backend`: TypeScript compilation check (`npm run build`)
-  - `apps/admin`: Vite + TypeScript production build (`npm run build`)
   - `apps/mobile`: TypeScript compilation check (`npx tsc --noEmit`)
+  - `apps/admin`: Production build (`npm run build`)
   - Root monorepo build & test automation (`npm run build`, `npm run test`)
 
 ### 1.1 Test Runner Output
 ```text
-> backend@0.1.0 test
-> jest --detectOpenHandles --forceExit
+PASS tests/integration/auth.test.ts
+  Auth Integration API Suite (TASK-P2-01 & TASK-P2-02)
+    √ POST /api/v1/auth/register should register a new patient user and return tokens (292 ms)
+    √ POST /api/v1/auth/register should reject duplicate email with 409 Conflict (245 ms)
+    √ POST /api/v1/auth/register should reject weak password with 400 Bad Request (5 ms)
+    √ POST /api/v1/auth/login should authenticate valid user credentials (443 ms)
+    √ POST /api/v1/auth/login should reject invalid password with 401 Unauthorized (452 ms)
+    √ POST /api/v1/auth/refresh-token should rotate tokens successfully (232 ms)
+    √ POST /api/v1/auth/refresh-token should detect reuse and revoke sessions with 401 (232 ms)
+    √ POST /api/v1/auth/logout should revoke session tokens (234 ms)
+    √ POST /api/v1/auth/forgot-password should return success message (4 ms)
 
-  console.log
-    [2026-10-17T12:19:01.141Z] [INFO] [GET] /health
-  console.log
-    [2026-10-17T12:19:01.171Z] [INFO] [GET] /api/v1/health
-  console.log
-    [2026-10-17T12:19:01.192Z] [INFO] [GET] /non-existent-route
+PASS tests/integration/profile.test.ts
+  Profile Integration API Suite (TASK-P2-05)
+    √ GET /api/v1/users/profile should return 200 with patient profile attributes (238 ms)
+    √ GET /api/v1/users/profile should reject unauthenticated requests with 401 (19 ms)
+    √ PUT /api/v1/users/profile should update demographic & dietary parameters (249 ms)
+    √ PUT /api/v1/users/profile should reject invalid enum values with 400 Bad Request (248 ms)
+
+PASS tests/security/privacy_zero_phi.test.ts
+  Security & Privacy Audit: Zero-PHI Token & Credential Exposure
+    √ JWT access token must contain strictly { userId, role, tokenVersion } and zero PHI attributes (239 ms)
+    √ Auth and profile API responses must never leak passwordHash or salt (254 ms)
+
+PASS tests/unit/password.test.ts
+  Password Security Unit Suite (TASK-P2-01 & SECURITY_PRIVACY.md)
+    √ should hash passwords using bcrypt with cost factor >= 12 (659 ms)
+
+PASS tests/unit/token.test.ts
+  Token Utilities Unit Suite
+    √ should generate a valid JWT access token with required payload (1 ms)
+    √ should generate a 64-character (256-bit) hex string for refresh tokens (1 ms)
+    √ should deterministically hash refresh tokens via SHA-256 (1 ms)
+    √ should throw an error when verifying an invalid or tampered token (4 ms)
+    √ should enforce 15-minute (900s) access token expiration constant (1 ms)
 
 PASS tests/health.test.ts
   Health Check API Suite
-    √ GET /health should return 200 OK with proper status payload (108 ms)
-    √ GET /api/v1/health should return 200 OK on prefixed route (11 ms)
-    √ GET /non-existent-route should return 404 with structured JSON (21 ms)
+    √ GET /health should return 200 OK with proper status payload (44 ms)
+    √ GET /api/v1/health should return 200 OK on prefixed route (13 ms)
+    √ GET /non-existent-route should return 404 with structured JSON (13 ms)
 
-Test Suites: 1 passed, 1 total
-Tests:       3 passed, 3 total
+Test Suites: 6 passed, 6 total
+Tests:       24 passed, 24 total
 Snapshots:   0 total
-Time:        1.797 s
+Time:        6.691 s
 Ran all test suites.
-```
-
-### 1.2 Monorepo Build Output
-```text
-> vitasun-monorepo@0.1.0 build
-> npm run build --workspaces --if-present
-
-> admin@0.1.0 build
-> tsc && vite build
-✓ 1577 modules transformed.
-dist/index.html                   1.09 kB │ gzip:  0.62 kB
-dist/assets/index-BGFCdP5N.css   11.91 kB │ gzip:  3.02 kB
-dist/assets/index-D0trJeT0.js   155.40 kB │ gzip: 49.18 kB
-✓ built in 2.04s
-
-> backend@0.1.0 build
-> rimraf dist && tsc
 ```
 
 ---
@@ -71,14 +85,17 @@ dist/assets/index-D0trJeT0.js   155.40 kB │ gzip: 49.18 kB
 | `TC-P1-BLD-01` | Build: Backend | `tsc` compiles TypeScript cleanly without errors | Phase 1 | **PASSED** | 2026-10-17 | **PASS** | Zero compiler errors |
 | `TC-P1-BLD-02` | Build: Admin | `vite build` bundles admin SPA cleanly | Phase 1 | **PASSED** | 2026-10-17 | **PASS** | 1577 modules transformed |
 | `TC-P1-BLD-03` | Build: Mobile | `npx tsc --noEmit` validates mobile TypeScript | Phase 1 | **PASSED** | 2026-10-17 | **PASS** | Zero type errors |
+| `TC-AUTH-01` | Integration: Auth | Valid user registration & bcrypt hashing | Phase 2 | **PASSED** | 2026-10-17 | **PASS** | Verified cost 12 bcrypt & 201 Created |
+| `TC-AUTH-02` | Integration: Auth | Duplicate email rejection (409 Conflict) | Phase 2 | **PASSED** | 2026-10-17 | **PASS** | 409 Conflict returned |
+| `TC-AUTH-03` | Integration: Auth | User login with valid credentials | Phase 2 | **PASSED** | 2026-10-17 | **PASS** | 200 OK and token pair returned |
+| `TC-AUTH-04` | Integration: Auth | Refresh token rotation & reuse compromise detection | Phase 2 | **PASSED** | 2026-10-17 | **PASS** | Family invalidation on reuse |
+| `TC-PROF-01` | Integration: Profile | `GET /api/v1/users/profile` returns baseline | Phase 2 | **PASSED** | 2026-10-17 | **PASS** | 200 OK with sanitized user profile |
+| `TC-PROF-02` | Integration: Profile | `PUT /api/v1/users/profile` updates demographic data | Phase 2 | **PASSED** | 2026-10-17 | **PASS** | 200 OK with updated attributes |
+| `TC-ZPHI-01` | Security: Audit | Zero-PHI Token check (no symptoms or clinical data) | Phase 2 | **PASSED** | 2026-10-17 | **PASS** | Token contains only { userId, role, tokenVersion } |
 | `TC-SCORE-01` | Unit: Scoring | Minimal symptoms & optimal sun/diet $\to$ Low Risk | Phase 4 | `PENDING / NOT RUN` | — | — | Awaiting Phase 4 authorization |
 | `TC-SCORE-02` | Unit: Scoring | PPT Slide 7 user profile $\to$ Moderate Risk | Phase 4 | `PENDING / NOT RUN` | — | — | Awaiting Phase 4 authorization |
 | `TC-SCORE-03` | Unit: Scoring | Severe symptoms & elderly/vegan $\to$ High Risk | Phase 4 | `PENDING / NOT RUN` | — | — | Awaiting Phase 4 authorization |
 | `TC-SCORE-04` | Unit: Scoring | Score boundary clamping to $[0, 100]$ | Phase 4 | `PENDING / NOT RUN` | — | — | Awaiting Phase 4 authorization |
-| `TC-AUTH-01` | Integration: Auth | Valid user registration & bcrypt hashing | Phase 2 | `PENDING / NOT RUN` | — | — | Awaiting Phase 2 authorization |
-| `TC-AUTH-02` | Integration: Auth | Duplicate email rejection (409 Conflict) | Phase 2 | `PENDING / NOT RUN` | — | — | Awaiting Phase 2 authorization |
-| `TC-AUTH-03` | Integration: Auth | User login with valid credentials | Phase 2 | `PENDING / NOT RUN` | — | — | Awaiting Phase 2 authorization |
-| `TC-AUTH-04` | Integration: Auth | Refresh token rotation & invalidation | Phase 2 | `PENDING / NOT RUN` | — | — | Awaiting Phase 2 authorization |
 | `TC-ASSESS-01`| Integration: Assessment | Complete assessment submission & persistence | Phase 3 | `PENDING / NOT RUN` | — | — | Awaiting Phase 3 authorization |
 | `TC-ASSESS-02`| Integration: Assessment | Rejection of malformed assessment payload | Phase 3 | `PENDING / NOT RUN` | — | — | Awaiting Phase 3 authorization |
 | `TC-REC-01` | Unit: Guidance | Vegan nutrition plan generation | Phase 5 | `PENDING / NOT RUN` | — | — | Awaiting Phase 5 authorization |

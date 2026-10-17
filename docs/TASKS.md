@@ -76,26 +76,32 @@
 
 ---
 
-## Phase 2: Authentication, Security Vault & User Profile (`Planned`)
+## Phase 2: Authentication, Security Vault & User Profile (`Completed`)
 
-- [ ] **TASK-P2-01: Backend User Model & Password Hashing**  
+- [x] **TASK-P2-01: Backend User Model & Password Hashing**  
   *Description:* Create Mongoose User schema with bcrypt pre-save hook, email normalization, and indexing.  
-  *Status:* `Planned`
-- [ ] **TASK-P2-02: JWT Auth Service & Token Rotation**  
+  *Verification:* Created `apps/backend/src/features/auth/models/user.model.ts` with bcrypt salt factor 12 pre-save hook, email normalization, compound index, and tested via `tests/unit/password.test.ts`.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P2-02: JWT Auth Service & Token Rotation**  
   *Description:* Implement login, signup, refresh token rotation, and logout endpoints with token invalidation.  
-  *Status:* `Planned`
-- [ ] **TASK-P2-03: Mobile Secure Storage Integration**  
+  *Verification:* Created `AuthService`, `RefreshToken` model with TTL indexing, single-use family token rotation, and compromise reuse detection; 9/9 integration tests passed in `tests/integration/auth.test.ts`.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P2-03: Mobile Secure Storage Integration**  
   *Description:* Integrate `expo-secure-store` for storing access and refresh tokens securely on iOS/Android.  
-  *Status:* `Planned`
-- [ ] **TASK-P2-04: Mobile Auth Screens & Navigation Flow**  
+  *Verification:* Installed `expo-secure-store` and implemented `TokenStorage` in `apps/mobile/src/shared/storage/secureStore.ts` with hardware KeyStore/Keychain integration and web fallback.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P2-04: Mobile Auth Screens & Navigation Flow**  
   *Description:* Implement Onboarding Carousel, Login, Register, and Forgot Password screens using React Native.  
-  *Status:* `Planned`
-- [ ] **TASK-P2-05: User Profile Data API & Schema**  
+  *Verification:* Implemented `OnboardingScreen`, `LoginScreen`, `RegisterScreen`, `ForgotPasswordScreen`, `AuthContext`, and route wrappers under `apps/mobile/app/(auth)/`; TypeScript check `npx tsc --noEmit` passed with 0 errors.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P2-05: User Profile Data API & Schema**  
   *Description:* Implement profile endpoints for age, biological sex, Fitzpatrick skin type, and medical history flags.  
-  *Status:* `Planned`
-- [ ] **TASK-P2-06: Mobile Profile Management Screen**  
+  *Verification:* Implemented `GET /api/v1/users/profile` and `PUT /api/v1/users/profile` with Zod validation and auth middleware; 4/4 integration tests passed in `tests/integration/profile.test.ts`.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P2-06: Mobile Profile Management Screen**  
   *Description:* Create UI allowing users to view and update baseline demographic and clinical profile information.  
-  *Status:* `Planned`
+  *Verification:* Implemented `ProfileScreen` in `apps/mobile/src/features/profile/screens/ProfileScreen.tsx` with skin phototype cards, dietary selectors, medical tags, and logout workflow; `app/profile.tsx` route operational.  
+  *Status:* `Completed` (2026-10-17)
 
 ---
 
