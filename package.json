@@ -1,0 +1,30 @@
+{
+  "name": "vitasun-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VitaSun - Self-Diagnosis & Guidance Platform for Vitamin D Deficiency",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "backend:dev": "npm run dev --workspace=apps/backend",
+    "backend:build": "npm run build --workspace=apps/backend",
+    "backend:test": "npm run test --workspace=apps/backend",
+    "admin:dev": "npm run dev --workspace=apps/admin",
+    "admin:build": "npm run build --workspace=apps/admin",
+    "mobile:start": "npm run start --workspace=apps/mobile"
+  },
+  "keywords": [
+    "vitasun",
+    "vitamin-d",
+    "health",
+    "expo",
+    "express",
+    "react"
+  ],
+  "author": "Satyam Kumar & Shilpi Shikha (VGU Jaipur)",
+  "license": "UNLICENSED"
+}
