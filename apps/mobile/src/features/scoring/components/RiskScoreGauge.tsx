@@ -4,7 +4,6 @@ import Svg, { Circle, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { AssessmentSubScores, RiskTier } from '../types/scoring.types';
 import { Colors } from '../../../shared/theme/colors';
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle as any);
 
 interface RiskScoreGaugeProps {
   score: number;
@@ -50,11 +49,8 @@ export const RiskScoreGauge: React.FC<RiskScoreGaugeProps> = ({
     };
   }, [clampedScore]);
 
-  // Stroke offset calculation
-  const strokeDashoffset = animatedValue.interpolate({
-    inputRange: [0, 100],
-    outputRange: [circumference, 0]
-  });
+  // Stroke offset calculation driven smoothly by displayScore
+  const strokeOffset = circumference - (circumference * displayScore) / 100;
 
   const getTierColors = () => {
     switch (riskTier) {
@@ -110,7 +106,7 @@ export const RiskScoreGauge: React.FC<RiskScoreGaugeProps> = ({
             </LinearGradient>
           </Defs>
 
-          <G rotation="-90" origin={`${center}, ${center}`}>
+          <G transform={`rotate(-90 ${center} ${center})`}>
             {/* Background Muted Track */}
             <Circle
               cx={center}
@@ -122,14 +118,14 @@ export const RiskScoreGauge: React.FC<RiskScoreGaugeProps> = ({
             />
 
             {/* Active Colored Progress Arc */}
-            <AnimatedCircle
+            <Circle
               cx={center}
               cy={center}
               r={radius}
               stroke="url(#scoreGaugeGrad)"
               strokeWidth={strokeWidth}
               strokeDasharray={`${circumference} ${circumference}`}
-              strokeDashoffset={strokeDashoffset}
+              strokeDashoffset={strokeOffset}
               strokeLinecap="round"
               fill="transparent"
             />
