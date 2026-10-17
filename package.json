@@ -16,7 +16,8 @@
     "admin:dev": "npm run dev --workspace=apps/admin",
     "admin:build": "npm run build --workspace=apps/admin",
     "mobile:start": "npm run start --workspace=apps/mobile",
-    "mobile:tunnel": "npm run start:tunnel --workspace=apps/mobile"
+    "mobile:tunnel": "npm run start:tunnel --workspace=apps/mobile",
+    "postinstall": "node scripts/patch-expo-notifications.js"
   },
   "keywords": [
     "VitaTrack",

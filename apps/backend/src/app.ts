@@ -9,6 +9,7 @@ import { authRouter } from './features/auth/routes/auth.routes';
 import { userRouter } from './features/user/routes/user.routes';
 import { assessmentRouter } from './features/assessment/routes/assessment.routes';
 import { guidanceRouter } from './features/guidance/routes/guidance.routes';
+import { reminderRouter } from './features/reminders/routes/reminder.routes';
 
 export function createApp(): Application {
   const app = express();
@@ -59,11 +60,12 @@ export function createApp(): Application {
     res.status(200).json(getHealthStatus());
   });
 
-  // Feature Routes (Phase 2, 3, 4 & 5)
+  // Feature Routes (Phase 2, 3, 4, 5 & 7)
   app.use(`${config.apiPrefix}/auth`, authRouter);
   app.use(`${config.apiPrefix}/users`, userRouter);
   app.use(`${config.apiPrefix}/assessments`, assessmentRouter);
   app.use(`${config.apiPrefix}/recommendations`, guidanceRouter);
+  app.use(`${config.apiPrefix}/reminders`, reminderRouter);
 
   // 404 Handler
   app.use((req: Request, res: Response) => {

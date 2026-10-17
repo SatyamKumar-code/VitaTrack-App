@@ -72,6 +72,13 @@ export default function RootLayout() {
               headerShown: false
             }}
           />
+          <Stack.Screen
+            name="reminders"
+            options={{
+              title: 'Smart Reminders',
+              headerShown: false
+            }}
+          />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>

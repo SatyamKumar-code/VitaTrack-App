@@ -175,6 +175,16 @@ export const AssessmentResultScreen: React.FC<AssessmentResultScreenProps> = ({ 
           </TouchableOpacity>
 
           <TouchableOpacity
+            style={styles.remindersBtn}
+            onPress={() => router.push('/reminders')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.remindersBtnText}>
+              🔔 Set Follow-Up &amp; Daily Sunlight Reminders &rarr;
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={styles.primaryBtn}
             onPress={() => router.push('/assessment')}
             activeOpacity={0.8}
@@ -319,6 +329,19 @@ const styles = StyleSheet.create({
   guidanceBtnText: {
     color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: '800'
+  },
+  remindersBtn: {
+    backgroundColor: '#1E293B',
+    borderRadius: 14,
+    paddingVertical: 15,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#6366F1'
+  },
+  remindersBtnText: {
+    color: '#818CF8',
+    fontSize: 15,
     fontWeight: '800'
   },
   primaryBtn: {

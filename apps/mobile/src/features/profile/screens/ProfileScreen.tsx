@@ -293,6 +293,13 @@ export default function ProfileScreen() {
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
+            style={styles.remindersButton}
+            onPress={() => router.push('/reminders')}
+          >
+            <Text style={styles.remindersButtonText}>🔔 Notification &amp; Reminder Settings &rarr;</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[styles.saveButton, saving && styles.buttonDisabled]}
             onPress={handleSave}
             disabled={saving}
@@ -539,6 +546,19 @@ const styles = StyleSheet.create({
   buttonContainer: {
     gap: 12,
     marginTop: 8
+  },
+  remindersButton: {
+    backgroundColor: '#1E293B',
+    borderWidth: 1,
+    borderColor: '#6366F1',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center'
+  },
+  remindersButtonText: {
+    color: '#818CF8',
+    fontSize: 14,
+    fontWeight: '700'
   },
   saveButton: {
     backgroundColor: Colors.primary.amber,

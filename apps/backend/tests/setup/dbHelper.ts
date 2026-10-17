@@ -4,6 +4,7 @@ import { User, IUser } from '../../src/features/auth/models/user.model';
 import { RefreshToken, IRefreshToken } from '../../src/features/auth/models/refreshToken.model';
 import { Assessment } from '../../src/features/assessment/models/assessment.model';
 import { Recommendation } from '../../src/features/guidance/models/recommendation.model';
+import { ReminderPreferences } from '../../src/features/reminders/models/reminderPreference.model';
 
 // In-memory collections for fast, deterministic, self-contained testing
 interface MockUserData {
@@ -37,6 +38,7 @@ interface MockRefreshTokenData {
 let mockUsers: MockUserData[] = [];
 let mockRefreshTokens: MockRefreshTokenData[] = [];
 let mockAssessments: any[] = [];
+let mockReminderPreferences: any[] = [];
 
 function createMockUserDoc(data: MockUserData): IUser {
   const doc = {
@@ -83,6 +85,7 @@ export async function connectTestDb(): Promise<void> {
   mockUsers = [];
   mockRefreshTokens = [];
   mockAssessments = [];
+  mockReminderPreferences = [];
 
   // Spy & Mock User Model methods
   jest.spyOn(User, 'findOne').mockImplementation((filter: any) => {
@@ -289,17 +292,56 @@ export async function connectTestDb(): Promise<void> {
       ...data
     }) as any;
   });
+
+  // Spy & Mock ReminderPreferences Model methods
+  jest.spyOn(ReminderPreferences, 'findOne').mockImplementation((filter: any) => {
+    const userIdStr = filter?.userId?.toString();
+    const found = mockReminderPreferences.find((p) => p.userId?.toString() === userIdStr);
+    return Promise.resolve(found ? { ...found } : null) as any;
+  });
+
+  jest.spyOn(ReminderPreferences, 'create').mockImplementation((data: any) => {
+    const doc = {
+      _id: new mongoose.Types.ObjectId(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...data
+    };
+    mockReminderPreferences.push(doc);
+    return Promise.resolve({ ...doc }) as any;
+  });
+
+  jest.spyOn(ReminderPreferences, 'findOneAndUpdate').mockImplementation((filter: any, update: any) => {
+    const userIdStr = filter?.userId?.toString();
+    let match = mockReminderPreferences.find((p) => p.userId?.toString() === userIdStr);
+    const updateData = update?.$set || update || {};
+    if (!match) {
+      match = {
+        _id: new mongoose.Types.ObjectId(),
+        userId: filter.userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        ...updateData
+      };
+      mockReminderPreferences.push(match);
+    } else {
+      Object.assign(match, updateData, { updatedAt: new Date() });
+    }
+    return Promise.resolve({ ...match }) as any;
+  });
 }
 
 export async function clearTestDb(): Promise<void> {
   mockUsers = [];
   mockRefreshTokens = [];
   mockAssessments = [];
+  mockReminderPreferences = [];
 }
 
 export async function closeTestDb(): Promise<void> {
   mockUsers = [];
   mockRefreshTokens = [];
   mockAssessments = [];
+  mockReminderPreferences = [];
   jest.restoreAllMocks();
 }

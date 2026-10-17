@@ -24,7 +24,7 @@ export default function WelcomeScreen() {
           <Text style={styles.brandTitle}>VitaTrack</Text>
           <Text style={styles.brandTagline}>Vitamin D Self-Assessment & Solar Wellness</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>Phase 6 History, Trends &amp; Clinician Reports Operational</Text>
+            <Text style={styles.badgeText}>Phase 7 Smart Reminders &amp; Notification Schedulers Active</Text>
           </View>
         </View>
 
@@ -74,6 +74,15 @@ export default function WelcomeScreen() {
               >
                 <Text style={styles.guidanceActionButtonText}>
                   🥗 Personalized Guidance Hub (Diet, Sun, Exercise) &rarr;
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.remindersActionButton, { marginTop: 10, width: '100%' }]}
+                onPress={() => router.push('/reminders')}
+              >
+                <Text style={styles.remindersActionButtonText}>
+                  🔔 Smart Reminders &amp; Solar Exposure Schedulers &rarr;
                 </Text>
               </TouchableOpacity>
 
@@ -150,6 +159,13 @@ export default function WelcomeScreen() {
           </View>
 
           <View style={styles.card}>
+            <Text style={styles.cardTitle}>Context-Aware Notification System (Phase 7)</Text>
+            <Text style={styles.cardBody}>
+              Proactive scheduling for optimal daily sun windows, balanced nutrient-dense meals, clinician supplements, and periodic re-evaluations.
+            </Text>
+          </View>
+
+          <View style={styles.card}>
             <Text style={styles.cardTitle}>Academic Research Origin</Text>
             <Text style={styles.cardBody}>
               Designed by Satyam Kumar &amp; Shilpi Shikha (Supervised by Dr. Hoshiyar Singh, VGU Jaipur).
@@ -165,7 +181,7 @@ export default function WelcomeScreen() {
         </View>
 
         <Text style={styles.footerText}>
-          VitaTrack Mobile Client &bull; Phase 5 Completed &amp; Verified
+          VitaTrack Mobile Client &bull; Phase 7 Completed &amp; Verified
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -322,6 +338,19 @@ const styles = StyleSheet.create({
   },
   guidanceActionButtonText: {
     color: '#F0FDFA',
+    fontSize: 13,
+    fontWeight: '700'
+  },
+  remindersActionButton: {
+    backgroundColor: '#312E81',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#6366F1'
+  },
+  remindersActionButtonText: {
+    color: '#E0E7FF',
     fontSize: 13,
     fontWeight: '700'
   },

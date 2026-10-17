@@ -139,6 +139,16 @@ export const PersonalizedGuidanceScreen: React.FC = () => {
           </View>
         )}
 
+        {/* Phase 7 Reminders CTA */}
+        <TouchableOpacity
+          style={styles.remindersCtaButton}
+          onPress={() => router.push('/reminders')}
+        >
+          <Text style={styles.remindersCtaText}>
+            🔔 Set Daily Sunlight, Meal &amp; Supplement Reminders &rarr;
+          </Text>
+        </TouchableOpacity>
+
         {/* Footer Medical Disclaimer */}
         <View style={styles.disclaimerContainer}>
           <Text style={styles.disclaimerTitle}>Medical &amp; Safety Disclaimer</Text>
@@ -218,6 +228,21 @@ const styles = StyleSheet.create({
   },
   tabContentContainer: {
     marginTop: 8
+  },
+  remindersCtaButton: {
+    marginTop: 20,
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#6366F1',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: 'center'
+  },
+  remindersCtaText: {
+    color: '#818CF8',
+    fontSize: 13,
+    fontWeight: '700'
   },
   disclaimerContainer: {
     marginTop: 32,
