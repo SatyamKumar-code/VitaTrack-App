@@ -24,7 +24,7 @@ export default function WelcomeScreen() {
           <Text style={styles.brandTitle}>VitaSun</Text>
           <Text style={styles.brandTagline}>Vitamin D Self-Assessment & Solar Wellness</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>Phase 2 Auth & Profile Operational</Text>
+            <Text style={styles.badgeText}>Phase 3 Clinical Assessment Engine Operational</Text>
           </View>
         </View>
 
@@ -39,8 +39,19 @@ export default function WelcomeScreen() {
                 Logged in as {user.email} &bull; Skin {user.skinType.toUpperCase()} &bull;{' '}
                 {user.dietaryPreference}
               </Text>
+
+              {/* Phase 3 Primary CTA */}
               <TouchableOpacity
-                style={styles.profileButton}
+                style={styles.primaryActionButton}
+                onPress={() => router.push('/assessment')}
+              >
+                <Text style={styles.primaryActionButtonText}>
+                  Start Clinical Self-Assessment &rarr;
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.profileButton, { marginTop: 10 }]}
                 onPress={() => router.push('/profile')}
               >
                 <Text style={styles.profileButtonText}>Manage Health Baseline & Profile &rarr;</Text>
@@ -76,6 +87,13 @@ export default function WelcomeScreen() {
 
         {/* System Architecture Status Cards */}
         <View style={styles.cardContainer}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Phase 3 Clinical Questionnaire Active</Text>
+            <Text style={styles.cardBody}>
+              Interactive 4-step clinical wizard covering symptom inventory, solar irradiance habits, dietary bio-availability, and offline auto-save persistence.
+            </Text>
+          </View>
+
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Phase 2 Security & Vault Status</Text>
             <Text style={styles.cardBody}>

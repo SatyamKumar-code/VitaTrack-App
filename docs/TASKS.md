@@ -11,8 +11,8 @@
 |:---:|:---|:---:|:---:|
 | **Phase 0** | Requirements, Architecture & Complete Documentation | 6 | **COMPLETED** |
 | **Phase 1** | Project Scaffolding & Tooling Setup | 6 | **COMPLETED** |
-| **Phase 2** | Authentication, Security Vault & User Profile | 6 | `Planned` |
-| **Phase 3** | Clinical Self-Assessment Questionnaire Engine | 6 | `Planned` |
+| **Phase 2** | Authentication, Security Vault & User Profile | 6 | **COMPLETED** |
+| **Phase 3** | Clinical Self-Assessment Questionnaire Engine | 6 | **COMPLETED** |
 | **Phase 4** | Deterministic Risk Scoring & AI Explainer Engine | 6 | `Planned` |
 | **Phase 5** | Personalized Nutritional, Solar & Exercise Guidance | 5 | `Planned` |
 | **Phase 6** | History, Trend Analytics & Clinician PDF Reports | 5 | `Planned` |
@@ -105,26 +105,32 @@
 
 ---
 
-## Phase 3: Clinical Self-Assessment Questionnaire Engine (`Planned`)
+## Phase 3: Clinical Self-Assessment Questionnaire Engine (`Completed`)
 
-- [ ] **TASK-P3-01: Assessment Data Schema & Validation**  
+- [x] **TASK-P3-01: Assessment Data Schema & Validation**  
   *Description:* Build Mongoose schema for assessments and Zod validation schema matching PPT Step 1 parameters.  
-  *Status:* `Planned`
-- [ ] **TASK-P3-02: Assessment Submission Endpoint**  
+  *Verification:* Created `Assessment` model in `apps/backend/src/features/assessment/models/assessment.model.ts` with compound descending index `(userId, completedAt)` and Zod validator in `assessment.validation.ts`.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P3-02: Assessment Submission Endpoint**  
   *Description:* Implement `POST /api/v1/assessments` with authentication middleware and input validation.  
-  *Status:* `Planned`
-- [ ] **TASK-P3-03: Mobile Multi-Step Questionnaire UI Flow**  
+  *Verification:* Implemented `POST /api/v1/assessments`, `GET /api/v1/assessments/latest`, and `GET /api/v1/assessments/history` in `assessment.controller.ts`; verified with 6/6 integration tests in `tests/integration/assessment.test.ts`.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P3-03: Mobile Multi-Step Questionnaire UI Flow**  
   *Description:* Build multi-screen survey wizard with animated progress bar and slide transitions.  
-  *Status:* `Planned`
-- [ ] **TASK-P3-04: Symptom Input Components**  
+  *Verification:* Implemented `AssessmentWizardScreen.tsx`, `AssessmentProgressBar.tsx`, and Expo Router wrapper in `apps/mobile/app/assessment.tsx`.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P3-04: Symptom Input Components**  
   *Description:* Implement interactive rating cards for fatigue, bone pain, muscle weakness, mood, and infections.  
-  *Status:* `Planned`
-- [ ] **TASK-P3-05: Sunlight Exposure & Dietary Habits Components**  
+  *Verification:* Implemented `SymptomStep.tsx` with severity rating selectors (None, Mild, Moderate, Severe), clinical hints, and frequent infections indicator.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P3-05: Sunlight Exposure & Dietary Habits Components**  
   *Description:* Implement UI selectors for daily outdoor exposure, clothing coverage, and nutritional frequencies.  
-  *Status:* `Planned`
-- [ ] **TASK-P3-06: Offline Draft Auto-Save Feature**  
+  *Verification:* Implemented `SolarExposureStep.tsx` with minutes steppers/preset chips, time of day cards, clothing coverage selectors, and sunscreen toggle; implemented `DietaryHabitsStep.tsx` with steppers for fish, milk, eggs, and toggles for mushrooms and supplements.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P3-06: Offline Draft Auto-Save Feature**  
   *Description:* Save partial survey progress to local device storage, allowing resume on app reload.  
-  *Status:* `Planned`
+  *Verification:* Implemented `DraftStorage` in `draftStorage.ts` with automatic saving on input changes, resume draft prompt banner on reload, and clean purge on assessment completion.  
+  *Status:* `Completed` (2026-10-17)
 
 ---
 

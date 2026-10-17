@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import { User, IUser } from '../../src/features/auth/models/user.model';
 import { RefreshToken, IRefreshToken } from '../../src/features/auth/models/refreshToken.model';
+import { Assessment } from '../../src/features/assessment/models/assessment.model';
 
 // In-memory collections for fast, deterministic, self-contained testing
 interface MockUserData {
@@ -34,6 +35,7 @@ interface MockRefreshTokenData {
 
 let mockUsers: MockUserData[] = [];
 let mockRefreshTokens: MockRefreshTokenData[] = [];
+let mockAssessments: any[] = [];
 
 function createMockUserDoc(data: MockUserData): IUser {
   const doc = {
@@ -79,6 +81,7 @@ export async function connectTestDb(): Promise<void> {
   // Clear any existing data
   mockUsers = [];
   mockRefreshTokens = [];
+  mockAssessments = [];
 
   // Spy & Mock User Model methods
   jest.spyOn(User, 'findOne').mockImplementation((filter: any) => {
@@ -182,15 +185,85 @@ export async function connectTestDb(): Promise<void> {
     }
     return Promise.resolve({ matchedCount: count, modifiedCount: count }) as any;
   });
+
+  // Spy & Mock Assessment Model methods
+  jest.spyOn(Assessment, 'create').mockImplementation((data: any) => {
+    const doc: any = {
+      _id: new mongoose.Types.ObjectId(),
+      userId: data.userId,
+      completedAt: data.completedAt || new Date(),
+      symptoms: data.symptoms,
+      sunExposure: data.sunExposure,
+      dietaryHabits: data.dietaryHabits,
+      scoringResults: data.scoringResults,
+      aiExplanation: data.aiExplanation
+    };
+    mockAssessments.push(doc);
+    return Promise.resolve(doc) as any;
+  });
+
+  jest.spyOn(Assessment, 'findOne').mockImplementation((filter: any) => {
+    const userIdStr = filter?.userId?.toString();
+    const matches = mockAssessments
+      .filter((a) => !userIdStr || a.userId?.toString() === userIdStr)
+      .sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime());
+
+    const result = matches[0] || null;
+
+    return {
+      sort: () => Promise.resolve(result),
+      then: (resolve: any, reject: any) => Promise.resolve(result).then(resolve, reject)
+    } as any;
+  });
+
+  jest.spyOn(Assessment, 'countDocuments').mockImplementation((filter: any) => {
+    const userIdStr = filter?.userId?.toString();
+    const count = mockAssessments.filter(
+      (a) => !userIdStr || a.userId?.toString() === userIdStr
+    ).length;
+    return Promise.resolve(count) as any;
+  });
+
+  (jest.spyOn(Assessment, 'find') as any).mockImplementation((filter: any) => {
+    const userIdStr = filter?.userId?.toString();
+    const getMatches = () => {
+      return [...mockAssessments]
+        .filter((a) => !userIdStr || a.userId?.toString() === userIdStr)
+        .sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime());
+    };
+
+    let skipCount = 0;
+    let limitCount = 50;
+
+    const queryObj: any = {
+      sort: () => queryObj,
+      skip: (count: number) => {
+        skipCount = count;
+        return queryObj;
+      },
+      limit: (count: number) => {
+        limitCount = count;
+        return queryObj;
+      },
+      then: (resolve: any, reject: any) => {
+        const matches = getMatches().slice(skipCount, skipCount + limitCount);
+        return Promise.resolve(matches).then(resolve, reject);
+      }
+    };
+
+    return queryObj as any;
+  });
 }
 
 export async function clearTestDb(): Promise<void> {
   mockUsers = [];
   mockRefreshTokens = [];
+  mockAssessments = [];
 }
 
 export async function closeTestDb(): Promise<void> {
   mockUsers = [];
   mockRefreshTokens = [];
+  mockAssessments = [];
   jest.restoreAllMocks();
 }

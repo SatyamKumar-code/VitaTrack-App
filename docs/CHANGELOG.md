@@ -2,6 +2,21 @@
 
 All notable changes to the VitaTrack platform are documented in this file in adherence to the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] — 2026-10-17
+
+### Added
+- **Phase 3 Implementation: Clinical Self-Assessment Questionnaire Engine:**
+  - **Backend Assessment Mongoose Model:** Created `apps/backend/src/features/assessment/models/assessment.model.ts` implementing symptoms, solar exposure, dietary habits, preliminary scoring results, AI explanation, and compound descending index `(userId, completedAt)` strictly conforming to `DATABASE_SCHEMA.md`.
+  - **Zod Assessment Validator:** Created `apps/backend/src/features/assessment/validators/assessment.validation.ts` validating clinical symptom severities, UV exposure windows, and weekly nutritional frequencies.
+  - **Assessment Endpoints:** Implemented `POST /api/v1/assessments`, `GET /api/v1/assessments/latest`, and `GET /api/v1/assessments/history` in `assessment.controller.ts` & `assessment.service.ts` protected by `authenticate` middleware.
+  - **Mobile 4-Step Questionnaire Wizard:** Implemented `AssessmentWizardScreen.tsx`, `AssessmentProgressBar.tsx`, and route wrapper in `apps/mobile/app/assessment.tsx`.
+  - **Symptom Inventory Input Components:** Implemented `SymptomStep.tsx` with interactive cards for fatigue, bone/back pain, muscle weakness, mood changes, and frequent respiratory infections.
+  - **Solar & Dietary Input Components:** Implemented `SolarExposureStep.tsx` (outdoor minutes steppers/presets, time of day cards, clothing coverage visual pickers, sunscreen SPF 30+ toggle) and `DietaryHabitsStep.tsx` (fatty fish, fortified milk, egg yolk counters, UV-exposed mushrooms and supplement toggles).
+  - **Offline Auto-Save Persistence Engine:** Implemented `DraftStorage` in `apps/mobile/src/features/assessment/storage/draftStorage.ts` automatically auto-saving questionnaire progress, with a "Resume Draft" banner on app launch and automatic purge upon submission.
+  - **Automated Integration Test Suite:** Added 6 comprehensive integration tests in `apps/backend/tests/integration/assessment.test.ts` (30/30 total tests passing).
+
+---
+
 ## [0.3.0] — 2026-10-17
 
 ### Added

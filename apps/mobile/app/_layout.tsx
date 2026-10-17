@@ -44,6 +44,13 @@ export default function RootLayout() {
               headerShown: false
             }}
           />
+          <Stack.Screen
+            name="assessment"
+            options={{
+              title: 'Clinical Assessment',
+              headerShown: false
+            }}
+          />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>
