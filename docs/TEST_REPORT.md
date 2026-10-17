@@ -1,6 +1,6 @@
 # TEST_REPORT.md — Quality Assurance Execution & Test Results Ledger
 
-> **Project:** VitaSun — Self-Diagnosis & Guidance Platform for Vitamin D Deficiency  
+> **Project:** VitaTrack — Self-Diagnosis & Guidance Platform for Vitamin D Deficiency  
 > **Status:** Phase 2 Complete (Auth, Security Vault & Profile Verified)  
 > **Test Runner Status:** **ACTIVE (Phase 1 & Phase 2 Tests 100% Passed: 24/24)**
 

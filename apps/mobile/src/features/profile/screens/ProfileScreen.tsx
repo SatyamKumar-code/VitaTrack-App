@@ -116,7 +116,7 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = async () => {
-    Alert.alert('Sign Out', 'Are you sure you want to log out of VitaSun?', [
+    Alert.alert('Sign Out', 'Are you sure you want to log out of VitaTrack?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Sign Out',
@@ -305,13 +305,13 @@ export default function ProfileScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Sign Out of VitaSun</Text>
+            <Text style={styles.logoutButtonText}>Sign Out of VitaTrack</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.privacyNote}>
           <Text style={styles.privacyNoteText}>
-            🔒 VitaSun operates under strict Zero-PHI privacy boundaries. Your clinical baseline is encrypted and never accessible to administrative telemetry.
+            🔒 VitaTrack operates under strict Zero-PHI privacy boundaries. Your clinical baseline is encrypted and never accessible to administrative telemetry.
           </Text>
         </View>
       </ScrollView>

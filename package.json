@@ -1,8 +1,8 @@
 {
-  "name": "vitasun-monorepo",
+  "name": "VitaTrack-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "VitaSun - Self-Diagnosis & Guidance Platform for Vitamin D Deficiency",
+  "description": "VitaTrack - Self-Diagnosis & Guidance Platform for Vitamin D Deficiency",
   "workspaces": [
     "apps/*"
   ],
@@ -19,7 +19,7 @@
     "mobile:tunnel": "npm run start:tunnel --workspace=apps/mobile"
   },
   "keywords": [
-    "vitasun",
+    "VitaTrack",
     "vitamin-d",
     "health",
     "expo",

@@ -1,5 +1,5 @@
 /**
- * VitaSun Clinical Risk Scoring Rules & Weight Constants
+ * VitaTrack Clinical Risk Scoring Rules & Weight Constants
  * Reference: VGU Vitamin D Study, Slide 6 (Methodology) & Slide 7 (Sample User Analysis Table)
  * Architecture Reference: ARCHITECTURE.md Section 5 (Two-Tier Risk Scoring Engine)
  */

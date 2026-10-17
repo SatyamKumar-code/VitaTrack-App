@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { 
-  Activity, 
-  ShieldCheck, 
-  Server, 
-  Database, 
-  Cpu, 
-  Clock, 
-  CheckCircle2, 
-  AlertTriangle 
+import {
+  Activity,
+  ShieldCheck,
+  Server,
+  Database,
+  Cpu,
+  Clock,
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
 
 export default function App() {
@@ -45,7 +45,7 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-xl font-bold font-['Outfit'] tracking-tight flex items-center gap-2">
-              VitaSun <span className="text-xs bg-amber-500/20 text-amber-400 font-semibold px-2 py-0.5 rounded-full border border-amber-500/30">Phase 1 Foundation</span>
+              VitaTrack <span className="text-xs bg-amber-500/20 text-amber-400 font-semibold px-2 py-0.5 rounded-full border border-amber-500/30">Phase 1 Foundation</span>
             </h1>
             <p className="text-xs text-slate-400">Technical Operations & Telemetry Portal</p>
           </div>
@@ -168,7 +168,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-slate-900 py-4 px-6 text-center text-xs text-slate-500">
-        VitaSun Clinical Platform &bull; Academic Research Origin: VGU Jaipur &bull; Strictly for Technical Observability (Zero-PHI)
+        VitaTrack Clinical Platform &bull; Academic Research Origin: VGU Jaipur &bull; Strictly for Technical Observability (Zero-PHI)
       </footer>
     </div>
   );

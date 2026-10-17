@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { AssessmentDraft } from '../types/assessment.types';
 
-const DRAFT_STORAGE_KEY = 'vitasun_assessment_draft';
+const DRAFT_STORAGE_KEY = 'VitaTrack_assessment_draft';
 
 // Fallback in-memory storage for web/node environments
 let inMemoryDraft: string | null = null;

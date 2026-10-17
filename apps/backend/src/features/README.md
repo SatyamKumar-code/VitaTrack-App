@@ -1,4 +1,4 @@
-# VitaSun Backend Features Directory
+# VitaTrack Backend Features Directory
 
 This directory hosts business domain features following the **Feature-First (Vertical Slice) Architecture**:
 

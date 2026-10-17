@@ -17,7 +17,7 @@ async function bootstrap() {
 
   const server = app.listen(config.port, () => {
     logger.info(`===============================================`);
-    logger.info(`  VitaSun Backend API running in [${config.nodeEnv}]`);
+    logger.info(`  VitaTrack Backend API running in [${config.nodeEnv}]`);
     logger.info(`  Listening on: http://localhost:${config.port}`);
     logger.info(`  Health check: http://localhost:${config.port}/health`);
     logger.info(`  API Prefix:   ${config.apiPrefix}`);

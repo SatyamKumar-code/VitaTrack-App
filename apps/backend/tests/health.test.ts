@@ -9,7 +9,7 @@ describe('Health Check API Suite', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('status', 'ok');
-    expect(res.body).toHaveProperty('service', 'VitaSun API');
+    expect(res.body).toHaveProperty('service', 'VitaTrack API');
     expect(res.body).toHaveProperty('version', '0.1.0');
     expect(res.body).toHaveProperty('phase', 'Phase 1 - Foundation & Tooling');
     expect(res.body).toHaveProperty('uptimeSeconds');
@@ -21,7 +21,7 @@ describe('Health Check API Suite', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('status', 'ok');
-    expect(res.body).toHaveProperty('service', 'VitaSun API');
+    expect(res.body).toHaveProperty('service', 'VitaTrack API');
   });
 
   it('GET /non-existent-route should return 404 with structured JSON', async () => {

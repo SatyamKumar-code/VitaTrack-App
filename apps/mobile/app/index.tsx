@@ -21,7 +21,7 @@ export default function WelcomeScreen() {
 
         {/* Title & Tagline */}
         <View style={styles.header}>
-          <Text style={styles.brandTitle}>VitaSun</Text>
+          <Text style={styles.brandTitle}>VitaTrack</Text>
           <Text style={styles.brandTagline}>Vitamin D Self-Assessment & Solar Wellness</Text>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>Phase 4 Risk Scoring &amp; AI Explainer Operational</Text>
@@ -143,13 +143,13 @@ export default function WelcomeScreen() {
           <View style={styles.disclaimerCard}>
             <Text style={styles.disclaimerTitle}>Medical & Safety Disclaimer</Text>
             <Text style={styles.disclaimerBody}>
-              VitaSun is an informational self-assessment screening and lifestyle guidance aid. It does not provide medical diagnoses or replace laboratory blood serum testing.
+              VitaTrack is an informational self-assessment screening and lifestyle guidance aid. It does not provide medical diagnoses or replace laboratory blood serum testing.
             </Text>
           </View>
         </View>
 
         <Text style={styles.footerText}>
-          VitaSun Mobile Client &bull; Phase 5 Completed &amp; Verified
+          VitaTrack Mobile Client &bull; Phase 5 Completed &amp; Verified
         </Text>
       </ScrollView>
     </SafeAreaView>

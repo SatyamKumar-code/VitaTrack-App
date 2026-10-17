@@ -37,7 +37,7 @@ export function createApp(): Application {
     const dbStatus = DatabaseManager.getStatus();
     return {
       status: 'ok',
-      service: 'VitaSun API',
+      service: 'VitaTrack API',
       version: '0.1.0',
       phase: 'Phase 1 - Foundation & Tooling',
       environment: config.nodeEnv,
@@ -70,7 +70,7 @@ export function createApp(): Application {
     res.status(404).json({
       success: false,
       error: {
-        message: `Route ${req.method} ${req.originalUrl} not found on VitaSun API.`,
+        message: `Route ${req.method} ${req.originalUrl} not found on VitaTrack API.`,
         statusCode: 404
       }
     });

@@ -1,4 +1,4 @@
-# VitaSun Mobile Features Directory
+# VitaTrack Mobile Features Directory
 
 This directory hosts business domain features following the **Feature-First (Vertical Slice) Architecture**:
 

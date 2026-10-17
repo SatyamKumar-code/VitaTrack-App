@@ -2,9 +2,9 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 const STORAGE_KEYS = {
-  ACCESS_TOKEN: 'vitasun_access_token',
-  REFRESH_TOKEN: 'vitasun_refresh_token',
-  USER_DATA: 'vitasun_user_data'
+  ACCESS_TOKEN: 'VitaTrack_access_token',
+  REFRESH_TOKEN: 'VitaTrack_refresh_token',
+  USER_DATA: 'VitaTrack_user_data'
 };
 
 // Memory fallback for platforms where SecureStore is unavailable (e.g. standard Web preview)

@@ -27,7 +27,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="index"
             options={{
-              title: 'VitaSun',
+              title: 'VitaTrack',
               headerShown: false
             }}
           />

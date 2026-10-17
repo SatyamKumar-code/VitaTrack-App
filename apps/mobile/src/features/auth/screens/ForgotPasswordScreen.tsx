@@ -58,7 +58,7 @@ export default function ForgotPasswordScreen() {
           <View style={styles.successBox}>
             <Text style={styles.successTitle}>Request Initiated</Text>
             <Text style={styles.successMessage}>
-              If an account with that email exists in the VitaSun database, password recovery instructions have been dispatched.
+              If an account with that email exists in the VitaTrack database, password recovery instructions have been dispatched.
             </Text>
             <TouchableOpacity
               style={styles.returnButton}

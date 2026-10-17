@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "VitaSun Technical Administration & Telemetry Portal",
+  "description": "VitaTrack Technical Administration & Telemetry Portal",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

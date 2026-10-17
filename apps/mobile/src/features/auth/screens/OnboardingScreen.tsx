@@ -64,7 +64,7 @@ export default function OnboardingScreen() {
     <SafeAreaView style={styles.container}>
       {/* Top Header / Skip */}
       <View style={styles.topBar}>
-        <Text style={styles.logoText}>VitaSun</Text>
+        <Text style={styles.logoText}>VitaTrack</Text>
         {!isLastSlide ? (
           <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
             <Text style={styles.skipText}>Skip</Text>
