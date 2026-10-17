@@ -2,6 +2,24 @@
 
 All notable changes to the VitaTrack platform are documented in this file in adherence to the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] — 2026-10-17
+
+### Added
+- **Phase 4 Implementation: Deterministic Risk Scoring & AI Explainer Engine:**
+  - **Deterministic Scoring Rules & Weights Config:** Created `apps/backend/src/features/assessment/scoring/scoringRules.config.ts` establishing mathematical weights for symptom severity ($0–45$), solar deficit ($0–25$), dietary deficit ($0–20$), and medical multipliers ($0–10$).
+  - **Core Deterministic Scoring Engine:** Implemented `DeterministicScoringEngine` in `apps/backend/src/features/assessment/scoring/deterministicScoring.engine.ts` calculating multi-factor composite risk scores ($0–100$), stratified risk tiers (`low`, `moderate`, `high`), and clinical consultation requirement flags with urgency markers (`routine_monitoring`, `recommended_within_2_weeks`, `urgent_medical_evaluation`).
+  - **Risk Scoring Service Façade:** Created `RiskScoringService` in `apps/backend/src/features/assessment/services/riskScoringService.ts` unifying deterministic scoring and sub-score exports.
+  - **AI Explainer Service (Google Gemini Flash Proxy):** Implemented `AiExplainerService` in `apps/backend/src/features/assessment/scoring/aiExplainer.service.ts` invoking the Google Gemini API with Zero-PHI sanitized clinical prompt engineering, strict anti-hallucination guardrails, and deterministic clinical rule fallback synthesis for offline resilience.
+  - **Integrated Backend Assessment Flow:** Updated `AssessmentService.ts` to seamlessly compute deterministic scores with full demographic context (age, skin phototype, diet, medical conditions) and persist AI explanations.
+  - **Mobile Circular SVG Risk Gauge:** Implemented `RiskScoreGauge.tsx` using `react-native-svg` featuring smooth cubic easing arc animation, glowing ambient backdrop, large centered score readout ($0–100$), and subscore progress indicators.
+  - **Mobile Stratified Risk Level Badge:** Created `RiskLevelBadge.tsx` displaying glowing pill indicators with distinct icons for Low, Moderate, and High Risk tiers.
+  - **Mobile Doctor Consultation Warning Banner:** Built `DoctorAlertBanner.tsx` featuring high-visibility clinical advisories, action timeline pills, serum 25(OH)D reference range education, and non-diagnostic disclaimers.
+  - **Mobile AI Insights Synthesis Card:** Implemented `KeyContributorsCard.tsx` presenting synthesized plain-language summaries and structured primary contributor factor badges.
+  - **Mobile Assessment Results Screen & Route:** Built `AssessmentResultScreen.tsx` and Expo Router route `apps/mobile/app/results.tsx` with instant transition from assessment completion and dashboard links.
+  - **Comprehensive Scoring Engine Test Suite (36 Tests):** Created `apps/backend/tests/unit/scoring.test.ts` validating mandatory test cases `TC-SCORE-01` to `TC-SCORE-04`, PPT Slide 7 user profile ($62/100$, Moderate Risk), boundary transitions ($39 \to 40$, $69 \to 70$), clamping $[0, 100]$, and AI fallback logic with 100% pass rate (66/66 total backend tests passing).
+
+---
+
 ## [0.4.0] — 2026-10-17
 
 ### Added

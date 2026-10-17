@@ -138,7 +138,7 @@ export const AssessmentWizardScreen: React.FC = () => {
   };
 
   const handleFinish = () => {
-    router.replace('/');
+    router.replace('/results');
   };
 
   const currentInfo = STEP_INFO[draft.currentStep - 1] || STEP_INFO[0];

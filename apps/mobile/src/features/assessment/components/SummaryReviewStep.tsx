@@ -252,7 +252,7 @@ export const SummaryReviewStep: React.FC<SummaryReviewStepProps> = ({
                 onPress={onFinish}
                 activeOpacity={0.8}
               >
-                <Text style={styles.modalConfirmBtnText}>Return to Dashboard</Text>
+                <Text style={styles.modalConfirmBtnText}>View Full Clinical Evaluation &rarr;</Text>
               </TouchableOpacity>
             </View>
           </View>

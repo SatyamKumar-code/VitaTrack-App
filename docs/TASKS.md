@@ -13,7 +13,7 @@
 | **Phase 1** | Project Scaffolding & Tooling Setup | 6 | **COMPLETED** |
 | **Phase 2** | Authentication, Security Vault & User Profile | 6 | **COMPLETED** |
 | **Phase 3** | Clinical Self-Assessment Questionnaire Engine | 6 | **COMPLETED** |
-| **Phase 4** | Deterministic Risk Scoring & AI Explainer Engine | 6 | `Planned` |
+| **Phase 4** | Deterministic Risk Scoring & AI Explainer Engine | 6 | **COMPLETED** |
 | **Phase 5** | Personalized Nutritional, Solar & Exercise Guidance | 5 | `Planned` |
 | **Phase 6** | History, Trend Analytics & Clinician PDF Reports | 5 | `Planned` |
 | **Phase 7** | Context-Aware Reminders & Notification System | 4 | `Planned` |
@@ -134,26 +134,32 @@
 
 ---
 
-## Phase 4: Deterministic Risk Scoring & AI Explainer Engine (`Planned`)
+## Phase 4: Deterministic Risk Scoring & AI Explainer Engine (COMPLETED)
 
-- [ ] **TASK-P4-01: Implement Core Deterministic Scoring Algorithm**  
+- [x] **TASK-P4-01: Implement Core Deterministic Scoring Algorithm**  
   *Description:* Code the weighted multi-factor scoring formula ($0–100$) in backend `services/riskScoringService.ts`.  
-  *Status:* `Planned`
-- [ ] **TASK-P4-02: Risk Stratification & Clinical Consultation Alert Logic**  
+  *Verification:* Implemented `deterministicScoring.engine.ts` and `riskScoringService.ts` evaluating symptom severity ($0–45$), solar deficit ($0–25$), dietary deficit ($0–20$), and medical multipliers ($0–10$), clamped strictly to $[0, 100]$.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P4-02: Risk Stratification & Clinical Consultation Alert Logic**  
   *Description:* Implement logic classifying scores into Low, Moderate, High, and triggering mandatory doctor alerts.  
-  *Status:* `Planned`
-- [ ] **TASK-P4-03: AI Explainer Service Integration**  
+  *Verification:* Configured strict tier thresholds in `scoringRules.config.ts` (Low: 0–39, Moderate: 40–69, High: 70–100) with automatic doctor consultation triggers and urgency tagging (`routine_monitoring`, `recommended_within_2_weeks`, `urgent_medical_evaluation`).  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P4-03: AI Explainer Service Integration**  
   *Description:* Implement backend proxy calling Google Gemini API to synthesize patient-friendly risk explanations.  
-  *Status:* `Planned`
-- [ ] **TASK-P4-04: Mobile Assessment Results Screen**  
+  *Verification:* Implemented `aiExplainer.service.ts` connecting to Google Gemini 1.5 Flash with Zero-PHI sanitized clinical prompt engineering, strict anti-hallucination guardrails, and deterministic clinical rule fallback.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P4-04: Mobile Assessment Results Screen**  
   *Description:* Build interactive results view with circular SVG gauge, risk level badge, and primary contributors breakdown.  
-  *Status:* `Planned`
-- [ ] **TASK-P4-05: Doctor Consultation Warning Banner**  
+  *Verification:* Built `AssessmentResultScreen.tsx` with animated SVG arc gauge (`RiskScoreGauge.tsx`), stratified badge (`RiskLevelBadge.tsx`), and key factor breakdown (`KeyContributorsCard.tsx`), wired into Expo Router via `/results`.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P4-05: Doctor Consultation Warning Banner**  
   *Description:* Render high-visibility clinical consultation advisory banner with educational guidance on lab testing.  
-  *Status:* `Planned`
-- [ ] **TASK-P4-06: Comprehensive Unit Tests for Scoring Engine**  
+  *Verification:* Created `DoctorAlertBanner.tsx` featuring high-visibility clinical alerts, action timeline pills, serum 25(OH)D reference range education (&lt;20 ng/mL deficient, 20–29 insufficient, 30–50 sufficient), and mandatory non-diagnostic disclaimers.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P4-06: Comprehensive Unit Tests for Scoring Engine**  
   *Description:* Author Jest test vectors asserting deterministic score calculation across 20+ clinical edge cases.  
-  *Status:* `Planned`
+  *Verification:* Created `tests/unit/scoring.test.ts` executing 36 comprehensive test vectors verifying TC-SCORE-01 to TC-SCORE-04, Slide 7 profile, boundary transitions, and AI explainer fallbacks with 100% pass rate.  
+  *Status:* `Completed` (2026-10-17)
 
 ---
 

@@ -1,12 +1,18 @@
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import { TokenStorage } from '../../../shared/storage/secureStore';
 import {
   AssessmentPayload,
   AssessmentResponse
 } from '../types/assessment.types';
 
+// Dynamically resolves host IP so physical devices on Expo Go can communicate with backend
+const hostUri = Constants.expoConfig?.hostUri;
+const host = hostUri ? hostUri.split(':')[0] : 'localhost';
 const DEFAULT_API_BASE =
-  Platform.OS === 'android' ? 'http://10.0.2.2:4000/api/v1' : 'http://localhost:4000/api/v1';
+  process.env.EXPO_PUBLIC_API_URL && !process.env.EXPO_PUBLIC_API_URL.includes('localhost')
+    ? process.env.EXPO_PUBLIC_API_URL
+    : `http://${host}:4000/api/v1`;
 
 export const AssessmentApi = {
   /**

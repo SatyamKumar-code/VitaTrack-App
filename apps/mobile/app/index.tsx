@@ -24,7 +24,7 @@ export default function WelcomeScreen() {
           <Text style={styles.brandTitle}>VitaSun</Text>
           <Text style={styles.brandTagline}>Vitamin D Self-Assessment & Solar Wellness</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>Phase 3 Clinical Assessment Engine Operational</Text>
+            <Text style={styles.badgeText}>Phase 4 Risk Scoring &amp; AI Explainer Operational</Text>
           </View>
         </View>
 
@@ -40,13 +40,22 @@ export default function WelcomeScreen() {
                 {user.dietaryPreference}
               </Text>
 
-              {/* Phase 3 Primary CTA */}
+              {/* Phase 3 & 4 Primary CTAs */}
               <TouchableOpacity
                 style={styles.primaryActionButton}
                 onPress={() => router.push('/assessment')}
               >
                 <Text style={styles.primaryActionButtonText}>
                   Start Clinical Self-Assessment &rarr;
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.outlineActionButton, { marginTop: 10, width: '100%' }]}
+                onPress={() => router.push('/results')}
+              >
+                <Text style={styles.outlineActionButtonText}>
+                  📊 View Latest Clinical Risk Results &rarr;
                 </Text>
               </TouchableOpacity>
 
@@ -87,6 +96,13 @@ export default function WelcomeScreen() {
 
         {/* System Architecture Status Cards */}
         <View style={styles.cardContainer}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Phase 4 Deterministic Risk &amp; AI Explainer</Text>
+            <Text style={styles.cardBody}>
+              Two-tier risk calculation engine with animated circular SVG gauge, clinical consultation alert rules, and zero-PHI AI diagnostic synthesis.
+            </Text>
+          </View>
+
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Phase 3 Clinical Questionnaire Active</Text>
             <Text style={styles.cardBody}>
