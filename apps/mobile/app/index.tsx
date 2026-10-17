@@ -60,6 +60,15 @@ export default function WelcomeScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
+                style={[styles.guidanceActionButton, { marginTop: 10, width: '100%' }]}
+                onPress={() => router.push('/guidance')}
+              >
+                <Text style={styles.guidanceActionButtonText}>
+                  🥗 Personalized Guidance Hub (Diet, Sun, Exercise) &rarr;
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 style={[styles.profileButton, { marginTop: 10 }]}
                 onPress={() => router.push('/profile')}
               >
@@ -97,6 +106,13 @@ export default function WelcomeScreen() {
         {/* System Architecture Status Cards */}
         <View style={styles.cardContainer}>
           <View style={styles.card}>
+            <Text style={styles.cardTitle}>Phase 5 Personalized Guidance Hub Active</Text>
+            <Text style={styles.cardBody}>
+              Omnivore/vegetarian/vegan bioavailable nutrition engine, phototype-calibrated solar countdown timer, and osteogenic exercise guide module fully active.
+            </Text>
+          </View>
+
+          <View style={styles.card}>
             <Text style={styles.cardTitle}>Phase 4 Deterministic Risk &amp; AI Explainer</Text>
             <Text style={styles.cardBody}>
               Two-tier risk calculation engine with animated circular SVG gauge, clinical consultation alert rules, and zero-PHI AI diagnostic synthesis.
@@ -133,7 +149,7 @@ export default function WelcomeScreen() {
         </View>
 
         <Text style={styles.footerText}>
-          VitaSun Mobile Client &bull; Phase 2 Completed &amp; Verified
+          VitaSun Mobile Client &bull; Phase 5 Completed &amp; Verified
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -266,6 +282,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 12,
     textAlign: 'center'
+  },
+  guidanceActionButton: {
+    backgroundColor: '#0F766E',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#14B8A6'
+  },
+  guidanceActionButtonText: {
+    color: '#F0FDFA',
+    fontSize: 13,
+    fontWeight: '700'
   },
   profileButton: {
     backgroundColor: Colors.clinical.teal,

@@ -14,7 +14,7 @@
 | **Phase 2** | Authentication, Security Vault & User Profile | 6 | **COMPLETED** |
 | **Phase 3** | Clinical Self-Assessment Questionnaire Engine | 6 | **COMPLETED** |
 | **Phase 4** | Deterministic Risk Scoring & AI Explainer Engine | 6 | **COMPLETED** |
-| **Phase 5** | Personalized Nutritional, Solar & Exercise Guidance | 5 | `Planned` |
+| **Phase 5** | Personalized Nutritional, Solar & Exercise Guidance | 5 | **COMPLETED** |
 | **Phase 6** | History, Trend Analytics & Clinician PDF Reports | 5 | `Planned` |
 | **Phase 7** | Context-Aware Reminders & Notification System | 4 | `Planned` |
 | **Phase 8** | Smartwatch Integration via Android Health Connect | 6 | `Planned` |
@@ -163,23 +163,28 @@
 
 ---
 
-## Phase 5: Personalized Nutritional, Solar & Exercise Guidance (`Planned`)
+## Phase 5: Personalized Nutritional, Solar & Exercise Guidance (`Completed`)
 
-- [ ] **TASK-P5-01: Nutritional Recommendation Engine**  
+- [x] **TASK-P5-01: Nutritional Recommendation Engine**  
   *Description:* Generate customized diet suggestions (Omnivore, Vegetarian, Vegan) emphasizing bioavailable Vitamin D.  
-  *Status:* `Planned`
-- [ ] **TASK-P5-02: Safe Sunlight Exposure Calculator**  
+  *Verification:* Created `NutritionalEngine.ts` with evidence-based profiles for Vegan (UV mushrooms, fortified plant milk, lichen D3), Vegetarian (fortified dairy, pastured eggs, mushrooms), and Omnivore (wild salmon, mackerel, sardines), complete with Magnesium & Vitamin K2 (MK-7) bone-axis co-factors and lipid micellar absorption guidance.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P5-02: Safe Sunlight Exposure Calculator**  
   *Description:* Implement solar guidance based on user skin phototype and conservative UV exposure guidelines.  
-  *Status:* `Planned`
-- [ ] **TASK-P5-03: Musculoskeletal Exercise Guide Module**  
+  *Verification:* Built `SolarCalculatorEngine.ts` calibrating daily safe exposure duration across Fitzpatrick Phototypes I through VI (10 min for Type I up to 38 min for Type VI), optimal solar windows (10:00–11:30 AM / 2:30–3:30 PM), conservative UV Index > 8 warnings, and sunscreen timing advice.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P5-03: Musculoskeletal Exercise Guide Module**  
   *Description:* Curate weight-bearing and outdoor exercise routines designed to support bone mineral density.  
-  *Status:* `Planned`
-- [ ] **TASK-P5-04: Mobile Guidance & Diet Tabs UI**  
+  *Verification:* Created `ExerciseGuideModule.ts` curating weight-bearing outdoor walking with solar synergy, bodyweight squats, resistance band training, stair climbing, and gentle mobility tailored dynamically based on reported bone pain and muscle weakness severity.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P5-04: Mobile Guidance & Diet Tabs UI**  
   *Description:* Build rich mobile screens displaying meal cards, sunlight timers, and exercise walkthroughs.  
-  *Status:* `Planned`
-- [ ] **TASK-P5-05: Educational Content Hub**  
+  *Verification:* Built `PersonalizedGuidanceScreen.tsx` with `SegmentedTabSelector.tsx`, `DietGuidanceCard.tsx` with diet switcher pills and daily IU banner, `SunlightExposureTracker.tsx` with animated SVG circular countdown timer and completion alerts, and `ExerciseRoutinesView.tsx` with osteogenic mechanism walkthroughs. Connected to Expo Router via `/guidance`.  
+  *Status:* `Completed` (2026-10-17)
+- [x] **TASK-P5-05: Educational Content Hub**  
   *Description:* Create in-app educational reading cards explaining Vitamin D synthesis, testing, and health benefits.  
-  *Status:* `Planned`
+  *Verification:* Implemented `EducationalKnowledgeBase.ts` (backend) and `EducationalHubView.tsx` (mobile) delivering 5 comprehensive clinical guides with category filtering, reading time estimates, section breakdowns, key clinical takeaways, and peer-reviewed citations.  
+  *Status:* `Completed` (2026-10-17)
 
 ---
 

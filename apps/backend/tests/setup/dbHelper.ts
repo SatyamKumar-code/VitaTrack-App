@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { User, IUser } from '../../src/features/auth/models/user.model';
 import { RefreshToken, IRefreshToken } from '../../src/features/auth/models/refreshToken.model';
 import { Assessment } from '../../src/features/assessment/models/assessment.model';
+import { Recommendation } from '../../src/features/guidance/models/recommendation.model';
 
 // In-memory collections for fast, deterministic, self-contained testing
 interface MockUserData {
@@ -252,6 +253,14 @@ export async function connectTestDb(): Promise<void> {
     };
 
     return queryObj as any;
+  });
+
+  // Spy & Mock Recommendation Model methods
+  jest.spyOn(Recommendation, 'create').mockImplementation((data: any) => {
+    return Promise.resolve({
+      _id: new mongoose.Types.ObjectId(),
+      ...data
+    }) as any;
   });
 }
 

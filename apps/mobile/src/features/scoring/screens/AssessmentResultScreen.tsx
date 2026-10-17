@@ -157,6 +157,14 @@ export const AssessmentResultScreen: React.FC<AssessmentResultScreenProps> = ({ 
         {/* Action Buttons */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity
+            style={styles.guidanceBtn}
+            onPress={() => router.push('/guidance')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.guidanceBtnText}>View Personalized Guidance &rarr;</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={styles.primaryBtn}
             onPress={() => router.push('/assessment')}
             activeOpacity={0.8}
@@ -268,6 +276,22 @@ const styles = StyleSheet.create({
   actionsContainer: {
     marginTop: 20,
     gap: 12
+  },
+  guidanceBtn: {
+    backgroundColor: Colors.clinical.teal,
+    borderRadius: 14,
+    paddingVertical: 15,
+    alignItems: 'center',
+    shadowColor: Colors.clinical.teal,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4
+  },
+  guidanceBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '800'
   },
   primaryBtn: {
     backgroundColor: Colors.primary.amber,

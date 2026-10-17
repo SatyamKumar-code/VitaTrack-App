@@ -98,8 +98,8 @@ Ran all test suites.
 | `TC-SCORE-04` | Unit: Scoring | Score boundary clamping to $[0, 100]$ | Phase 4 | **PASSED** | 2026-10-17 | **PASS** | Clamped strictly to $[0, 100]$ across extreme ranges |
 | `TC-ASSESS-01`| Integration: Assessment | Complete assessment submission & persistence | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | 201 Created with deterministic score & AI explanation |
 | `TC-ASSESS-02`| Integration: Assessment | Rejection of malformed assessment payload | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | 400 Bad Request with Zod schema validation errors |
-| `TC-REC-01` | Unit: Guidance | Vegan nutrition plan generation | Phase 5 | `PENDING / NOT RUN` | — | — | Awaiting Phase 5 authorization |
-| `TC-REC-02` | Unit: Guidance | Sun exposure duration by Fitzpatrick type | Phase 5 | `PENDING / NOT RUN` | — | — | Awaiting Phase 5 authorization |
+| `TC-REC-01` | Unit: Guidance | Vegan nutrition plan generation | Phase 5 | **PASSED** | 2026-10-17 | **PASS** | Includes UV mushrooms, fortified plant milk, lichen D3; 0 fish/dairy/meat |
+| `TC-REC-02` | Unit: Guidance | Sun exposure duration by Fitzpatrick type | Phase 5 | **PASSED** | 2026-10-17 | **PASS** | Type I receives 10m; Type VI receives 38m; monotonic scaling; SPF rules |
 | `TC-WEAR-01` | Integration: Wearable | Ingest valid Health Connect biometrics | Phase 8 | `PENDING / NOT RUN` | — | — | Awaiting Phase 8 authorization |
 | `TC-WEAR-02` | Integration: Wearable | Reject physiologically invalid biometric data | Phase 8 | `PENDING / NOT RUN` | — | — | Awaiting Phase 8 authorization |
 | `TC-PRIV-01` | Security: Privacy | Admin metrics endpoint returns zero PHI | Phase 9 | `PENDING / NOT RUN` | — | — | Awaiting Phase 9 authorization |
@@ -114,16 +114,26 @@ Ran all test suites.
 
 ## 3. Test Execution Summary Metrics
 
-- **Total Test Suites Executed (Backend):** 8 passed, 8 total
-- **Total Tests Passed (Backend):** 66 passed, 66 total (100% pass rate)
+- **Total Test Suites Executed (Backend):** 10 passed, 10 total
+- **Total Tests Passed (Backend):** 83 passed, 83 total (100% pass rate)
 - **Scoring Engine Tests:** 36 passed (asserting TC-SCORE-01 to TC-SCORE-04 + 32 granular clinical permutations)
-- **Mobile TypeScript Verification:** 0 errors (`npx tsc --noEmit` clean)
-- **Backend Production Build:** Clean compilation (`rimraf dist && tsc` clean)
+- **Personalized Guidance Tests:** 17 passed (11 unit tests in `guidance.test.ts` + 6 integration tests in `recommendations.test.ts`)
+- **Mobile TypeScript Verification:** 0 errors (`npx tsc --noEmit` clean across all guidance components & routes)
+- **Backend Production Build:** Clean compilation (`npx tsc --noEmit` clean)
 
-### Execution Record: Phase 4 (2026-10-17)
-- **Authorizing Prompt:** "implement Phase 4 only."
+### Execution Record: Phase 5 (2026-10-17)
+- **Authorizing Prompt:** "implement Phase 5 only."
 - **Environment:** Node v22.x, Jest v29.7.0, Windows local runner
+- **Scope Implemented & Verified:**
+  - `NutritionalEngine`: Evidence-based diets (Omnivore, Vegetarian, Vegan), Magnesium & K2 co-factors, target daily IU calibration.
+  - `SolarCalculatorEngine`: Safe sunlight exposure duration by Fitzpatrick phototypes I–VI, conservative UV Index > 8 warnings, sunscreen application rules.
+  - `ExerciseGuideModule`: Osteogenic mechanotransduction routines tailored to patient bone pain & muscle weakness.
+  - `EducationalKnowledgeBase`: 5 evidence-based clinical articles with key takeaways and citations.
+  - `GuidanceApi` & `PersonalizedGuidanceScreen`: Segmented tabs, diet switcher pills, interactive SVG countdown exposure timer, and in-app article reader modal.
 - **Suites Executed:**
+  - `tests/unit/scoring.test.ts` (36 tests)
+  - `tests/unit/guidance.test.ts` (11 tests)
+  - `tests/integration/recommendations.test.ts` (6 tests)
   - `tests/unit/scoring.test.ts` (36 tests)
   - `tests/integration/assessment.test.ts` (6 tests)
   - `tests/integration/auth.test.ts` (7 tests)
@@ -132,13 +142,13 @@ Ran all test suites.
   - `tests/unit/password.test.ts` (1 test)
   - `tests/unit/token.test.ts` (5 tests)
   - `tests/health.test.ts` (5 tests)
-- **Results:** 66 passed, 0 failed, 0 skipped
+- **Results:** 83 passed, 0 failed, 0 skipped (100% pass rate)
 - **Raw Runner Output Excerpt:**
   ```text
-  Test Suites: 8 passed, 8 total
-  Tests:       66 passed, 66 total
+  Test Suites: 10 passed, 10 total
+  Tests:       83 passed, 83 total
   Snapshots:   0 total
-  Time:        11.122 s
+  Time:        9.121 s
   Ran all test suites.
   ```
-- **Remediations / Code Fixes:** Corrected `timeOfDay` test enum values in `scoring.test.ts` to strictly adhere to Zod validator schema (`early_morning`, `midday`, `late_afternoon`, `mixed`). Replaced `Colors.slate.bgDark` with `Colors.slate.bg` in `AssessmentResultScreen.tsx`. Installed `react-native-svg` in `apps/mobile`.
+- **Remediations / Code Fixes:** Added safe string fallback defaults in `env.ts` for strict TypeScript tests. Handled user ID extraction via `req.user?.userId`. Mocked `Recommendation.create` in `dbHelper.ts` for in-memory test isolation. Registered `/guidance` and `/results` in Expo Router `_layout.tsx`. Verified 0 TypeScript errors via `npx tsc --noEmit`.

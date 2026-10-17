@@ -51,6 +51,20 @@ export default function RootLayout() {
               headerShown: false
             }}
           />
+          <Stack.Screen
+            name="results"
+            options={{
+              title: 'Assessment Results',
+              headerShown: false
+            }}
+          />
+          <Stack.Screen
+            name="guidance"
+            options={{
+              title: 'Personalized Guidance',
+              headerShown: false
+            }}
+          />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>

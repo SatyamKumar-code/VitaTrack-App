@@ -2,6 +2,26 @@
 
 All notable changes to the VitaTrack platform are documented in this file in adherence to the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] — 2026-10-17
+
+### Added
+- **Phase 5 Implementation: Personalized Nutritional, Solar & Exercise Guidance Hub:**
+  - **Nutritional Recommendation Subsystem:** Implemented `NutritionalEngine` in `apps/backend/src/features/guidance/services/nutritionalEngine.ts` generating customized dietary protocols for Omnivore, Vegetarian, and Vegan profiles emphasizing bioavailable Vitamin D (UV-exposed mushrooms, lichen D3, fortified plant/dairy milks, wild cold-water fish), Magnesium & Vitamin K2 (MK-7) bone-axis co-factors, target daily IU calibration ($1,000–4,000\text{ IU}$), and lipid micellar absorption delivery.
+  - **Safe Sunlight Exposure Calculator:** Implemented `SolarCalculatorEngine` in `apps/backend/src/features/guidance/services/solarCalculatorEngine.ts` dynamically calculating daily safe exposure windows by Fitzpatrick Phototypes I through VI ($10\text{ min}$ for Type I up to $38\text{ min}$ for Type VI), optimal solar hours ($10:00\text{–}11:30\text{ AM} / 2:30\text{–}3:30\text{ PM}$), conservative $\text{UV Index} \ge 8$ warnings, and sunscreen timing protocols.
+  - **Musculoskeletal Exercise Guide Module:** Created `ExerciseGuideModule` in `apps/backend/src/features/guidance/services/exerciseGuideModule.ts` curating weight-bearing outdoor walking with solar synergy, bodyweight squats, resistance band training, stair climbing, and gentle mobility tailored to user symptom severity (joint/bone pain and muscle weakness).
+  - **Educational Content Hub Subsystem:** Built `EducationalKnowledgeBase` in `apps/backend/src/features/guidance/services/educationalKnowledgeBase.ts` delivering 5 comprehensive clinical guides with category filtering, reading time estimates, section breakdowns, key clinical takeaways, and peer-reviewed scientific citations.
+  - **Recommendations REST API Endpoints:** Implemented `GET /api/v1/recommendations/current` (supporting dynamic query overrides `?diet=...&skinType=...`), `GET /api/v1/recommendations/education`, and `GET /api/v1/recommendations/education/:id` in `guidance.controller.ts` & `guidance.routes.ts`, persisted in Mongoose `Recommendation` collection.
+  - **Mobile Personalized Guidance Screen & Route:** Built `PersonalizedGuidanceScreen.tsx` and Expo Router route `apps/mobile/app/guidance.tsx` with top navigation and offline-first fallback capability.
+  - **Mobile Segmented Tab Navigation:** Implemented `SegmentedTabSelector.tsx` providing rapid switching between `[Nutrition]`, `[Sunlight]`, `[Exercise]`, and `[Learn]`.
+  - **Mobile Diet Guidance Component:** Built `DietGuidanceCard.tsx` featuring diet switcher pills (Omnivore, Vegetarian, Vegan), daily target IU banner, high-bioavailability food cards with IU badges and absorption notes, and bone-mineral co-factor cards.
+  - **Mobile Safe Sunlight Exposure Tracker:** Created `SunlightExposureTracker.tsx` featuring phototype pills (Types I–VI), optimal window cards, live animated circular SVG countdown timer (Start, Pause, Reset), and safe exposure completion alert banner advising shade or SPF 30+.
+  - **Mobile Exercise Routines Component:** Built `ExerciseRoutinesView.tsx` displaying osteogenic mechanotransduction mechanisms, tailored symptom advisories, and expandable step-by-step instructions.
+  - **Mobile Educational Knowledge Hub Component:** Built `EducationalHubView.tsx` with category filters and interactive full-screen reader modal.
+  - **Results Screen & Dashboard Wiring:** Added "View Personalized Guidance &rarr;" primary CTA to `AssessmentResultScreen.tsx` and dashboard navigation link in `apps/mobile/app/index.tsx`.
+  - **Automated Verification Suites (17 New Tests, 83 Total):** Created unit test suite `tests/unit/guidance.test.ts` (11 tests verifying `TC-REC-01`, `TC-REC-02`, monotonic phototype duration scaling, symptom filtering, and article completeness) and integration test suite `tests/integration/recommendations.test.ts` (6 tests asserting authentication, profile binding, query overrides, and 404 handling) with 100% pass rate (83/83 tests passing, clean mobile TypeScript verification).
+
+---
+
 ## [0.5.0] — 2026-10-17
 
 ### Added
