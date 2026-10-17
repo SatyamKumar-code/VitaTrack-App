@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
 import { logger } from '../logger/logger';
 
 interface ConnectOptions {
@@ -18,6 +19,15 @@ export class DatabaseManager {
     if (this.isConnected) {
       logger.info('MongoDB is already connected.');
       return true;
+    }
+
+    // Windows DNS SRV fallback for MongoDB Atlas clusters
+    if (uri && uri.startsWith('mongodb+srv://')) {
+      try {
+        dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
+      } catch {
+        // Fallback silently if system restricts DNS overrides
+      }
     }
 
     let attempt = 0;
