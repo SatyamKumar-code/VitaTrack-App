@@ -11,11 +11,11 @@ VitaTrack employs a multi-layered quality assurance matrix ensuring clinical rel
 
 ```mermaid
 graph TD
-    subgraph Testing Pyramid
-        E2E[Tier 4: End-to-End & UI Flow Tests<br/><i>Maestro / Detox / Mobile Device Simulator</i>]
-        SEC[Tier 3: Security & Zero-PHI Privacy Audits<br/><i>Payload Analysis, Permutation Testing, RBAC</i>]
-        INT[Tier 2: Backend Integration & API Tests<br/><i>Supertest + Mongo Memory Server + OpenAPI Validation</i>]
-        UNIT[Tier 1: Deterministic Unit Tests<br/><i>Jest: Scoring Formulas, Rec Logic, Crypto Validators</i>]
+    subgraph TestingPyramid ["Testing Pyramid"]
+        E2E["Tier 4: End-to-End & UI Flow Tests<br/><i>Maestro / Detox / Mobile Device Simulator</i>"]
+        SEC["Tier 3: Security & Zero-PHI Privacy Audits<br/><i>Payload Analysis, Permutation Testing, RBAC</i>"]
+        INT["Tier 2: Backend Integration & API Tests<br/><i>Supertest + Mongo Memory Server + OpenAPI Validation</i>"]
+        UNIT["Tier 1: Deterministic Unit Tests<br/><i>Jest: Scoring Formulas, Rec Logic, Crypto Validators</i>"]
     end
 
     UNIT --> INT

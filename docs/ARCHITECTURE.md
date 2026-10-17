@@ -42,31 +42,31 @@ C4Context
 
 ```mermaid
 graph TB
-    subgraph Client Tier
-        MA[Mobile Application<br/><i>React Native + Expo SDK 52+</i>]
-        AD[Admin Web Portal<br/><i>React 18 + Vite + Tailwind CSS</i>]
+    subgraph ClientTier ["Client Tier"]
+        MA["Mobile Application<br/><i>React Native + Expo SDK 52+</i>"]
+        AD["Admin Web Portal<br/><i>React 18 + Vite + Tailwind CSS</i>"]
     end
 
-    subgraph Edge & Gateway Tier
-        RP[Nginx Reverse Proxy / Load Balancer<br/><i>TLS 1.3 Termination & Rate Limiting</i>]
+    subgraph EdgeTier ["Edge & Gateway Tier"]
+        RP["Nginx Reverse Proxy / Load Balancer<br/><i>TLS 1.3 Termination & Rate Limiting</i>"]
     end
 
-    subgraph Backend Application Tier
-        API[Express.js Application Server<br/><i>Node.js LTS + TypeScript</i>]
+    subgraph BackendTier ["Backend Application Tier"]
+        API["Express.js Application Server<br/><i>Node.js LTS + TypeScript</i>"]
         
-        subgraph Internal Modules
-            MOD_AUTH[Auth & Security Module]
-            MOD_SCORE[Deterministic Risk Engine]
-            MOD_REC[Lifestyle & Diet Engine]
-            MOD_AI[AI Insight Synthesizer]
-            MOD_WEAR[Wearable Ingestion Pipeline]
-            MOD_ADMIN[System Telemetry Subsystem]
+        subgraph InternalModules ["Internal Modules"]
+            MOD_AUTH["Auth & Security Module"]
+            MOD_SCORE["Deterministic Risk Engine"]
+            MOD_REC["Lifestyle & Diet Engine"]
+            MOD_AI["AI Insight Synthesizer"]
+            MOD_WEAR["Wearable Ingestion Pipeline"]
+            MOD_ADMIN["System Telemetry Subsystem"]
         end
     end
 
-    subgraph Persistence Tier
-        MDB[(MongoDB Cluster<br/><i>User Data, Assessments, Logs</i>)]
-        REDIS[(Redis Cache - Optional Phase 10<br/><i>Session Blacklist & Rate Limiting</i>)]
+    subgraph PersistenceTier ["Persistence Tier"]
+        MDB[("MongoDB Cluster<br/><i>User Data, Assessments, Logs</i>")]
+        REDIS[("Redis Cache - Optional Phase 10<br/><i>Session Blacklist & Rate Limiting</i>")]
     end
 
     MA -->|HTTPS / JSON + JWT| RP
@@ -396,30 +396,30 @@ To protect user confidentiality, VitaTrack implements an architectural firewall 
 
 ```mermaid
 flowchart LR
-    subgraph Protected Health Information Realm [Strictly Protected Clinical Realm]
-        U[User Profiles]
-        A[Assessment Answers]
-        R[Risk Scores]
-        W[Biometrics & SpO2]
+    subgraph PHI_Realm ["Protected Health Information (Clinical Realm)"]
+        U["User Profiles"]
+        A["Assessment Answers"]
+        R["Risk Scores"]
+        W["Biometrics & SpO2"]
     end
 
-    subgraph Wall [Architectural Firewall / RBAC Boundary]
-        API_USER[Client User Endpoints<br/><i>/api/v1/assessments, /api/v1/wearables</i>]
-        API_ADMIN[Admin Ops Endpoints<br/><i>/api/v1/admin/*</i>]
+    subgraph Wall ["Architectural Firewall / RBAC Boundary"]
+        API_USER["Client User Endpoints<br/><i>/api/v1/assessments, /api/v1/wearables</i>"]
+        API_ADMIN["Admin Ops Endpoints<br/><i>/api/v1/admin/*</i>"]
     end
 
-    subgraph Technical Operations Realm [Admin Monitoring Realm]
-        STA[Uptime & Latency Monitors]
-        ERR[Error Logs & Stack Traces]
-        AGG[Macro Counts: Total Users, DAU]
+    subgraph Ops_Realm ["Technical Operations (Admin Monitoring Realm)"]
+        STA["Uptime & Latency Monitors"]
+        ERR["Error Logs & Stack Traces"]
+        AGG["Macro Counts: Total Users, DAU"]
     end
 
-    Protected Health Information Realm --- API_USER
-    API_USER -.->|BLOCKED FOR ADMIN ROLE| Wall
+    PHI_Realm --- API_USER
+    API_USER -.->|"BLOCKED FOR ADMIN ROLE"| Wall
     Wall --- API_ADMIN
-    API_ADMIN --- Technical Operations Realm
+    API_ADMIN --- Ops_Realm
 
-    style Protected Health Information Realm fill:#ffefef,stroke:#ff5555,stroke-width:2px
-    style Technical Operations Realm fill:#e6f7ff,stroke:#1890ff,stroke-width:2px
+    style PHI_Realm fill:#ffefef,stroke:#ff5555,stroke-width:2px
+    style Ops_Realm fill:#e6f7ff,stroke:#1890ff,stroke-width:2px
     style Wall fill:#fffbe6,stroke:#faad14,stroke-width:3px
 ```

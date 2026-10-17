@@ -22,29 +22,38 @@ Android Health Connect availability and architecture vary across OS generations:
 
 ```mermaid
 graph LR
-    subgraph Fully Supported Ecosystems
-        S[Samsung Galaxy Watch 4/5/6/7]
-        P[Google Pixel Watch 1/2/3]
-        G[Garmin Smartwatches]
+    subgraph FullySupported ["Fully Supported Ecosystems"]
+        S["Samsung Galaxy Watch 4/5/6/7"]
+        P["Google Pixel Watch 1/2/3"]
+        G["Garmin Smartwatches"]
     end
 
-    subgraph Conditionally Supported Ecosystems
-        Z[Amazfit / Zepp OS Watches]
-        F[Fitbit Trackers: Charge, Sense, Versa]
+    subgraph PopularBrands ["Noise & Fire-Boltt Ecosystems (Supported)"]
+        N["Noise Smartwatches<br/>(ColorFit Pro 4/5, Pulse, Icon, Halo)"]
+        FB["Fire-Boltt Smartwatches<br/>(Invincible Plus, Ninja, Ring, Phoenix)"]
     end
 
-    subgraph Unsupported Hardware
-        B[Budget RTOS Bands: boAt, Noise, Fire-Boltt]
+    subgraph ConditionallySupported ["Additional Supported Ecosystems"]
+        Z["Amazfit / Zepp OS Watches"]
+        F["Fitbit Trackers: Charge, Sense, Versa"]
+        M["Mobvoi TicWatch Series"]
     end
 
-    S -->|Samsung Health Sync| HC[Android Health Connect]
-    P -->|Fitbit App Sync| HC
-    G -->|Garmin Connect Sync| HC
-    Z -.->|Zepp Health Connect Toggle| HC
-    F -->|Fitbit App Sync| HC
-    B -.->|No Health Connect Integration| FAIL[Incompatible with Auto-Sync]
+    subgraph UnsupportedHardware ["Unsupported Hardware"]
+        GEN["Generic Offline Bands (No Companion App Sync)"]
+    end
 
-    HC --> APP[VitaTrack Application]
+    S -->|"Samsung Health Sync"| HC["Android Health Connect"]
+    P -->|"Fitbit App Sync"| HC
+    G -->|"Garmin Connect Sync"| HC
+    N -->|"NoiseFit Health Connect Sync"| HC
+    FB -->|"Fire-Boltt Hub / Da Fit Sync"| HC
+    Z -.->|"Zepp Health Connect Toggle"| HC
+    F -->|"Fitbit App Sync"| HC
+    M -->|"Mobvoi Health Sync"| HC
+    GEN -.->|"No Health Sync Bridge"| FAIL["Incompatible with Auto-Sync"]
+
+    HC --> APP["VitaTrack Application"]
 ```
 
 ### 2.1 Detailed Manufacturer Compatibility Table
@@ -54,10 +63,12 @@ graph LR
 | **Samsung** | Galaxy Watch 4, 5, 6, 7, Ultra | Wear OS 3.5 / 4.0 / 5.0 | Samsung Health | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Full Stages | **Tier 1 (Optimal)** |
 | **Google** | Pixel Watch 1, 2, 3 | Wear OS 3.5 / 4.0 / 5.0 | Google Pixel Watch / Fitbit | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Full Stages | **Tier 1 (Optimal)** |
 | **Fitbit** | Sense 2, Versa 4, Charge 6 | Fitbit OS | Fitbit Mobile App | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Full Stages | **Tier 1 (Optimal)** |
+| **Noise** | **ColorFit Pro 4, Pro 5, Pulse 2/3, Icon Buzz, Halo, Caliber, Twist** | Noise RTOS / Smart OS | NoiseFit App (Health Connect & Google Fit Bridge) | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Total Sleep & Deep/Light | **Tier 2 (Fully Supported)** |
+| **Fire-Boltt** | **Invincible Plus, Ninja series, Ring series, Phoenix, Gladiator, Talk** | Boltt OS / Da Fit RTOS | Fire-Boltt Health Hub / Da Fit / FitCloudPro | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Total Sleep & Basic Stages | **Tier 2 (Fully Supported)** |
 | **Garmin** | Forerunner, Venu, Fenix | Garmin Proprietary OS | Garmin Connect App | ✅ Yes | ✅ Yes | ✅ Yes (if equipped) | ✅ Sleep & REM | **Tier 2 (High)** |
 | **Amazfit / Zepp** | GTR, GTS, Cheetah, Balance | Zepp OS | Zepp App | ✅ Yes | ✅ Yes | ⚠️ Periodic | ⚠️ Basic Sleep | **Tier 3 (Conditional)** |
 | **Mobvoi** | TicWatch Pro 3, Pro 5 | Wear OS 3.0 / 3.5 | Mobvoi Health | ✅ Yes | ✅ Yes | ⚠️ Manual Sync | ⚠️ Limited | **Tier 3 (Conditional)** |
-| **Budget RTOS Brands** | boAt, Noise, Fire-Boltt | Proprietary Micro-RTOS | Proprietary Apps | ❌ No | ❌ No | ❌ No | ❌ No | **Tier 4 (Unsupported)** |
+| **Generic No-Sync Bands** | Unbranded Offline Micro-Trackers | Micro-Firmware | Standalone / None | ❌ No | ❌ No | ❌ No | ❌ No | **Tier 4 (Unsupported)** |
 
 ---
 

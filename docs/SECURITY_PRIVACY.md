@@ -12,34 +12,34 @@ VitaTrack enforces a structural privacy barrier dividing patient healthcare data
 
 ```mermaid
 flowchart TD
-    subgraph User / Clinical Context [Protected Health Information (PHI) Layer]
-        A1[User Identity & Profile]
-        A2[Symptom Inputs: Fatigue, Pain]
-        A3[Solar & Dietary Assessment Answers]
-        A4[Deterministic Score & Risk Stratification]
-        A5[Wearable Biometrics: Heart Rate, SpO2, Sleep]
-        A6[Generated Health Reports]
+    subgraph PHI_Layer ["Protected Health Information (PHI) Layer"]
+        A1["User Identity & Profile"]
+        A2["Symptom Inputs: Fatigue, Pain"]
+        A3["Solar & Dietary Assessment Answers"]
+        A4["Deterministic Score & Risk Stratification"]
+        A5["Wearable Biometrics: Heart Rate, SpO2, Sleep"]
+        A6["Generated Health Reports"]
     end
 
-    subgraph Privacy Wall [Cryptographic & Role Firewall]
-        B1[Endpoint RBAC Gatekeeper]
-        B2[Log Sanitizer Engine: Scrubs PHI & PII]
-        B3[K-Anonymity Aggregation Threshold N >= 10]
+    subgraph Privacy_Wall ["Cryptographic & Role Firewall"]
+        B1["Endpoint RBAC Gatekeeper"]
+        B2["Log Sanitizer Engine: Scrubs PHI & PII"]
+        B3["K-Anonymity Aggregation Threshold N >= 10"]
     end
 
-    subgraph Admin Context [Technical Operations & Maintenance Layer]
-        C1[Service Uptime & Ping Latency]
-        C2[HTTP Error Rates: 4xx, 5xx Spikes]
-        C3[Database Pool & System Memory]
-        C4[Macro Metrics: Total Registered Count]
+    subgraph Admin_Layer ["Technical Operations & Maintenance Layer"]
+        C1["Service Uptime & Ping Latency"]
+        C2["HTTP Error Rates: 4xx, 5xx Spikes"]
+        C3["Database Pool & System Memory"]
+        C4["Macro Metrics: Total Registered Count"]
     end
 
-    User / Clinical Context -.->|DIRECT ACCESS BLOCKED| Privacy Wall
-    Privacy Wall -->|Aggregated / Scrubbed Data Only| Admin Context
+    PHI_Layer -.->|"DIRECT ACCESS BLOCKED"| Privacy_Wall
+    Privacy_Wall -->|"Aggregated / Scrubbed Data Only"| Admin_Layer
 
-    style User / Clinical Context fill:#ffe6e6,stroke:#ff0000,stroke-width:2px
-    style Admin Context fill:#e6f2ff,stroke:#0066cc,stroke-width:2px
-    style Privacy Wall fill:#ffffcc,stroke:#e6b800,stroke-width:3px
+    style PHI_Layer fill:#ffe6e6,stroke:#ff0000,stroke-width:2px
+    style Admin_Layer fill:#e6f2ff,stroke:#0066cc,stroke-width:2px
+    style Privacy_Wall fill:#ffffcc,stroke:#e6b800,stroke-width:3px
 ```
 
 ### 1.1 The Inviolable Admin Rules

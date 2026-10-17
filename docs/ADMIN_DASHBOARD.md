@@ -12,26 +12,26 @@ The VitaTrack Admin Dashboard is strictly an **engineering operations and infras
 
 ```mermaid
 graph TD
-    subgraph Admin Web Application [React 18 + Tailwind CSS]
-        UI1[Uptime & Ping Latency Cards]
-        UI2[HTTP Error Breakdown & Stack Traces]
-        UI3[Database Connection Pool Monitor]
-        UI4[Aggregate Population Counters: DAU, MAU, Total Users]
-        UI5[System Health Alert Bell]
+    subgraph AdminWebApp ["Admin Web Application (React 18 + Tailwind CSS)"]
+        UI1["Uptime & Ping Latency Cards"]
+        UI2["HTTP Error Breakdown & Stack Traces"]
+        UI3["Database Connection Pool Monitor"]
+        UI4["Aggregate Population Counters: DAU, MAU, Total Users"]
+        UI5["System Health Alert Bell"]
     end
 
-    subgraph Strictly Prohibited Data Views [Zero-PHI Invariants]
-        BAD1[Patient Names & Email Lists]
-        BAD2[Individual Symptom Ratings: Fatigue, Bone Pain]
-        BAD3[Personal Risk Scores & Tier Classifications]
-        BAD4[Clinician PDF Health Reports]
-        BAD5[Patient Heart Rate, SpO2 & Sleep Streams]
+    subgraph ProhibitedViews ["Strictly Prohibited Data Views (Zero-PHI Invariants)"]
+        BAD1["Patient Names & Email Lists"]
+        BAD2["Individual Symptom Ratings: Fatigue, Bone Pain"]
+        BAD3["Personal Risk Scores & Tier Classifications"]
+        BAD4["Clinician PDF Health Reports"]
+        BAD5["Patient Heart Rate, SpO2 & Sleep Streams"]
     end
 
-    Admin Web Application -.->|ARCHITECTURALLY BLOCKED| Strictly Prohibited Data Views
+    AdminWebApp -.->|"ARCHITECTURALLY BLOCKED"| ProhibitedViews
 
-    style Admin Web Application fill:#e6f7ff,stroke:#1890ff,stroke-width:2px
-    style Strictly Prohibited Data Views fill:#fff1f0,stroke:#f5222d,stroke-width:2px
+    style AdminWebApp fill:#e6f7ff,stroke:#1890ff,stroke-width:2px
+    style ProhibitedViews fill:#fff1f0,stroke:#f5222d,stroke-width:2px
 ```
 
 > [!CAUTION]

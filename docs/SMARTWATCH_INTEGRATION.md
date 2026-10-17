@@ -8,43 +8,51 @@
 
 ## 1. Architectural Strategy & Reality-Based Principles
 
-Wearable integration in Android is fragmented across proprietary ecosystems (Samsung Health, Google Pixel Watch/Fitbit, Garmin Connect, Amazfit/Zepp, Wear OS). To deliver a stable, privacy-compliant architecture without requiring dozens of proprietary SDKs, VitaTrack adopts **Android Health Connect** as the centralized, OS-level biometric data broker.
+Wearable integration in Android is fragmented across proprietary ecosystems (Samsung Health, Google Pixel Watch/Fitbit, Garmin Connect, Amazfit/Zepp, NoiseFit, Fire-Boltt Da Fit/Health Hub, Wear OS). To deliver a stable, privacy-compliant architecture without requiring dozens of proprietary SDKs, VitaTrack adopts **Android Health Connect** as the centralized, OS-level biometric data broker.
 
 ```mermaid
 graph TD
-    subgraph Wearable Hardware
-        W1[Samsung Galaxy Watch 4/5/6/7]
-        W2[Google Pixel Watch 1/2/3]
-        W3[Garmin Smartwatches]
-        W4[Other Wear OS 3+ Smartwatches]
+    subgraph WearableHardware ["Wearable Hardware"]
+        W1["Samsung Galaxy Watch 4/5/6/7"]
+        W2["Google Pixel Watch 1/2/3"]
+        W3["Garmin Smartwatches"]
+        W4["Noise Smartwatches<br/>(ColorFit Pro 4/5, Pulse, Icon, Halo)"]
+        W5["Fire-Boltt Smartwatches<br/>(Invincible Plus, Ninja, Ring, Phoenix)"]
+        W6["Other Wear OS 3+ Smartwatches"]
     end
 
-    subgraph Manufacturer Companion Apps
-        C1[Samsung Health]
-        C2[Fitbit / Pixel Watch App]
-        C3[Garmin Connect App]
+    subgraph CompanionApps ["Manufacturer Companion Apps"]
+        C1["Samsung Health"]
+        C2["Fitbit / Pixel Watch App"]
+        C3["Garmin Connect App"]
+        C4["NoiseFit Companion App"]
+        C5["Fire-Boltt Health Hub / Da Fit"]
     end
 
-    subgraph Android OS Abstraction Layer
-        HC[Android Health Connect API<br/><i>System Service in Android 14+ / Standalone in Android 9-13</i>]
+    subgraph AndroidOS ["Android OS Abstraction Layer"]
+        HC["Android Health Connect API<br/><i>System Service in Android 14+ / Standalone in Android 9-13</i>"]
     end
 
-    subgraph VitaTrack Application
-        RN_HC[react-native-health-connect Bridge]
-        NORM[Biometric Normalizer & Validator]
-        CACHE[Local SQLite / Storage Sync Queue]
-        API_CLIENT[Backend API Client]
+    subgraph VitaTrackApp ["VitaTrack Application"]
+        RN_HC["react-native-health-connect Bridge"]
+        NORM["Biometric Normalizer & Validator"]
+        CACHE["Local SQLite / Storage Sync Queue"]
+        API_CLIENT["Backend API Client"]
     end
 
-    W1 -->|Bluetooth Sync| C1
-    W2 -->|Bluetooth Sync| C2
-    W3 -->|Bluetooth Sync| C3
+    W1 -->|"Bluetooth Sync"| C1
+    W2 -->|"Bluetooth Sync"| C2
+    W3 -->|"Bluetooth Sync"| C3
+    W4 -->|"Bluetooth Sync"| C4
+    W5 -->|"Bluetooth Sync"| C5
 
-    C1 -->|OS Health Connect Permission Sync| HC
-    C2 -->|OS Health Connect Permission Sync| HC
-    C3 -->|Health Connect Export Sync| HC
+    C1 -->|"OS Health Connect Permission Sync"| HC
+    C2 -->|"OS Health Connect Permission Sync"| HC
+    C3 -->|"Health Connect Export Sync"| HC
+    C4 -->|"Health Connect / Fit Bridge Sync"| HC
+    C5 -->|"Health Connect / Bridge Sync"| HC
 
-    HC -->|Authorized Read Operations| RN_HC
+    HC -->|"Authorized Read Operations"| RN_HC
     RN_HC --> NORM
     NORM --> CACHE
     CACHE --> API_CLIENT
@@ -52,7 +60,7 @@ graph TD
 
 > [!IMPORTANT]
 > **Realistic Hardware Integration Boundary:**  
-> VitaTrack does **not** establish direct low-level Bluetooth LE connections to smartwatches. Smartwatches sync to their official manufacturer companion applications (e.g. Samsung Health, Fitbit), which in turn sync data into Android Health Connect. VitaTrack requests granular user permissions from Health Connect to read authorized data points. **If a manufacturer's app does not sync a metric to Health Connect, or if the user's watch lacks a specific hardware sensor, that metric will not be available in VitaTrack.**
+> VitaTrack does **not** establish direct low-level Bluetooth LE connections to smartwatches. Smartwatches (including Samsung Galaxy, Google Pixel, Garmin, Noise ColorFit lineup, and Fire-Boltt series) sync to their official companion applications (e.g., Samsung Health, Fitbit, NoiseFit, Fire-Boltt Health Hub / Da Fit), which in turn sync data into Android Health Connect. VitaTrack requests granular user permissions from Health Connect to read authorized data points. **If a manufacturer's app does not sync a metric to Health Connect, or if the user's watch lacks a specific hardware sensor, that metric will not be available in VitaTrack.**
 
 ---
 
@@ -154,6 +162,7 @@ export function validateAndNormalizeBiometrics(raw: any): NormalizedBiometrics {
 
 ## 6. Real-World Limitations & Vendor Restrictions
 
-1. **Vendor Sync Delays:** Data from smartwatches is not real-time in Health Connect; Samsung Health and Fitbit typically sync biometrics in batches every 15–60 minutes.
+1. **Vendor Sync Delays:** Data from smartwatches is not real-time in Health Connect; Samsung Health, Fitbit, NoiseFit, and Da Fit typically sync biometrics in batches every 15–60 minutes.
 2. **Sensor Variability:** Low-cost or budget fitness bands may lack optical SpO₂ sensors or sleep stage algorithms, resulting in null fields.
-3. **No Direct Wear OS APK in Phase 8:** Phase 8 focuses on ingesting data via Health Connect on the mobile companion phone. A dedicated standalone Wear OS app is an open future consideration.
+3. **Companion App Sync Toggle:** For Noise (e.g., ColorFit Pro 4/5) and Fire-Boltt watches, users must enable the "Sync with Health Connect / Google Fit" toggle within the respective companion application (NoiseFit or Da Fit / Fire-Boltt Health Hub).
+4. **No Direct Wear OS APK in Phase 8:** Phase 8 focuses on ingesting data via Health Connect on the mobile companion phone. A dedicated standalone Wear OS app is an open future consideration.

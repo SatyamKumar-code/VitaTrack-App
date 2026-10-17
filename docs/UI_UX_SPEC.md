@@ -14,20 +14,20 @@ VitaTrack's aesthetic combines the trustworthy authority of a clinical applicati
 
 ```mermaid
 graph LR
-    subgraph Primary Solar Palette [Warmth & Synthesis]
-        C1[Amber Sunlight<br/>#F59E0B / HSL 38, 92%, 50%]
-        C2[Solar Dawn Orange<br/>#EA580C / HSL 21, 90%, 48%]
+    subgraph PrimarySolarPalette ["Primary Solar Palette: Warmth & Synthesis"]
+        C1["Amber Sunlight<br/>#F59E0B / HSL 38, 92%, 50%"]
+        C2["Solar Dawn Orange<br/>#EA580C / HSL 21, 90%, 48%"]
     end
 
-    subgraph Clinical Authority Palette [Trust & Health]
-        C3[Clinical Slate Dark<br/>#0F172A / HSL 222, 47%, 11%]
-        C4[Deep Medical Teal<br/>#0D9488 / HSL 175, 84%, 32%]
+    subgraph ClinicalAuthorityPalette ["Clinical Authority Palette: Trust & Health"]
+        C3["Clinical Slate Dark<br/>#0F172A / HSL 222, 47%, 11%"]
+        C4["Deep Medical Teal<br/>#0D9488 / HSL 175, 84%, 32%"]
     end
 
-    subgraph Status & Clinical Alerts [Risk Stratification]
-        S1[Low Risk / Safe: Emerald<br/>#10B981]
-        S2[Moderate Risk: Amber<br/>#F59E0B]
-        S3[High Risk / Clinical Alert: Crimson<br/>#EF4444]
+    subgraph StatusClinicalAlerts ["Status & Clinical Alerts: Risk Stratification"]
+        S1["Low Risk / Safe: Emerald<br/>#10B981"]
+        S2["Moderate Risk: Amber<br/>#F59E0B"]
+        S3["High Risk / Clinical Alert: Crimson<br/>#EF4444"]
     end
 ```
 
@@ -48,25 +48,25 @@ graph LR
 
 ```mermaid
 flowchart TD
-    subgraph Onboarding & Auth Flow [Expo Router: /auth]
-        ONB[Onboarding Slides] --> LOGIN[Login Screen]
-        ONB --> SIGNUP[Sign Up Screen]
-        LOGIN --> FORGOT[Forgot Password]
+    subgraph OnboardingAuthFlow ["Onboarding & Auth Flow: Expo Router /auth"]
+        ONB["Onboarding Slides"] --> LOGIN["Login Screen"]
+        ONB --> SIGNUP["Sign Up Screen"]
+        LOGIN --> FORGOT["Forgot Password"]
     end
 
-    subgraph Main Bottom Tab Navigator [Expo Router: /(tabs)]
-        HOME[Home Dashboard]
-        ASSESS[Assessment Wizard]
-        GUIDE[Personalized Guidance]
-        WEAR[Wearable Sync]
-        HIST[History & Reports]
+    subgraph MainTabNav ["Main Bottom Tab Navigator: Expo Router /(tabs)"]
+        HOME["Home Dashboard"]
+        ASSESS["Assessment Wizard"]
+        GUIDE["Personalized Guidance"]
+        WEAR["Wearable Sync"]
+        HIST["History & Reports"]
     end
 
-    subgraph Modal & Detail Stacks [Expo Router: /modals]
-        RES[Assessment Results & Risk Gauge]
-        PDF[Clinician PDF Report Viewer]
-        SETTINGS[Profile & Privacy Settings]
-        SUN_TIMER[Live Sunlight Exposure Timer]
+    subgraph ModalDetailStacks ["Modal & Detail Stacks: Expo Router /modals"]
+        RES["Assessment Results & Risk Gauge"]
+        PDF["Clinician PDF Report Viewer"]
+        SETTINGS["Profile & Privacy Settings"]
+        SUN_TIMER["Live Sunlight Exposure Timer"]
     end
 
     LOGIN --> HOME

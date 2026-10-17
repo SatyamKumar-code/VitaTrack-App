@@ -10,28 +10,28 @@
 
 ```mermaid
 graph TB
-    subgraph Client Distribution [Mobile Client Distribution]
-        EAS[Expo Application Services EAS Build]
-        PLAY[Google Play Console / Store]
-        TEST_APK[Internal Testing Standalone APK]
-        DEVICE[User Android Smartphones]
+    subgraph ClientDist ["Mobile Client Distribution"]
+        EAS["Expo Application Services EAS Build"]
+        PLAY["Google Play Console / Store"]
+        TEST_APK["Internal Testing Standalone APK"]
+        DEVICE["User Android Smartphones"]
     end
 
-    subgraph Production Cloud Infrastructure [Backend Cloud Tier]
-        LB[Nginx Load Balancer / TLS 1.3 Termination]
-        API1[Express API Container 1]
-        API2[Express API Container 2]
-        DB[(MongoDB Atlas Replica Set)]
-        ADMIN_WEB[Admin Dashboard - Static SPA on CDN]
+    subgraph CloudInfra ["Backend Cloud Tier"]
+        LB["Nginx Load Balancer / TLS 1.3 Termination"]
+        API1["Express API Container 1"]
+        API2["Express API Container 2"]
+        DB[("MongoDB Atlas Replica Set")]
+        ADMIN_WEB["Admin Dashboard - Static SPA on CDN"]
     end
 
-    EAS -->|Signed .aab| PLAY
-    EAS -->|Debug .apk| TEST_APK
+    EAS -->|"Signed .aab"| PLAY
+    EAS -->|"Debug .apk"| TEST_APK
     PLAY --> DEVICE
     TEST_APK --> DEVICE
 
-    DEVICE -->|HTTPS TLS 1.3| LB
-    ADMIN_WEB -->|HTTPS TLS 1.3| LB
+    DEVICE -->|"HTTPS TLS 1.3"| LB
+    ADMIN_WEB -->|"HTTPS TLS 1.3"| LB
     LB --> API1
     LB --> API2
     API1 --> DB

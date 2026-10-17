@@ -58,37 +58,37 @@ This repository strictly adheres to a multi-phase, specification-first engineeri
 
 ```mermaid
 graph TD
-    subgraph Mobile Client [Mobile Client - Android & iOS]
-        RN[React Native + Expo SDK]
-        ER[Expo Router Navigation]
-        TSM[TypeScript]
-        HC[Android Health Connect API]
-        SS[Expo SecureStore]
+    subgraph MobileClient ["Mobile Client - Android & iOS"]
+        RN["React Native + Expo SDK"]
+        ER["Expo Router Navigation"]
+        TSM["TypeScript"]
+        HC["Android Health Connect API"]
+        SS["Expo SecureStore"]
     end
 
-    subgraph Backend API [Backend Application Services]
-        EX[Node.js + Express]
-        TSB[TypeScript]
-        OA[OpenAPI / Swagger Docs]
-        JWT[JWT Auth + Refresh Rotation]
-        RUL[Deterministic Risk Engine]
-        AI[AI Diagnostic Explainer Agent]
+    subgraph BackendAPI ["Backend Application Services"]
+        EX["Node.js + Express"]
+        TSB["TypeScript"]
+        OA["OpenAPI / Swagger Docs"]
+        JWT["JWT Auth + Refresh Rotation"]
+        RUL["Deterministic Risk Engine"]
+        AI["AI Diagnostic Explainer Agent"]
     end
 
-    subgraph Data Tier [Persistence Layer]
-        MDB[(MongoDB Atlas / Replica Set)]
-        MGS[Mongoose ODM]
+    subgraph DataTier ["Persistence Layer"]
+        MDB[("MongoDB Atlas / Replica Set")]
+        MGS["Mongoose ODM"]
     end
 
-    subgraph Admin Portal [Technical Operations]
-        RAD[React + Tailwind CSS]
-        TEL[System Metrics & Error Logs]
-        NOPHI[Zero PHI / Aggregate Only]
+    subgraph AdminPortal ["Technical Operations"]
+        RAD["React + Tailwind CSS"]
+        TEL["System Metrics & Error Logs"]
+        NOPHI["Zero PHI / Aggregate Only"]
     end
 
-    Mobile Client -->|HTTPS / TLS 1.3 REST API| Backend API
-    Backend API -->|Mongoose Queries| Data Tier
-    Admin Portal -->|HTTPS / Operational Endpoints| Backend API
+    MobileClient -->|"HTTPS / TLS 1.3 REST API"| BackendAPI
+    BackendAPI -->|"Mongoose Queries"| DataTier
+    AdminPortal -->|"HTTPS / Operational Endpoints"| BackendAPI
 ```
 
 - **Mobile Application:** React Native with Expo SDK and TypeScript.
