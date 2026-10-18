@@ -1,6 +1,6 @@
 {
   "name": "mobile",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
@@ -8,7 +8,11 @@
     "start:tunnel": "expo start --tunnel -c",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "build:android:preview": "eas build --platform android --profile preview",
+    "build:android:prod": "eas build --platform android --profile production",
+    "credentials:android": "eas credentials --platform android"
   },
   "dependencies": {
     "@expo/metro-runtime": "~57.0.17",

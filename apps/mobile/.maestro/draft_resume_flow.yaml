@@ -1,0 +1,22 @@
+appId: com.vitatrack.health
+---
+# VitaTrack Maestro Automated Flow: Offline Draft Persistence & Recovery (TC-UI-02)
+- launchApp:
+    clearState: true
+
+# 1. Initiate Assessment and enter Step 1
+- tapOn: "Start Assessment"
+- assertVisible: "Fatigue & Energy"
+- tapOn: "Severe"
+- tapOn: "Next Step"
+
+# 2. Simulate Mid-Survey Exit / Background Termination
+- stopApp
+- launchApp
+
+# 3. Verify Draft Detection & Resumption Prompt
+- assertVisible: "Resume Draft Assessment?"
+- tapOn: "Resume Draft"
+
+# 4. Verify Restored Step & State
+- assertVisible: "Bone Pain & Muscle Weakness"

@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "VitaTrack",
-    "slug": "VitaTrack",
-    "version": "0.1.0",
+    "slug": "vitatrack",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "VitaTrack",
+    "scheme": "vitatrack",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "splash": {
@@ -15,14 +15,15 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.VitaTrack.health"
+      "bundleIdentifier": "com.vitatrack.health"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0F172A"
       },
-      "package": "com.VitaTrack.health",
+      "package": "com.vitatrack.health",
+      "versionCode": 1,
       "permissions": [
         "android.permission.health.READ_STEPS",
         "android.permission.health.READ_HEART_RATE",

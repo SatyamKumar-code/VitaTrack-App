@@ -1,0 +1,20 @@
+appId: com.vitatrack.health
+---
+# VitaTrack Maestro Automated Flow: Clinician PDF Export & Sharing (TC-UI-03)
+- launchApp:
+    clearState: false
+
+# 1. Navigate to History Tab
+- tapOn: "History"
+- assertVisible: "Longitudinal Risk History"
+
+# 2. Select Most Recent Assessment Record
+- tapOn:
+    id: "assessment_record_0"
+
+# 3. Trigger Clinician PDF Summary Generation
+- assertVisible: "Clinician Diagnostic Summary"
+- tapOn: "Export PDF Report"
+
+# 4. Assert Sharing Sheet / Print Invocation
+- assertVisible: "VitaTrack_Clinical_Summary"

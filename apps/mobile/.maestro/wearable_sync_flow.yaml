@@ -1,0 +1,18 @@
+appId: com.vitatrack.health
+---
+# VitaTrack Maestro Automated Flow: Smartwatch Sync & Compatibility (TC-HARD-01)
+- launchApp:
+    clearState: false
+
+# 1. Navigate to Wearables Tab
+- tapOn: "Wearables"
+- assertVisible: "Health Connect Sync"
+
+# 2. Check Device Compatibility Banner
+- assertVisible: "Smartwatch Biometric Telemetry"
+
+# 3. Verify Biometric Correlation Display
+- assertVisible: "Fatigue Correlation Index"
+- assertVisible: "Daily Step Count"
+- assertVisible: "Resting Heart Rate"
+- assertVisible: "Sleep Duration"

@@ -2,7 +2,50 @@
 
 All notable changes to the VitaTrack platform are documented in this file in adherence to the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.9.0] — 2026-10-18
+## [1.0.0] — 2026-10-18
+
+### Added
+- **Phase 10 Implementation: Security Hardening, E2E Testing & EAS Android Release (v1.0.0 Production Release):**
+  - **API Security Hardening & Rate Limiting (`TASK-P10-01`):**
+    - Integrated `express-rate-limit` in `apps/backend/src/core/security/rateLimiter.ts`:
+      - Authentication rate limiter: 5 attempts per 15 minutes per IP on `/api/v1/auth/login`, `/api/v1/auth/register`, `/api/v1/auth/forgot-password`, and `/api/v1/admin/auth/login`. Returns structured 429 Too Many Requests JSON with retry advice.
+      - General API rate limiter: 100 requests per minute per client IP on all standard REST endpoints.
+    - Configured hardened Helmet HTTP security headers in `apps/backend/src/core/security/helmetConfig.ts` enforcing Content-Security-Policy (CSP), Strict-Transport-Security (HSTS 1 year, preload), X-Content-Type-Options: nosniff, X-Frame-Options: DENY, and Referrer-Policy: strict-origin-when-cross-origin.
+    - Implemented recursive input sanitization in `apps/backend/src/core/security/inputSanitizer.ts` stripping MongoDB operator keys (`$`, `.`) from request bodies, queries, and params to defeat NoSQL injection attacks.
+    - Implemented HTTP Parameter Pollution (HPP) normalization middleware safely collapsing repeated query parameters.
+    - Verified with automated test suite `apps/backend/tests/security/security_hardening.test.ts` (6 tests, all passing).
+  - **Comprehensive Integration Test Suite Execution (`TASK-P10-02`):**
+    - Authored and verified full lifecycle integration suite `apps/backend/tests/integration/e2e_full_journey.test.ts` (9 tests, all passing) validating the end-to-end patient workflow:
+      - Step 1: User registration and token pair issuance
+      - Step 2: Profile update with Fitzpatrick skin phototype and dietary preferences
+      - Step 3: Complete assessment submission, deterministic scoring, and AI explanation
+      - Step 4: Longitudinal history retrieval and summary statistics
+      - Step 5: Personalized nutrition, sunlight, and exercise guidance generation
+      - Step 6: Android Health Connect smartwatch biometric ingestion and deduplication
+      - Step 7: Context-aware reminder configuration
+      - Step 8: Administrative Zero-PHI invariant verification (regex assertions proving absence of patient names, emails, symptoms, or biometrics)
+      - Step 9: Single-use refresh token rotation and reuse compromise detection
+  - **Mobile UI Automated Flow Tests (`TASK-P10-03`):**
+    - Created complete Maestro UI flow specifications in `apps/mobile/.maestro/`:
+      - `assessment_flow.yaml`: Multi-step questionnaire wizard navigation, slider inputs, and risk gauge display (TC-UI-01).
+      - `draft_resume_flow.yaml`: Survey state persistence to AsyncStorage, simulated app termination, and draft resumption prompt (TC-UI-02).
+      - `clinician_pdf_flow.yaml`: Assessment selection, formatted PDF report generation, and sharing sheet invocation (TC-UI-03).
+      - `wearable_sync_flow.yaml`: Health Connect connection checking, biometric card rendering, and sensor fallback notices (TC-HARD-01).
+    - Verified clean TypeScript compilation for mobile (`npm run mobile:typecheck` 0 errors).
+  - **Expo EAS Android Build Configuration (`TASK-P10-04`):**
+    - Created `eas.json` for both `apps/mobile/eas.json` and monorepo root:
+      - `development`: Internal distribution with development client enabled.
+      - `preview`: Internal distribution building standalone Android `.apk` for direct sideloading and rapid device QA.
+      - `production`: Optimized Google Play Store distribution building signed Android App Bundles (`.aab`).
+    - Configured `apps/mobile/app.json` with release metadata: version `1.0.0`, versionCode `1`, package `com.vitatrack.health`, Health Connect permissions, and intent filters.
+  - **Android Keystore & Code Signing Setup (`TASK-P10-05`):**
+    - Created `apps/mobile/credentials.json.example` providing release signing keystore configuration.
+    - Added EAS build and credential management scripts to package definitions (`mobile:build:preview`, `mobile:build:prod`, `credentials:android`).
+  - **Release Verification & Documentation Freeze (`TASK-P10-06`):**
+    - Authored `apps/backend/tests/security/log_sanitization.test.ts` verifying `TC-PRIV-03` (asserting automated scrubbing of passwords, tokens, symptoms, risk scores, and wearable metrics).
+    - Executed complete backend test regression: 17 suites, 146 tests passed (100% pass rate).
+    - Verified clean production builds across all workspaces: `npm run backend:build` clean, `npm run admin:build` clean (1586 modules transformed, 0 errors).
+    - Tagged version `1.0.0` across root, backend, admin, and mobile `package.json` files.
 
 ### Added
 - **Phase 9 Implementation: Technical Admin Monitoring Dashboard (Zero-PHI Operations Portal):**

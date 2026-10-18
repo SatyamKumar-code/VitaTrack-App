@@ -1,6 +1,6 @@
 {
   "name": "VitaTrack-monorepo",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "VitaTrack - Self-Diagnosis & Guidance Platform for Vitamin D Deficiency",
   "workspaces": [
@@ -17,6 +17,9 @@
     "admin:build": "npm run build --workspace=apps/admin",
     "mobile:start": "npm run start --workspace=apps/mobile",
     "mobile:tunnel": "npm run start:tunnel --workspace=apps/mobile",
+    "mobile:typecheck": "npm run typecheck --workspace=apps/mobile",
+    "mobile:build:preview": "npm run build:android:preview --workspace=apps/mobile",
+    "mobile:build:prod": "npm run build:android:prod --workspace=apps/mobile",
     "docker:up": "docker compose up --build -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
