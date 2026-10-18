@@ -1,0 +1,73 @@
+# ==============================================================================
+# VitaTrack Render Infrastructure as Code (Blueprint Specification)
+# Docs Reference: docs/DEPLOYMENT.md & docs/HUMAN_UI_GUEST_REVAMP_SPEC.md
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. VitaTrack Express REST API Backend (Multi-Instance Load Balanced)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: vitatrack-backend
+    runtime: node
+    plan: starter
+    rootDir: apps/backend
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health
+    autoDeploy: true
+    # Render Built-in Layer 7 Load Balancing & Auto-scaling
+    scaling:
+      minInstances: 2
+      maxInstances: 4
+      targetCPUPercent: 75
+      targetMemoryPercent: 80
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PREFIX
+        value: /api/v1
+      - key: MONGO_URI
+        sync: false # Set securely in Render Dashboard (e.g., MongoDB Atlas URI)
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ADMIN_JWT_SECRET
+        generateValue: true
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: vitatrack-redis
+          property: connectionString
+      - key: CORS_ORIGIN
+        value: "*"
+
+  # ----------------------------------------------------------------------------
+  # 2. VitaTrack Admin Operations Web Portal (Static SPA)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: vitatrack-admin
+    runtime: static
+    rootDir: apps/admin
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: vitatrack-backend
+          property: host
+
+  # ----------------------------------------------------------------------------
+  # 3. VitaTrack Managed In-Memory Redis Cache (Phase E)
+  # ----------------------------------------------------------------------------
+  - type: redis
+    name: vitatrack-redis
+    plan: free
+    ipAllowList: [] # Strict internal VPC security (Only backend can connect)
+    maxmemoryPolicy: allkeys-lru
