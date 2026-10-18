@@ -18,7 +18,7 @@
 | **🤖 Android APK (GitHub)** | [⬇️ **Download VitaTrack.apk (Direct)**](https://github.com/SatyamKumar-code/VitaTrack-App/releases/latest/download/VitaTrack.apk) | Direct download with filename **`VitaTrack.apk`** from GitHub Releases. |
 | **📦 Release History** | [**View All GitHub Releases**](https://github.com/SatyamKumar-code/VitaTrack-App/releases) | View all version tags, changelog, and binaries. |
 | **🍏 iOS App (.ipa)** | [⬇️ **Download VitaTrack.ipa (GitHub)**](https://github.com/SatyamKumar-code/VitaTrack-App/releases/latest/download/VitaTrack.ipa) | Native iOS build binary (`.ipa` / Simulator) for iPhone & iPad. |
-| **💻 Admin Portal** | [**Open Admin Dashboard**](https://vitatrack-app-zvrg.onrender.com) | Operations & technical telemetry monitor (Zero-PHI aggregate metrics). |
+| **💻 Admin Portal** | [**Open Admin Dashboard**](https://vitatrack-admin.onrender.com) | Operations & technical telemetry monitor (Zero-PHI aggregate metrics). |
 
 ### 📲 How to Install & Run
 
