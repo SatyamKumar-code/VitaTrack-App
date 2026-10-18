@@ -26,6 +26,8 @@ coverage/
 *.key
 *.mobileprovision
 *.orig.*
+*.apk
+*.aab
 
 # Operating System files
 .DS_Store

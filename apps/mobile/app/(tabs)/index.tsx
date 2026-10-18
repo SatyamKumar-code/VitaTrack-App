@@ -5,7 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  RefreshControl
+  RefreshControl,
+  Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -48,7 +49,11 @@ export default function HomeScreen() {
         <View style={styles.topBar}>
           <View style={styles.brandGroup}>
             <View style={styles.solarIconWrapper}>
-              <Text style={styles.solarIcon}>☀️</Text>
+              <Image
+                source={require('../../assets/logo.png')}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
             </View>
             <View>
               <Text style={styles.brandTitle}>VitaTrack</Text>
@@ -138,17 +143,21 @@ const styles = StyleSheet.create({
     gap: 10
   },
   solarIconWrapper: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     borderRadius: 12,
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.35)',
+    borderColor: 'rgba(245, 158, 11, 0.4)',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    overflow: 'hidden',
+    padding: 3
   },
-  solarIcon: {
-    fontSize: 20
+  logoImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8
   },
   brandTitle: {
     fontSize: 22,

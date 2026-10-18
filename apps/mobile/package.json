@@ -12,6 +12,8 @@
     "typecheck": "tsc --noEmit",
     "build:android:preview": "eas build --platform android --profile preview",
     "build:android:prod": "eas build --platform android --profile production",
+    "build:ios:sim": "eas build --platform ios --profile preview",
+    "build:ios:device": "eas build --platform ios --profile preview-device",
     "credentials:android": "eas credentials --platform android"
   },
   "dependencies": {

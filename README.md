@@ -2,9 +2,56 @@
 
 > **Academic Research & Project Origin:** Based on the study and design by **Satyam Kumar (B.Tech)** and **Shilpi Shikha (BPT)**, supervised by **Dr. Hoshiyar Singh** (Dean of Agriculture Department), **Vivekananda Global University (VGU Jaipur)**.
 
-[![Status: Documentation Phase Complete](https://img.shields.io/badge/Status-Phase_0_Documentation_Complete-brightgreen.svg)]()
-[![Implementation: Not Started](https://img.shields.io/badge/Implementation-Awaiting_Authorization-orange.svg)]()
+[![Status: Production Release v1.0.0](https://img.shields.io/badge/Release-v1.0.0_Production-brightgreen.svg)](https://github.com/SatyamKumar-code/VitaTrack-App/releases)
+[![Live Web App](https://img.shields.io/badge/Live_Web_App-vitatrack--app--zvrg.onrender.com-success?style=flat&logo=render&logoColor=white)](https://vitatrack-app-zvrg.onrender.com)
+[![Android APK Direct Download](https://img.shields.io/badge/Direct_Download-VitaTrack.apk-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/SatyamKumar-code/VitaTrack-App/releases/latest/download/VitaTrack.apk)
+[![iOS IPA Direct Download](https://img.shields.io/badge/Direct_Download-VitaTrack.ipa-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/SatyamKumar-code/VitaTrack-App/releases/latest/download/VitaTrack.ipa)
 [![Architecture: Mobile_API_Admin](https://img.shields.io/badge/Architecture-Expo_%7C_Node.js_%7C_MongoDB-blue.svg)]()
+
+---
+
+## 🚀 Live Demo & Mobile App Downloads
+
+| Platform | Access / Direct Download Link | Description |
+|:---|:---|:---|
+| **🌐 Live Web App** | [**vitatrack-app-zvrg.onrender.com**](https://vitatrack-app-zvrg.onrender.com) | Instant access directly in any web or mobile browser (Chrome, Safari, Edge). |
+| **🤖 Android APK (GitHub)** | [⬇️ **Download VitaTrack.apk (Direct)**](https://github.com/SatyamKumar-code/VitaTrack-App/releases/latest/download/VitaTrack.apk) | Direct download with filename **`VitaTrack.apk`** from GitHub Releases. |
+| **📦 Release History** | [**View All GitHub Releases**](https://github.com/SatyamKumar-code/VitaTrack-App/releases) | View all version tags, changelog, and binaries. |
+| **🍏 iOS App (.ipa)** | [⬇️ **Download VitaTrack.ipa (GitHub)**](https://github.com/SatyamKumar-code/VitaTrack-App/releases/latest/download/VitaTrack.ipa) | Native iOS build binary (`.ipa` / Simulator) for iPhone & iPad. |
+| **💻 Admin Portal** | [**Open Admin Dashboard**](https://vitatrack-app-zvrg.onrender.com) | Operations & technical telemetry monitor (Zero-PHI aggregate metrics). |
+
+### 📲 How to Install & Run
+
+#### 1. Android (.apk) Installation
+1. Click [⬇️ **Direct Download VitaTrack.apk**](https://github.com/SatyamKumar-code/VitaTrack-App/releases/latest/download/VitaTrack.apk) to immediately download `VitaTrack.apk` directly on your Android device.
+2. Once downloaded, tap the `VitaTrack.apk` file and select **Install** *(if prompted by Android, toggle on "Allow from this source" in Chrome / Files settings)*.
+3. Open **VitaTrack** and register / log in to access the symptom assessment, solar calculator, and health telemetry.
+4. *(Developer Build)* To generate a fresh standalone APK locally:
+   ```bash
+   cd apps/mobile
+   npm install
+   npx eas-cli build --platform android --profile preview
+   ```
+
+#### 2. iOS (iPhone / iPad) Installation
+
+- **Option A (Native iOS .ipa via Sideloading / AltStore):**
+  1. Download [**VitaTrack.ipa**](https://github.com/SatyamKumar-code/VitaTrack-App/releases/latest/download/VitaTrack.ipa) from GitHub Releases.
+  2. Sideload onto your iPhone using **AltStore**, **Sideloadly**, or **TrollStore** (free with your regular Apple ID).
+- **Option B (Instant Testing via Expo Go):**
+  1. Install **Expo Go** from the Apple App Store.
+  2. Run `npm run start` in `apps/mobile` and scan the QR code with your iPhone camera to launch the native app instantly!
+- **Option C (Build Native iOS Binary via EAS):**
+  ```bash
+  cd apps/mobile
+  # For iOS Simulator build (No Apple Developer account required):
+  npx eas-cli build --platform ios --profile preview
+
+  # For Real iPhone Device .ipa (Requires Apple Developer account):
+  npx eas-cli build --platform ios --profile preview-device
+  ```
+- **Option D (Instant Web App / PWA):**
+  Open [https://vitatrack-app-zvrg.onrender.com](https://vitatrack-app-zvrg.onrender.com) in **Safari**, tap **Share** -> **"Add to Home Screen"**.
 
 ---
 
@@ -114,10 +161,10 @@ VitaTrack is partitioned into modular, verifiable development phases:
 - **Phase 5:** Personalized Nutritional, Solar Exposure & Exercise Recommendation Subsystems (*Complete & Verified*)
 - **Phase 6:** Longitudinal Assessment History, Trend Analytics & PDF Health Report Generation (*Complete & Verified*)
 - **Phase 7:** Context-Aware Push Reminders & Notification Scheduler (*Complete & Verified*)
-- **Phase 8:** Smartwatch Ingestion Subsystem via Android Health Connect (*Planned*)
-- **Phase 9:** Technical Admin Monitoring Dashboard (Zero-PHI Operations Portal) (*Planned*)
-- **Phase 10:** End-to-End Security Audit, Verification Testing, Optimization & EAS Android Release (*Planned*)
-- **Future Phase:** Privacy-Preserving Ethical Advertising (Strictly on user authorization)
+- **Phase 8:** Smartwatch Ingestion Subsystem via Android Health Connect (*Complete & Verified*)
+- **Phase 9:** Technical Admin Monitoring Dashboard (Zero-PHI Operations Portal) (*Complete & Verified*)
+- **Phase 10:** End-to-End Security Audit, Verification Testing, Optimization & EAS Android Release (*Complete & Verified — v1.0.0*)
+- **Future Phase:** Privacy-Preserving Ethical Advertising (Deferred / Strictly on user authorization)
 
 ---
 

@@ -9,7 +9,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -80,7 +81,11 @@ export default function LoginScreen() {
               <Text style={styles.backButtonText}>&larr; Back</Text>
             </TouchableOpacity>
             <View style={styles.iconRing}>
-              <Text style={styles.icon}>☀️</Text>
+              <Image
+                source={require('../../../../assets/logo.png')}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
             </View>
             <Text style={styles.title}>Welcome Back</Text>
             <Text style={styles.subtitle}>
@@ -193,18 +198,22 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   iconRing: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: Colors.primary.glow,
+    width: 76,
+    height: 76,
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderColor: Colors.primary.amber,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16
+    marginBottom: 16,
+    overflow: 'hidden',
+    padding: 6
   },
-  icon: {
-    fontSize: 34
+  logoImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16
   },
   title: {
     fontSize: 26,

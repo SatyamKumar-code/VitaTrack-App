@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, ShieldCheck, Lock, Mail, AlertCircle, Sparkles, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, AlertCircle, Sparkles, ArrowRight } from 'lucide-react';
 import { AdminApiService } from '../services/adminApi.service';
 import { AdminUser } from '../types/admin.types';
 
@@ -57,8 +57,8 @@ export const AdminLoginScreen: React.FC<AdminLoginScreenProps> = ({ onLoginSucce
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl space-y-6">
           {/* Logo & Heading */}
           <div className="text-center space-y-3">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/25">
-              <Activity className="w-7 h-7 text-slate-950 font-black" />
+            <div className="w-16 h-16 mx-auto rounded-2xl overflow-hidden bg-white p-1.5 shadow-xl shadow-amber-500/25 border border-amber-500/30 flex items-center justify-center">
+              <img src="/logo.png" alt="VitaTrack Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">

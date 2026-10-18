@@ -15,12 +15,15 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.vitatrack.health"
+      "bundleIdentifier": "com.vitatrack.health",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0F172A"
+        "backgroundColor": "#FFFFFF"
       },
       "package": "com.vitatrack.health",
       "versionCode": 1,
@@ -48,6 +51,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3fe5550d-2c0e-41fc-b1d4-f4b6b4a8b74f"
+      }
     }
   }
 }

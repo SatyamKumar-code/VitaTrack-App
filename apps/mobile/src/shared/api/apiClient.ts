@@ -31,9 +31,15 @@ const resolveApiBase = (): string => {
     }
   }
 
-  // 3. Explicit environment variable set and not pointing to localhost (build-time)
+  // 3. Explicit environment variable set and not pointing to localhost or internal dummy domain
   const envUrl = process.env.EXPO_PUBLIC_API_URL;
-  if (envUrl && typeof envUrl === 'string' && envUrl.trim() && !envUrl.includes('localhost')) {
+  if (
+    envUrl &&
+    typeof envUrl === 'string' &&
+    envUrl.trim() &&
+    !envUrl.includes('localhost') &&
+    !envUrl.includes('.internal')
+  ) {
     const trimmed = envUrl.trim().replace(/\/$/, '');
     return trimmed.endsWith('/api/v1') ? trimmed : `${trimmed}/api/v1`;
   }
@@ -51,7 +57,12 @@ const resolveApiBase = (): string => {
     return `${window.location.protocol}//${backendHost}/api/v1`;
   }
 
-  // 5. Expo Go physical device dynamic IP resolver
+  // 5. Standalone APK / Mobile Production Fallback to Live Render Cloud Backend
+  if (Platform.OS !== 'web' && !Constants.expoConfig?.hostUri) {
+    return 'https://vitatrack-backend-qcaz.onrender.com/api/v1';
+  }
+
+  // 6. Expo Go physical device dynamic IP resolver
   const hostUri = Constants.expoConfig?.hostUri;
   const host = hostUri ? hostUri.split(':')[0] : 'localhost';
   return `http://${host}:4000/api/v1`;
