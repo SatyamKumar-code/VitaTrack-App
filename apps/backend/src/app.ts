@@ -11,6 +11,8 @@ import { assessmentRouter } from './features/assessment/routes/assessment.routes
 import { guidanceRouter } from './features/guidance/routes/guidance.routes';
 import { reminderRouter } from './features/reminders/routes/reminder.routes';
 import { wearableRouter } from './features/wearables/routes/wearable.routes';
+import { adminRouter } from './features/admin/routes/admin.routes';
+import { telemetryMiddleware } from './core/telemetry/telemetryTracker';
 
 export function createApp(): Application {
   const app = express();
@@ -27,6 +29,9 @@ export function createApp(): Application {
   // Request body parsing
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
+  // Telemetry & Latency Tracker (Zero-PHI)
+  app.use(telemetryMiddleware);
 
   // Basic request logging
   app.use((req: Request, res: Response, next) => {
@@ -47,7 +52,8 @@ export function createApp(): Application {
       uptimeSeconds: parseFloat(process.uptime().toFixed(2)),
       database: {
         status: dbStatus.isConnected ? 'connected' : 'disconnected',
-        readyState: dbStatus.readyState
+        readyState: dbStatus.readyState,
+        lastError: dbStatus.lastError
       }
     };
   };
@@ -61,13 +67,14 @@ export function createApp(): Application {
     res.status(200).json(getHealthStatus());
   });
 
-  // Feature Routes (Phase 2, 3, 4, 5 & 7)
+  // Feature Routes (Phase 2, 3, 4, 5, 7, 8 & 9)
   app.use(`${config.apiPrefix}/auth`, authRouter);
   app.use(`${config.apiPrefix}/users`, userRouter);
   app.use(`${config.apiPrefix}/assessments`, assessmentRouter);
   app.use(`${config.apiPrefix}/recommendations`, guidanceRouter);
   app.use(`${config.apiPrefix}/reminders`, reminderRouter);
   app.use(`${config.apiPrefix}/wearables`, wearableRouter);
+  app.use(`${config.apiPrefix}/admin`, adminRouter);
 
   // 404 Handler
   app.use((req: Request, res: Response) => {

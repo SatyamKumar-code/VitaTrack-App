@@ -179,7 +179,7 @@ export class AuthService {
     };
   }
 
-  private static async issueTokenPair(user: IUser): Promise<{
+  public static async issueTokenPair(user: IUser): Promise<{
     accessToken: string;
     refreshToken: string;
     expiresIn: number;

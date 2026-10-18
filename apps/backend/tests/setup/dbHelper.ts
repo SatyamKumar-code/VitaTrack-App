@@ -6,6 +6,7 @@ import { Assessment } from '../../src/features/assessment/models/assessment.mode
 import { Recommendation } from '../../src/features/guidance/models/recommendation.model';
 import { ReminderPreferences } from '../../src/features/reminders/models/reminderPreference.model';
 import { WearableMetric } from '../../src/features/wearables/models/wearableMetric.model';
+import { AdminAuditLog } from '../../src/features/admin/models/adminAuditLog.model';
 
 // In-memory collections for fast, deterministic, self-contained testing
 interface MockUserData {
@@ -41,6 +42,7 @@ let mockRefreshTokens: MockRefreshTokenData[] = [];
 let mockAssessments: any[] = [];
 let mockReminderPreferences: any[] = [];
 let mockWearables: any[] = [];
+let mockAuditLogs: any[] = [];
 
 function createMockUserDoc(data: MockUserData): IUser {
   const doc = {
@@ -88,6 +90,8 @@ export async function connectTestDb(): Promise<void> {
   mockRefreshTokens = [];
   mockAssessments = [];
   mockReminderPreferences = [];
+  mockWearables = [];
+  mockAuditLogs = [];
 
   // Spy & Mock User Model methods
   jest.spyOn(User, 'findOne').mockImplementation((filter: any) => {
@@ -114,6 +118,21 @@ export async function connectTestDb(): Promise<void> {
       return Promise.resolve(createMockUserDoc(match)) as any;
     }
     return Promise.resolve(null) as any;
+  });
+
+  jest.spyOn(User, 'countDocuments').mockImplementation((filter: any) => {
+    let matches = mockUsers;
+    if (filter?.role) {
+      matches = matches.filter((u) => u.role === filter.role);
+    }
+    if (filter?.isActive !== undefined) {
+      matches = matches.filter((u) => u.isActive === filter.isActive);
+    }
+    if (filter?.updatedAt?.$gte) {
+      const gteTime = new Date(filter.updatedAt.$gte).getTime();
+      matches = matches.filter((u) => new Date(u.updatedAt).getTime() >= gteTime);
+    }
+    return Promise.resolve(matches.length) as any;
   });
 
   // Override User constructor prototype save
@@ -213,6 +232,9 @@ export async function connectTestDb(): Promise<void> {
       return false;
     }
     if (filter?._id && a._id?.toString() !== filter._id?.toString()) {
+      return false;
+    }
+    if (filter?.['scoringResults.riskTier'] && a.scoringResults?.riskTier !== filter['scoringResults.riskTier']) {
       return false;
     }
     if (filter?.completedAt) {
@@ -422,6 +444,41 @@ export async function connectTestDb(): Promise<void> {
     }).length;
     return Promise.resolve(count) as any;
   });
+
+  (jest.spyOn(WearableMetric, 'distinct') as any).mockImplementation((field: string) => {
+    if (field === 'userId') {
+      const ids = Array.from(new Set(mockWearables.map((w) => w.userId?.toString()).filter(Boolean)));
+      return Promise.resolve(ids) as any;
+    }
+    return Promise.resolve([]) as any;
+  });
+
+  // Spy & Mock AdminAuditLog methods
+  jest.spyOn(AdminAuditLog, 'create').mockImplementation((data: any) => {
+    const doc = {
+      _id: new mongoose.Types.ObjectId(),
+      timestamp: new Date(),
+      ...data
+    };
+    mockAuditLogs.push(doc);
+    return Promise.resolve(doc) as any;
+  });
+
+  (jest.spyOn(AdminAuditLog, 'find') as any).mockImplementation(() => {
+    let limitCount = 50;
+    const queryObj: any = {
+      sort: () => queryObj,
+      limit: (count: number) => {
+        limitCount = count;
+        return queryObj;
+      },
+      lean: () => queryObj,
+      exec: () => Promise.resolve([...mockAuditLogs].reverse().slice(0, limitCount)),
+      then: (resolve: any, reject: any) =>
+        Promise.resolve([...mockAuditLogs].reverse().slice(0, limitCount)).then(resolve, reject)
+    };
+    return queryObj as any;
+  });
 }
 
 export async function clearTestDb(): Promise<void> {
@@ -430,6 +487,7 @@ export async function clearTestDb(): Promise<void> {
   mockAssessments = [];
   mockReminderPreferences = [];
   mockWearables = [];
+  mockAuditLogs = [];
 }
 
 export async function closeTestDb(): Promise<void> {
@@ -438,5 +496,6 @@ export async function closeTestDb(): Promise<void> {
   mockAssessments = [];
   mockReminderPreferences = [];
   mockWearables = [];
+  mockAuditLogs = [];
   jest.restoreAllMocks();
 }

@@ -11,9 +11,16 @@ async function bootstrap() {
     uri: config.mongoUri,
     maxRetries: 3,
     retryIntervalMs: 2000
-  }).catch((err) => {
-    logger.warn('Initial MongoDB connection deferred:', err);
-  });
+  })
+    .then(async (connected) => {
+      if (connected) {
+        const { ensureDefaultAdminExists } = await import('./features/admin/utils/seedAdmin');
+        await ensureDefaultAdminExists();
+      }
+    })
+    .catch((err) => {
+      logger.warn('Initial MongoDB connection deferred:', err);
+    });
 
   const server = app.listen(config.port, () => {
     logger.info(`===============================================`);

@@ -103,8 +103,12 @@ Ran all test suites.
 | `TC-REC-01` | Unit: Guidance | Vegan nutrition plan generation | Phase 5 | **PASSED** | 2026-10-17 | **PASS** | Includes UV mushrooms, fortified plant milk, lichen D3; 0 fish/dairy/meat |
 | `TC-WEAR-01` | Integration: Wearable | Ingest valid Health Connect biometrics | Phase 8 | **PASSED** | 2026-10-18 | **PASS** | 200 OK, persisted to WearableMetric with compound (userId, date) deduplication |
 | `TC-WEAR-02` | Integration: Wearable | Reject physiologically invalid biometric data | Phase 8 | **PASSED** | 2026-10-18 | **PASS** | 400 Bad Request on HR > 220 bpm, negative steps, SpO2 > 100% |
-| `TC-PRIV-01` | Security: Privacy | Admin metrics endpoint returns zero PHI | Phase 9 | `PENDING / NOT RUN` | — | — | Awaiting Phase 9 authorization |
-| `TC-PRIV-02` | Security: Privacy | Block non-admin from admin telemetry route | Phase 9 | `PENDING / NOT RUN` | — | — | Awaiting Phase 9 authorization |
+| `TC-PRIV-01` | Security: Privacy | Admin metrics endpoint returns zero PHI | Phase 9 | **PASSED** | 2026-10-18 | **PASS** | 200 OK, macro counts only; zero patient records, symptoms, or biometrics |
+| `TC-PRIV-02` | Security: Privacy | Block non-admin from admin telemetry route | Phase 9 | **PASSED** | 2026-10-18 | **PASS** | 403 Forbidden with "Administrative role required" on /api/v1/admin/* |
+| `TC-ADMIN-01`| Integration: Admin | Administrator login & session issuance | Phase 9 | **PASSED** | 2026-10-18 | **PASS** | 200 OK with admin JWT pair; rejects non-admin with 403 Forbidden |
+| `TC-ADMIN-02`| Integration: Admin | Technical infrastructure health & DB pool telemetry | Phase 9 | **PASSED** | 2026-10-18 | **PASS** | 200 OK with memory heap, RSS, CPU, and DB pool connection status |
+| `TC-ADMIN-03`| Security: Privacy | Differential privacy $N \ge 10$ suppression | Phase 9 | **PASSED** | 2026-10-18 | **PASS** | Suppresses risk tier percentages when $N < 10$; calculates when $N \ge 10$ |
+| `TC-ADMIN-04`| Integration: Admin | Administrative audit ledger persistence & retrieval | Phase 9 | **PASSED** | 2026-10-18 | **PASS** | 200 OK with recorded admin login & action audit entries |
 | `TC-PRIV-03` | Security: Privacy | Server log sanitization scrub audit | Phase 10 | `PENDING / NOT RUN` | — | — | Awaiting Phase 10 authorization |
 | `TC-UI-01` | Mobile UI | Multi-step survey wizard navigation | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | Verified via AssessmentWizardScreen & step components |
 | `TC-UI-02` | Mobile UI | Resume draft survey from local storage | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | Verified via DraftStorage AsyncStorage auto-save |
@@ -115,15 +119,32 @@ Ran all test suites.
 
 ## 3. Test Execution Summary Metrics
 
-- **Total Test Suites Executed (Backend):** 13 passed, 13 total
-- **Total Tests Passed (Backend):** 117 passed, 117 total (100% pass rate)
+- **Total Test Suites Executed (Backend):** 14 passed, 14 total
+- **Total Tests Passed (Backend):** 126 passed, 126 total (100% pass rate)
+- **Admin Zero-PHI & RBAC Tests:** 9 passed (`tests/security/admin_zero_phi.test.ts` asserting TC-PRIV-01, TC-PRIV-02, TC-ADMIN-01 to TC-ADMIN-04)
 - **Wearable Ingestion Tests:** 11 passed (`tests/integration/wearables.test.ts` + `tests/unit/wearableNormalizer.test.ts` covering TC-WEAR-01, TC-WEAR-02, TC-HARD-01, and deduplication)
 - **Scoring Engine Tests:** 36 passed (asserting TC-SCORE-01 to TC-SCORE-04 + 32 granular clinical permutations)
 - **Assessment & History Tests:** 9 passed (`tests/integration/assessment.test.ts` covering TC-ASSESS-01, TC-ASSESS-02, TC-HIST-01, TC-HIST-02)
 - **Personalized Guidance Tests:** 17 passed (11 unit tests in `guidance.test.ts` + 6 integration tests in `recommendations.test.ts`)
 - **Reminders & Scheduler Tests:** 10 passed (`tests/integration/reminders.test.ts` covering TASK-P7-01 to TASK-P7-04)
+- **Admin Web Application Build:** Clean compilation (`npm run admin:build` 1584 modules transformed, 0 errors)
 - **Mobile TypeScript Verification:** 0 errors (`npx tsc --noEmit` clean across all wearable, guidance, history, reports components & routes)
 - **Backend Production Build:** Clean compilation (`npm run backend:build` clean)
+
+### Execution Record: Phase 9 (2026-10-18)
+- **Authorizing Prompt:** "implement Phase 9 only."
+- **Environment:** Node v22.x, Jest v29.7.0, Vite 6, Windows local runner
+- **Scope Implemented & Verified:**
+  - `GET /api/v1/admin/health`: Technical telemetry returning live microservice status badges (API, MongoDB, Redis, AI Proxy), Node.js heap/RSS memory, CPU load, and DB connection pool utilization.
+  - `GET /api/v1/admin/metrics`: Macro population analytics with strict Zero-PHI invariant. Tested with regex assertions confirming complete absence of patient names, emails, symptom scores, SpO2, and individual records.
+  - `POST /api/v1/admin/auth/login`: Administrative authentication endpoint validating `role === 'admin'`, issuing admin JWTs, and rejecting non-admin credentials with 403 Forbidden.
+  - `requireAdmin` RBAC Middleware: Restricts all `/api/v1/admin/*` routes to verified administrators; blocks patient users with 403 Forbidden.
+  - Differential Privacy $N \ge 10$ Safeguard: Enforces suppression of population risk tier percentages when sample size $N < 10$.
+  - Immutable Audit Ledger: `AdminAuditLog` model and `GET /api/v1/admin/audit-logs` endpoint tracking administrative logins and access events.
+  - Admin Web Operations Portal (`apps/admin`): Complete React 18 + Vite + Tailwind CSS dashboard with KPI summary bar, 5 interactive modules (Overview, Infrastructure Health, API & Error Telemetry, Macro Analytics, Audit Trail & RBAC), auto-polling controls, and login modal.
+- **Suites Executed:**
+  - `tests/security/admin_zero_phi.test.ts` (9 tests, all PASSED)
+  - Full backend regression: 14 suites, 126 tests (100% pass rate)
 
 ### Execution Record: Phase 8 (2026-10-18)
 - **Authorizing Prompt:** "implement Phase 8 only."

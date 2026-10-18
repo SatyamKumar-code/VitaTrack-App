@@ -364,3 +364,29 @@ Retrieves aggregated macroscopic counts and API operational statistics ($N \ge 1
       }
     }
     ```
+
+---
+
+### 6.4 `GET /admin/audit-logs`
+Retrieves immutable administrative session and telemetry query audit records.
+- **Access:** Bearer JWT (`role: admin`)
+- **Query Parameters:** `limit` (default: 50, max: 100)
+- **Responses:**
+  - `200 OK`:
+    ```json
+    {
+      "success": true,
+      "data": [
+        {
+          "_id": "6710ee9a8f14c2d3a1e94b99",
+          "adminEmail": "sysadmin@vitatrack.com",
+          "action": "ADMIN_LOGIN_SUCCESS",
+          "ipAddress": "127.0.0.1",
+          "status": "SUCCESS",
+          "details": "Administrator authenticated successfully.",
+          "timestamp": "2026-10-18T11:45:00.000Z"
+        }
+      ]
+    }
+    ```
+

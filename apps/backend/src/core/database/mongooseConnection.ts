@@ -10,6 +10,7 @@ interface ConnectOptions {
 
 export class DatabaseManager {
   private static isConnected = false;
+  private static lastError: string | null = null;
 
   public static async connect({
     uri,
@@ -40,19 +41,23 @@ export class DatabaseManager {
         });
 
         this.isConnected = true;
+        this.lastError = null;
         logger.info('Successfully connected to MongoDB.');
 
         mongoose.connection.on('error', (err) => {
+          this.lastError = err?.message || 'MongoDB runtime connection error';
           logger.error('MongoDB runtime connection error:', err);
         });
 
         mongoose.connection.on('disconnected', () => {
           this.isConnected = false;
+          this.lastError = 'MongoDB connection lost / socket closed.';
           logger.warn('MongoDB connection lost / disconnected.');
         });
 
         return true;
       } catch (error) {
+        this.lastError = error instanceof Error ? error.message : String(error);
         logger.warn(
           `MongoDB connection attempt ${attempt} failed. Retrying in ${retryIntervalMs}ms...`
         );
@@ -78,10 +83,15 @@ export class DatabaseManager {
     }
   }
 
-  public static getStatus(): { isConnected: boolean; readyState: number } {
+  public static getStatus(): { isConnected: boolean; readyState: number; lastError: string | null } {
     return {
       isConnected: mongoose.connection.readyState === 1,
-      readyState: mongoose.connection.readyState
+      readyState: mongoose.connection.readyState,
+      lastError: this.lastError
     };
+  }
+
+  public static getLastError(): string | null {
+    return this.lastError;
   }
 }

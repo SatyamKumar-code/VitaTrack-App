@@ -2,7 +2,32 @@
 
 All notable changes to the VitaTrack platform are documented in this file in adherence to the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.8.0] — 2026-10-18
+## [0.9.0] — 2026-10-18
+
+### Added
+- **Phase 9 Implementation: Technical Admin Monitoring Dashboard (Zero-PHI Operations Portal):**
+  - **Admin Telemetry Ingestion API (`TASK-P9-01`):**
+    - Built `GET /api/v1/admin/health` returning real-time microservice statuses (API, MongoDB, Redis, AI Proxy), Node.js process heap memory vs RSS, CPU utilization estimate, and Mongoose connection pool utilization metrics.
+    - Built `GET /api/v1/admin/metrics` returning aggregate macroscopic usage metrics ($N \ge 10$) and API performance telemetry with strict Zero-PHI constraints.
+  - **Admin Role Authentication & RBAC (`TASK-P9-02`):**
+    - Implemented secure admin login endpoint `POST /api/v1/admin/auth/login` validating `role === 'admin'` and generating standard JWT pairs.
+    - Implemented `requireAdmin` Express middleware rejecting non-admin tokens with `403 Forbidden` (`TC-PRIV-02`).
+    - Implemented `AdminAuditLog` Mongoose collection and `GET /api/v1/admin/audit-logs` endpoint recording administrator authentication events, IP addresses, timestamps, and actions.
+  - **Telemetry Tracker & Latency Distribution (`TASK-P9-03`):**
+    - Created `apps/backend/src/core/telemetry/telemetryTracker.ts` measuring high-resolution response latencies (Avg, P50, P95 SLA target $\le 300\text{ ms}$, P99), tracking HTTP status code distribution (2xx, 3xx, 4xx, 5xx), and maintaining a rolling circular buffer of sanitized technical exceptions scrubbed of request bodies and clinical attributes.
+  - **Macro Aggregate Population Analytics with $N \ge 10$ Rule (`TASK-P9-04`):**
+    - Built macro population counter queries (Total Users, DAU, MAU, Total Assessments Completed).
+    - Implemented Differential Privacy safeguard: when total assessments completed $N < 10$, risk tier percentages are suppressed to protect patient anonymity; when $N \ge 10$, aggregate percentages (% Low, % Moderate, % High) are computed.
+    - Calculated Health Connect wearable adoption percentage across registered patient population.
+  - **Zero-PHI Privacy Verification Automated Test Suite (`TASK-P9-05`):**
+    - Created `apps/backend/tests/security/admin_zero_phi.test.ts` (9 tests, 100% passing) verifying `TC-PRIV-01` (admin metrics response strictly excludes patient names, emails, fatigue, bone pain, SpO2, and individual records), `TC-PRIV-02` (non-admin rejection with 403 Forbidden), unauthenticated rejection (401), $N \ge 10$ suppression and calculation, and audit ledger tracking.
+  - **Admin Web Operations Portal (`apps/admin`):**
+    - Built complete React 18 + Vite + Tailwind CSS dashboard with dark mode design system.
+    - Created `AdminHeader.tsx` featuring live heartbeat indicator, Zero-PHI safeguard badge, polling interval selector (Manual, 5s, 10s, 30s), manual refresh trigger, and session profile display.
+    - Implemented 5 interactive views: Overview Dashboard, `InfrastructureHealthView.tsx` (Module 1), `ApiTelemetryView.tsx` (Module 2), `MacroAnalyticsView.tsx` (Module 3), and `AuditTrailView.tsx` (Module 4).
+    - Created `AdminLoginModal.tsx` for administrative credential entry and session management.
+    - Clean production build verification (`npm run admin:build` 1584 modules transformed, 0 errors).
+
 
 ### Added
 - **Phase 8 Implementation: Smartwatch & Wearable Biometric Ingestion (Android Health Connect):**

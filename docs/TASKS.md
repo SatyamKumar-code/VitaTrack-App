@@ -18,7 +18,7 @@
 | **Phase 6** | History, Trend Analytics & Clinician PDF Reports | 5 | **COMPLETED** |
 | **Phase 7** | Context-Aware Reminders & Notification System | 4 | **COMPLETED** |
 | **Phase 8** | Smartwatch Integration via Android Health Connect | 6 | **COMPLETED** |
-| **Phase 9** | Technical Admin Monitoring Dashboard (Zero-PHI) | 5 | `Planned` |
+| **Phase 9** | Technical Admin Monitoring Dashboard (Zero-PHI) | 5 | **COMPLETED** |
 | **Phase 10** | Security Hardening, E2E Testing & EAS Android Release | 6 | `Planned` |
 | **Future** | Privacy-Preserving Ethical Advertising System | 4 | `Planned` |
 
@@ -248,23 +248,23 @@
 
 ---
 
-## Phase 9: Technical Admin Monitoring Dashboard (Zero-PHI) (`Planned`)
+## Phase 9: Technical Admin Monitoring Dashboard (Zero-PHI) (**COMPLETED**)
 
-- [ ] **TASK-P9-01: Admin Telemetry Ingestion API**  
+- [x] **TASK-P9-01: Admin Telemetry Ingestion API**  
   *Description:* Build `GET /api/v1/admin/health` and `GET /api/v1/admin/metrics` with strict Zero-PHI constraints.  
-  *Status:* `Planned`
-- [ ] **TASK-P9-02: Admin Role Authentication & RBAC**  
+  *Status:* `Completed`
+- [x] **TASK-P9-02: Admin Role Authentication & RBAC**  
   *Description:* Implement secure admin login endpoint, JWT verification with `role: admin`, and session expiry.  
-  *Status:* `Planned`
-- [ ] **TASK-P9-03: Infrastructure Performance Visualizers**  
+  *Status:* `Completed`
+- [x] **TASK-P9-03: Infrastructure Performance Visualizers**  
   *Description:* Build admin UI cards showing API latency, 5xx error spikes, memory usage, and DB pool status.  
-  *Status:* `Planned`
-- [ ] **TASK-P9-04: Aggregate Macro App Analytics**  
+  *Status:* `Completed`
+- [x] **TASK-P9-04: Aggregate Macro App Analytics**  
   *Description:* Display aggregate metrics only (Total Users, DAU, Total Assessments Completed) with $N \ge 10$ rule.  
-  *Status:* `Planned`
-- [ ] **TASK-P9-05: Zero-PHI Privacy Verification Automated Test**  
+  *Status:* `Completed`
+- [x] **TASK-P9-05: Zero-PHI Privacy Verification Automated Test**  
   *Description:* Author test asserting no individual patient records or biometric traces exist in admin API responses.  
-  *Status:* `Planned`
+  *Status:* `Completed`
 
 ---
 
