@@ -20,8 +20,8 @@ for (const p of candidateEnvPaths) {
   }
 }
 
-// 2. Alert if .env file itself is missing
-if (!loadedEnvPath) {
+// 2. Alert if .env file itself is missing and not already injected via environment (e.g. Docker)
+if (!loadedEnvPath && !process.env.MONGO_URI) {
   const missingFileAlert = `
 ================================================================================
 🚨 [ALERT: .ENV FILE NOT FOUND]

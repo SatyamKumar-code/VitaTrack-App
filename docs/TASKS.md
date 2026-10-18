@@ -17,7 +17,7 @@
 | **Phase 5** | Personalized Nutritional, Solar & Exercise Guidance | 5 | **COMPLETED** |
 | **Phase 6** | History, Trend Analytics & Clinician PDF Reports | 5 | **COMPLETED** |
 | **Phase 7** | Context-Aware Reminders & Notification System | 4 | **COMPLETED** |
-| **Phase 8** | Smartwatch Integration via Android Health Connect | 6 | `Planned` |
+| **Phase 8** | Smartwatch Integration via Android Health Connect | 6 | **COMPLETED** |
 | **Phase 9** | Technical Admin Monitoring Dashboard (Zero-PHI) | 5 | `Planned` |
 | **Phase 10** | Security Hardening, E2E Testing & EAS Android Release | 6 | `Planned` |
 | **Future** | Privacy-Preserving Ethical Advertising System | 4 | `Planned` |
@@ -225,26 +225,26 @@
 
 ---
 
-## Phase 8: Smartwatch & Wearable Ingestion (Android Health Connect) (`Planned`)
+## Phase 8: Smartwatch & Wearable Ingestion (Android Health Connect) (COMPLETED)
 
-- [ ] **TASK-P8-01: Health Connect Native Module Integration**  
+- [x] **TASK-P8-01: Health Connect Native Module Integration**  
   *Description:* Integrate `react-native-health-connect` with Android permissions configuration and manifest tags.  
-  *Status:* `Planned`
-- [ ] **TASK-P8-02: Biometric Querying Subsystem**  
+  *Status:* `Completed`
+- [x] **TASK-P8-02: Biometric Querying Subsystem**  
   *Description:* Query Daily Steps, Resting Heart Rate, SpO₂ (Oxygen Saturation), and Sleep Duration/Stages.  
-  *Status:* `Planned`
-- [ ] **TASK-P8-03: Wearable Ingestion Backend API**  
+  *Status:* `Completed`
+- [x] **TASK-P8-03: Wearable Ingestion Backend API**  
   *Description:* Implement `POST /api/v1/wearables/sync` and Mongoose `WearableMetric` collection schema.  
-  *Status:* `Planned`
-- [ ] **TASK-P8-04: Mobile Wearable Dashboard UI**  
+  *Status:* `Completed`
+- [x] **TASK-P8-04: Mobile Wearable Dashboard UI**  
   *Description:* Display synced biometric cards, connection status indicator, and last-synced timestamp.  
-  *Status:* `Planned`
-- [ ] **TASK-P8-05: Unsupported Device & Graceful Fallback Handling**  
+  *Status:* `Completed`
+- [x] **TASK-P8-05: Unsupported Device & Graceful Fallback Handling**  
   *Description:* Implement graceful UI states for devices lacking Health Connect or specific hardware sensors.  
-  *Status:* `Planned`
-- [ ] **TASK-P8-06: Wearable Correlation Insights**  
+  *Status:* `Completed`
+- [x] **TASK-P8-06: Wearable Correlation Insights**  
   *Description:* Correlate low physical activity or disrupted sleep patterns with fatigue scores in progress views.  
-  *Status:* `Planned`
+  *Status:* `Completed`
 
 ---
 

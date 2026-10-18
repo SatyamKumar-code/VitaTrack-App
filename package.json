@@ -17,6 +17,9 @@
     "admin:build": "npm run build --workspace=apps/admin",
     "mobile:start": "npm run start --workspace=apps/mobile",
     "mobile:tunnel": "npm run start:tunnel --workspace=apps/mobile",
+    "docker:up": "docker compose up --build -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
     "postinstall": "node scripts/patch-expo-notifications.js"
   },
   "keywords": [

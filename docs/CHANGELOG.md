@@ -2,6 +2,22 @@
 
 All notable changes to the VitaTrack platform are documented in this file in adherence to the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] — 2026-10-18
+
+### Added
+- **Phase 8 Implementation: Smartwatch & Wearable Biometric Ingestion (Android Health Connect):**
+  - **Android Health Connect Permissions & Manifest Configuration (`TASK-P8-01`):** Integrated Android permissions (`READ_STEPS`, `READ_HEART_RATE`, `READ_OXYGEN_SATURATION`, `READ_SLEEP`) and `androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE` intent filters in `apps/mobile/app.json`.
+  - **Biometric Querying & Normalization Subsystem (`TASK-P8-02`):** Created `validateAndNormalizeBiometrics` in `apps/mobile/src/features/wearables/services/biometricNormalizer.ts` and `HealthConnectBridge` in `apps/mobile/src/features/wearables/services/healthConnectBridge.ts` enforcing physiological boundaries (clamping steps to $[0, 100000]$, heart rate to $[30, 220]\text{ bpm}$, $\text{SpO}_2$ to $[50.0, 100.0]\%$, and sleep to $[0, 1440]\text{ min}$).
+  - **Wearable Ingestion REST API & Database Schema (`TASK-P8-03`):** Created Mongoose `WearableMetric` collection in `apps/backend/src/features/wearables/models/wearableMetric.model.ts` with compound unique index `(userId, metricsDate)` for daily deduplication, Zod schema validation in `wearable.validator.ts`, service logic in `wearable.service.ts`, and endpoints `POST /api/v1/wearables/sync`, `GET /api/v1/wearables/latest`, and `GET /api/v1/wearables/history`.
+  - **Mobile Wearable Dashboard Screen & Routes (`TASK-P8-04`):** Built `WearableDashboardScreen.tsx` and Expo Router route `apps/mobile/app/wearables.tsx` featuring individual biometric telemetry cards (`BiometricMetricCard.tsx`), real-time Health Connect connection pill with sync trigger (`ConnectionStatusBanner.tsx`), and last-synced timestamp.
+  - **Unsupported Device & Hardware Fallback Handling (`TASK-P8-05` / `TC-HARD-01`):** Implemented multi-tier OS detection (Tier 1 Android 14+ System Service, Tier 2 Android 9–13 Standalone Google Play App with direct install prompts, Tier 3 Android $\le 8.1$ graceful fallback to Manual Mode), local offline sync queueing, and sensor absence alerts.
+  - **Wearable Correlation Insights Subsystem (`TASK-P8-06`):** Implemented clinical synthesis in `WearableService.getCorrelationInsights` and mobile card `WearableCorrelationCard.tsx` correlating 7-day rolling physical activity ($< 4,000\text{ steps/day}$) and sleep deficit ($< 6\text{ hours/night}$) with user's clinical questionnaire fatigue scores.
+  - **7-Day Movement Trend Visualizer:** Created `WearableHistorySparkline.tsx` rendering SVG movement bars with goal benchmark reference line ($10,000\text{ steps}$).
+  - **Hardware Ecosystem Companion App Setup Guides:** Built `VendorGuideSection.tsx` with step-by-step setup walkthroughs for Samsung Health, Google Pixel Watch / Fitbit, Garmin Connect, NoiseFit, and Fire-Boltt Health Hub / Da Fit.
+  - **Automated Verification Suites (14 Tests, 117 Total):** Created integration test suite `apps/backend/tests/integration/wearables.test.ts` (verifying `TC-WEAR-01`, `TC-WEAR-02`, auth guards, date deduplication, and fatigue correlation) and unit test suite `apps/backend/tests/unit/wearableNormalizer.test.ts` (verifying physiological boundaries and `TC-HARD-01` graceful degradation) with 100% pass rate (117/117 backend tests passing, clean mobile TypeScript verification, and clean production build).
+
+---
+
 ## [0.6.0] — 2026-10-17
 
 ### Added

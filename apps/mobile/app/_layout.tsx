@@ -79,6 +79,13 @@ export default function RootLayout() {
               headerShown: false
             }}
           />
+          <Stack.Screen
+            name="wearables"
+            options={{
+              title: 'Smartwatch & Wearables',
+              headerShown: false
+            }}
+          />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>

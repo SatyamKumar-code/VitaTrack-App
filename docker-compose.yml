@@ -1,22 +1,37 @@
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo:7.0
-    container_name: VitaTrack-mongo
+  # 1. VitaTrack Express REST API Backend (Connected to MongoDB Atlas)
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: vitatrack-backend
     restart: always
     ports:
-      - "27017:27017"
+      - "4000:4000"
+    # Sabhi sensitive keys aur Atlas MONGO_URI seedhe .env file se load honge
+    env_file:
+      - .env
     environment:
-      MONGO_INITDB_DATABASE: VitaTrack
-    volumes:
-      - mongo_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - PORT=4000
+    networks:
+      - vitatrack-network
 
-volumes:
-  mongo_data:
-    driver: local
+  # 2. VitaTrack Admin Operations Web Portal
+  admin:
+    build:
+      context: ./apps/admin
+      dockerfile: Dockerfile
+    container_name: vitatrack-admin
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - vitatrack-network
+
+networks:
+  vitatrack-network:
+    driver: bridge

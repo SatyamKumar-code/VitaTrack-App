@@ -24,7 +24,7 @@ export default function WelcomeScreen() {
           <Text style={styles.brandTitle}>VitaTrack</Text>
           <Text style={styles.brandTagline}>Vitamin D Self-Assessment & Solar Wellness</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>Phase 7 Smart Reminders &amp; Notification Schedulers Active</Text>
+            <Text style={styles.badgeText}>Phase 8 Smartwatch &amp; Wearable Biometric Ingestion Active</Text>
           </View>
         </View>
 
@@ -87,6 +87,15 @@ export default function WelcomeScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
+                style={[styles.wearablesActionButton, { marginTop: 10, width: '100%' }]}
+                onPress={() => router.push('/wearables' as any)}
+              >
+                <Text style={styles.wearablesActionButtonText}>
+                  ⌚ Smartwatch &amp; Wearable Biometrics Hub &rarr;
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 style={[styles.profileButton, { marginTop: 10 }]}
                 onPress={() => router.push('/profile')}
               >
@@ -123,6 +132,13 @@ export default function WelcomeScreen() {
 
         {/* System Architecture Status Cards */}
         <View style={styles.cardContainer}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Phase 8 Smartwatch &amp; Wearable Ingestion Active</Text>
+            <Text style={styles.cardBody}>
+              Android Health Connect OS biometric broker integration (Steps, Resting Heart Rate, SpO₂, Sleep Duration &amp; Stages), offline sync queueing, and clinical fatigue correlation insights fully active.
+            </Text>
+          </View>
+
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Phase 6 History, Trends &amp; Clinician Reports Active</Text>
             <Text style={styles.cardBody}>
@@ -351,6 +367,19 @@ const styles = StyleSheet.create({
   },
   remindersActionButtonText: {
     color: '#E0E7FF',
+    fontSize: 13,
+    fontWeight: '700'
+  },
+  wearablesActionButton: {
+    backgroundColor: '#0F766E',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#14B8A6'
+  },
+  wearablesActionButtonText: {
+    color: '#CCFBF1',
     fontSize: 13,
     fontWeight: '700'
   },

@@ -101,28 +101,44 @@ Ran all test suites.
 | `TC-HIST-01` | Integration: History | Assessment history pagination & summary metrics | Phase 6 | **PASSED** | 2026-10-17 | **PASS** | 200 OK with average, delta, distribution & trend direction |
 | `TC-HIST-02` | Integration: History | Date range filtering & individual record retrieval | Phase 6 | **PASSED** | 2026-10-17 | **PASS** | 200 OK with ISO date boundaries and GET /:id details |
 | `TC-REC-01` | Unit: Guidance | Vegan nutrition plan generation | Phase 5 | **PASSED** | 2026-10-17 | **PASS** | Includes UV mushrooms, fortified plant milk, lichen D3; 0 fish/dairy/meat |
-| `TC-REC-02` | Unit: Guidance | Sun exposure duration by Fitzpatrick type | Phase 5 | **PASSED** | 2026-10-17 | **PASS** | Type I receives 10m; Type VI receives 38m; monotonic scaling; SPF rules |
-| `TC-WEAR-01` | Integration: Wearable | Ingest valid Health Connect biometrics | Phase 8 | `PENDING / NOT RUN` | — | — | Awaiting Phase 8 authorization |
-| `TC-WEAR-02` | Integration: Wearable | Reject physiologically invalid biometric data | Phase 8 | `PENDING / NOT RUN` | — | — | Awaiting Phase 8 authorization |
+| `TC-WEAR-01` | Integration: Wearable | Ingest valid Health Connect biometrics | Phase 8 | **PASSED** | 2026-10-18 | **PASS** | 200 OK, persisted to WearableMetric with compound (userId, date) deduplication |
+| `TC-WEAR-02` | Integration: Wearable | Reject physiologically invalid biometric data | Phase 8 | **PASSED** | 2026-10-18 | **PASS** | 400 Bad Request on HR > 220 bpm, negative steps, SpO2 > 100% |
 | `TC-PRIV-01` | Security: Privacy | Admin metrics endpoint returns zero PHI | Phase 9 | `PENDING / NOT RUN` | — | — | Awaiting Phase 9 authorization |
 | `TC-PRIV-02` | Security: Privacy | Block non-admin from admin telemetry route | Phase 9 | `PENDING / NOT RUN` | — | — | Awaiting Phase 9 authorization |
 | `TC-PRIV-03` | Security: Privacy | Server log sanitization scrub audit | Phase 10 | `PENDING / NOT RUN` | — | — | Awaiting Phase 10 authorization |
 | `TC-UI-01` | Mobile UI | Multi-step survey wizard navigation | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | Verified via AssessmentWizardScreen & step components |
 | `TC-UI-02` | Mobile UI | Resume draft survey from local storage | Phase 3 | **PASSED** | 2026-10-17 | **PASS** | Verified via DraftStorage AsyncStorage auto-save |
 | `TC-UI-03` | Mobile UI | Clinician PDF generation & sharing | Phase 6 | **PASSED** | 2026-10-17 | **PASS** | Verified via expo-print PDF template & expo-sharing sheet |
-| `TC-HARD-01` | Mobile Native | Health Connect missing on older Android device | Phase 8 | `PENDING / NOT RUN` | — | — | Awaiting Phase 8 authorization |
+| `TC-HARD-01` | Mobile Native | Health Connect missing on older Android device | Phase 8 | **PASSED** | 2026-10-18 | **PASS** | Prompts for Google Play APK on Android 9-13; degrades to Manual Mode on Android <= 8.1 |
 
 ---
 
 ## 3. Test Execution Summary Metrics
 
-- **Total Test Suites Executed (Backend):** 10 passed, 10 total
-- **Total Tests Passed (Backend):** 86 passed, 86 total (100% pass rate)
+- **Total Test Suites Executed (Backend):** 13 passed, 13 total
+- **Total Tests Passed (Backend):** 117 passed, 117 total (100% pass rate)
+- **Wearable Ingestion Tests:** 11 passed (`tests/integration/wearables.test.ts` + `tests/unit/wearableNormalizer.test.ts` covering TC-WEAR-01, TC-WEAR-02, TC-HARD-01, and deduplication)
 - **Scoring Engine Tests:** 36 passed (asserting TC-SCORE-01 to TC-SCORE-04 + 32 granular clinical permutations)
 - **Assessment & History Tests:** 9 passed (`tests/integration/assessment.test.ts` covering TC-ASSESS-01, TC-ASSESS-02, TC-HIST-01, TC-HIST-02)
 - **Personalized Guidance Tests:** 17 passed (11 unit tests in `guidance.test.ts` + 6 integration tests in `recommendations.test.ts`)
-- **Mobile TypeScript Verification:** 0 errors (`npx tsc --noEmit` clean across all guidance, history, reports components & routes)
-- **Backend Production Build:** Clean compilation (`npx tsc --noEmit` clean)
+- **Reminders & Scheduler Tests:** 10 passed (`tests/integration/reminders.test.ts` covering TASK-P7-01 to TASK-P7-04)
+- **Mobile TypeScript Verification:** 0 errors (`npx tsc --noEmit` clean across all wearable, guidance, history, reports components & routes)
+- **Backend Production Build:** Clean compilation (`npm run backend:build` clean)
+
+### Execution Record: Phase 8 (2026-10-18)
+- **Authorizing Prompt:** "implement Phase 8 only."
+- **Environment:** Node v22.x, Jest v29.7.0, Windows local runner
+- **Scope Implemented & Verified:**
+  - `POST /api/v1/wearables/sync`: Biometric telemetry ingestion and Zod physiological boundary validation (clamping steps [0, 100k], HR [30, 220], SpO2 [50, 100]%, sleep [0, 1440]m).
+  - `WearableMetric` Mongoose Model & Compound Index: `(userId, metricsDate)` unique index for daily deduplication and update upserts.
+  - `GET /api/v1/wearables/latest`, `GET /api/v1/wearables/history`: Multi-day biometric history query with offline resilience queueing.
+  - `WearableService.getCorrelationInsights`: TASK-P8-06 correlation linking low physical activity (< 4k steps/day) or short sleep (< 6h) with clinical fatigue scores and solar circadian synthesis.
+  - `HealthConnectBridge`: Platform OS tier detection (Tier 1 Android 14+ System Service, Tier 2 Android 9-13 Standalone Google Play App, Tier 3 Android <= 8.1 Manual Mode degradation).
+  - `WearableDashboardScreen` & Mobile UI: Biometric telemetry cards, connection status pill, last-synced timestamp, 7-day SVG movement sparkline, and companion app instructions (Samsung Health, Pixel Watch/Fitbit, Garmin, Noise, Fire-Boltt).
+- **Suites Executed:**
+  - `tests/integration/wearables.test.ts` (7 tests, all PASSED)
+  - `tests/unit/wearableNormalizer.test.ts` (7 tests, all PASSED)
+  - Full backend regression: 13 suites, 117 tests (100% pass rate)
 
 ### Execution Record: Phase 6 (2026-10-17)
 - **Authorizing Prompt:** "implement Phase 6 only."

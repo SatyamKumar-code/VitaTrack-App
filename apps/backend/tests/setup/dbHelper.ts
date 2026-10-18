@@ -5,6 +5,7 @@ import { RefreshToken, IRefreshToken } from '../../src/features/auth/models/refr
 import { Assessment } from '../../src/features/assessment/models/assessment.model';
 import { Recommendation } from '../../src/features/guidance/models/recommendation.model';
 import { ReminderPreferences } from '../../src/features/reminders/models/reminderPreference.model';
+import { WearableMetric } from '../../src/features/wearables/models/wearableMetric.model';
 
 // In-memory collections for fast, deterministic, self-contained testing
 interface MockUserData {
@@ -39,6 +40,7 @@ let mockUsers: MockUserData[] = [];
 let mockRefreshTokens: MockRefreshTokenData[] = [];
 let mockAssessments: any[] = [];
 let mockReminderPreferences: any[] = [];
+let mockWearables: any[] = [];
 
 function createMockUserDoc(data: MockUserData): IUser {
   const doc = {
@@ -232,10 +234,12 @@ export async function connectTestDb(): Promise<void> {
 
     const result = matches[0] || null;
 
-    return {
-      sort: () => Promise.resolve(result),
+    const queryObj: any = {
+      sort: () => queryObj,
+      exec: () => Promise.resolve(result),
       then: (resolve: any, reject: any) => Promise.resolve(result).then(resolve, reject)
-    } as any;
+    };
+    return queryObj as any;
   });
 
   jest.spyOn(Assessment, 'countDocuments').mockImplementation((filter: any) => {
@@ -329,6 +333,95 @@ export async function connectTestDb(): Promise<void> {
     }
     return Promise.resolve({ ...match }) as any;
   });
+
+  // Spy & Mock WearableMetric Model methods
+  jest.spyOn(WearableMetric, 'findOneAndUpdate').mockImplementation((filter: any, update: any) => {
+    const userIdStr = filter?.userId?.toString();
+    const metricsDate = filter?.metricsDate;
+    let match = mockWearables.find(
+      (w) => w.userId?.toString() === userIdStr && w.metricsDate === metricsDate
+    );
+    const updateData = update?.$set || update || {};
+    if (!match) {
+      match = {
+        _id: new mongoose.Types.ObjectId(),
+        userId: filter.userId,
+        metricsDate,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        syncedAt: new Date(),
+        ...updateData
+      };
+      mockWearables.push(match);
+    } else {
+      Object.assign(match, updateData, { updatedAt: new Date() });
+    }
+    return Promise.resolve({ ...match }) as any;
+  });
+
+  jest.spyOn(WearableMetric, 'findOne').mockImplementation((filter: any) => {
+    const userIdStr = filter?.userId?.toString();
+    const metricsDate = filter?.metricsDate;
+    const matches = mockWearables
+      .filter((w) => {
+        if (userIdStr && w.userId?.toString() !== userIdStr) return false;
+        if (metricsDate && w.metricsDate !== metricsDate) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        if (b.metricsDate !== a.metricsDate) {
+          return b.metricsDate.localeCompare(a.metricsDate);
+        }
+        return new Date(b.syncedAt).getTime() - new Date(a.syncedAt).getTime();
+      });
+
+    const result = matches[0] ? { ...matches[0] } : null;
+
+    const queryObj: any = {
+      sort: () => queryObj,
+      exec: () => Promise.resolve(result),
+      then: (resolve: any, reject: any) => Promise.resolve(result).then(resolve, reject)
+    };
+    return queryObj as any;
+  });
+
+  (jest.spyOn(WearableMetric, 'find') as any).mockImplementation((filter: any) => {
+    const userIdStr = filter?.userId?.toString();
+    let limitCount = 50;
+
+    const getMatches = () => {
+      return mockWearables
+        .filter((w) => {
+          if (userIdStr && w.userId?.toString() !== userIdStr) return false;
+          return true;
+        })
+        .sort((a, b) => b.metricsDate.localeCompare(a.metricsDate))
+        .map((w) => ({ ...w }));
+    };
+
+    const queryObj: any = {
+      sort: () => queryObj,
+      limit: (count: number) => {
+        limitCount = count;
+        return queryObj;
+      },
+      exec: () => Promise.resolve(getMatches().slice(0, limitCount)),
+      then: (resolve: any, reject: any) =>
+        Promise.resolve(getMatches().slice(0, limitCount)).then(resolve, reject)
+    };
+    return queryObj as any;
+  });
+
+  jest.spyOn(WearableMetric, 'countDocuments').mockImplementation((filter: any) => {
+    const userIdStr = filter?.userId?.toString();
+    const metricsDate = filter?.metricsDate;
+    const count = mockWearables.filter((w) => {
+      if (userIdStr && w.userId?.toString() !== userIdStr) return false;
+      if (metricsDate && w.metricsDate !== metricsDate) return false;
+      return true;
+    }).length;
+    return Promise.resolve(count) as any;
+  });
 }
 
 export async function clearTestDb(): Promise<void> {
@@ -336,6 +429,7 @@ export async function clearTestDb(): Promise<void> {
   mockRefreshTokens = [];
   mockAssessments = [];
   mockReminderPreferences = [];
+  mockWearables = [];
 }
 
 export async function closeTestDb(): Promise<void> {
@@ -343,5 +437,6 @@ export async function closeTestDb(): Promise<void> {
   mockRefreshTokens = [];
   mockAssessments = [];
   mockReminderPreferences = [];
+  mockWearables = [];
   jest.restoreAllMocks();
 }

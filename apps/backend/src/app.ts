@@ -10,6 +10,7 @@ import { userRouter } from './features/user/routes/user.routes';
 import { assessmentRouter } from './features/assessment/routes/assessment.routes';
 import { guidanceRouter } from './features/guidance/routes/guidance.routes';
 import { reminderRouter } from './features/reminders/routes/reminder.routes';
+import { wearableRouter } from './features/wearables/routes/wearable.routes';
 
 export function createApp(): Application {
   const app = express();
@@ -66,6 +67,7 @@ export function createApp(): Application {
   app.use(`${config.apiPrefix}/assessments`, assessmentRouter);
   app.use(`${config.apiPrefix}/recommendations`, guidanceRouter);
   app.use(`${config.apiPrefix}/reminders`, reminderRouter);
+  app.use(`${config.apiPrefix}/wearables`, wearableRouter);
 
   // 404 Handler
   app.use((req: Request, res: Response) => {
