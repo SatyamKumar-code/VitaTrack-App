@@ -1,6 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
+import fs from 'fs';
 import { config } from './core/config/env';
 import { errorHandler } from './core/middleware/errorHandler';
 import { DatabaseManager } from './core/database/mongooseConnection';
@@ -88,7 +90,51 @@ export function createApp(): Application {
   app.use(`${config.apiPrefix}/wearables`, wearableRouter);
   app.use(`${config.apiPrefix}/admin`, adminRouter);
 
-  // 404 Handler
+  // ---------------------------------------------------------------------------
+  // Unified Static SPA Mounting (Mobile Web App at / and Admin Portal at /admin)
+  // ---------------------------------------------------------------------------
+  if (process.env.NODE_ENV !== 'test') {
+    // 1. Mount Admin SPA at /admin
+    const candidateAdminPaths = [
+      path.resolve(process.cwd(), 'public/admin'),
+      path.resolve(process.cwd(), '../admin/dist'),
+      path.resolve(__dirname, '../../../admin/dist'),
+      path.resolve(__dirname, '../../admin/dist')
+    ];
+    const adminDist = candidateAdminPaths.find((p) => fs.existsSync(p));
+
+    if (adminDist) {
+      app.use('/admin', express.static(adminDist));
+      app.get(['/admin', '/admin/*'], (req: Request, res: Response) => {
+        res.sendFile(path.join(adminDist, 'index.html'));
+      });
+    }
+
+    // 2. Mount Mobile Web SPA at /
+    const candidateMobilePaths = [
+      path.resolve(process.cwd(), 'public/mobile'),
+      path.resolve(process.cwd(), '../mobile/dist'),
+      path.resolve(__dirname, '../../../mobile/dist'),
+      path.resolve(__dirname, '../../mobile/dist')
+    ];
+    const mobileDist = candidateMobilePaths.find((p) => fs.existsSync(p));
+
+    if (mobileDist) {
+      app.use(express.static(mobileDist));
+      app.get('*', (req: Request, res: Response, next) => {
+        if (
+          req.path.startsWith('/api') ||
+          req.path.startsWith('/health') ||
+          req.path.startsWith('/admin')
+        ) {
+          return next();
+        }
+        res.sendFile(path.join(mobileDist, 'index.html'));
+      });
+    }
+  }
+
+  // 404 Handler (for unmatched API routes and missing endpoints)
   app.use((req: Request, res: Response) => {
     res.status(404).json({
       success: false,

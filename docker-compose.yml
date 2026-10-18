@@ -57,7 +57,7 @@ services:
     networks:
       - vitatrack-network
 
-  # 4. VitaTrack Admin Operations Web Portal
+  # 4. VitaTrack Admin Operations Web Portal Container
   admin:
     build:
       context: ./apps/admin
@@ -65,7 +65,21 @@ services:
     container_name: vitatrack-admin
     restart: always
     ports:
-      - "5173:5173"
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - vitatrack-network
+
+  # 5. VitaTrack Mobile Web App Container (Expo React Native Web)
+  mobile:
+    build:
+      context: ./apps/mobile
+      dockerfile: Dockerfile
+    container_name: vitatrack-mobile-web
+    restart: always
+    ports:
+      - "8081:80"
     depends_on:
       - backend
     networks:

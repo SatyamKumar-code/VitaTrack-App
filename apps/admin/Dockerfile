@@ -10,7 +10,7 @@ COPY tailwind.config.js ./
 COPY postcss.config.js ./
 COPY index.html ./
 
-RUN npm ci
+RUN npm install
 
 COPY src ./src
 
@@ -23,7 +23,8 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Custom nginx conf for SPA routing fallback
 RUN echo 'server { \
-    listen 5173; \
+    listen 80; \
+    server_name _; \
     location / { \
         root /usr/share/nginx/html; \
         index index.html index.htm; \
@@ -31,6 +32,6 @@ RUN echo 'server { \
     } \
 }' > /etc/nginx/conf.d/default.conf
 
-EXPOSE 5173
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
