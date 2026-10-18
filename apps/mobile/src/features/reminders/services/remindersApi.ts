@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { TokenStorage } from '../../../shared/storage/secureStore';
+import { apiFetch } from '../../../shared/api/apiClient';
 import { ReminderPreferences, ReminderType } from '../types/reminder.types';
 
 const hostUri = Constants.expoConfig?.hostUri;
@@ -72,12 +73,8 @@ export const RemindersApi = {
     }
 
     try {
-      const res = await fetch(`${DEFAULT_API_BASE}/reminders`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        }
+      const res = await apiFetch(`/reminders`, {
+        method: 'GET'
       });
 
       if (!res.ok) {
@@ -109,12 +106,8 @@ export const RemindersApi = {
     }
 
     try {
-      const res = await fetch(`${DEFAULT_API_BASE}/reminders`, {
+      const res = await apiFetch(`/reminders`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
         body: JSON.stringify(updates)
       });
 

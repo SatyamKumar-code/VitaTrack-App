@@ -1,20 +1,13 @@
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
-import { TokenStorage } from '../../../shared/storage/secureStore';
+import { apiFetch } from '../../../shared/api/apiClient';
 import {
   WearableMetricRecord,
   WearableCorrelationInsights,
   NormalizedBiometrics
 } from '../types/wearable.types';
 import { HealthConnectBridge } from './healthConnectBridge';
-
-const hostUri = Constants.expoConfig?.hostUri;
-const host = hostUri ? hostUri.split(':')[0] : 'localhost';
-const DEFAULT_API_BASE =
-  process.env.EXPO_PUBLIC_API_URL && !process.env.EXPO_PUBLIC_API_URL.includes('localhost')
-    ? process.env.EXPO_PUBLIC_API_URL
-    : `http://${host}:4000/api/v1`;
 
 const LOCAL_LATEST_METRICS_KEY = 'vitatrack_latest_wearable_metrics';
 
@@ -58,19 +51,9 @@ export const WearableApiService = {
     metricsDate: string;
     data: NormalizedBiometrics;
   }): Promise<{ syncedAt: string; metric: WearableMetricRecord }> {
-    const accessToken = await TokenStorage.getAccessToken();
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
-    };
-
-    if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
-    }
-
     try {
-      const response = await fetch(`${DEFAULT_API_BASE}/wearables/sync`, {
+      const response = await apiFetch(`/wearables/sync`, {
         method: 'POST',
-        headers,
         body: JSON.stringify(payload)
       });
 
@@ -116,18 +99,9 @@ export const WearableApiService = {
    * GET /api/v1/wearables/latest
    */
   async getLatestMetrics(): Promise<WearableMetricRecord | null> {
-    const accessToken = await TokenStorage.getAccessToken();
-    if (!accessToken) {
-      return this.getLocalLatest();
-    }
-
     try {
-      const response = await fetch(`${DEFAULT_API_BASE}/wearables/latest`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
+      const response = await apiFetch(`/wearables/latest`, {
+        method: 'GET'
       });
 
       if (!response.ok) {
@@ -149,19 +123,9 @@ export const WearableApiService = {
    * GET /api/v1/wearables/history
    */
   async getMetricsHistory(days: number = 7): Promise<WearableMetricRecord[]> {
-    const accessToken = await TokenStorage.getAccessToken();
-    if (!accessToken) {
-      const local = await this.getLocalLatest();
-      return local ? [local] : [];
-    }
-
     try {
-      const response = await fetch(`${DEFAULT_API_BASE}/wearables/history?days=${days}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
+      const response = await apiFetch(`/wearables/history?days=${days}`, {
+        method: 'GET'
       });
 
       if (!response.ok) {
@@ -181,18 +145,9 @@ export const WearableApiService = {
    * GET /api/v1/wearables/insights
    */
   async getCorrelationInsights(): Promise<WearableCorrelationInsights | null> {
-    const accessToken = await TokenStorage.getAccessToken();
-    if (!accessToken) {
-      return null;
-    }
-
     try {
-      const response = await fetch(`${DEFAULT_API_BASE}/wearables/insights`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
+      const response = await apiFetch(`/wearables/insights`, {
+        method: 'GET'
       });
 
       if (!response.ok) {

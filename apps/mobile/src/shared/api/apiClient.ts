@@ -1,0 +1,130 @@
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
+import { TokenStorage } from '../storage/secureStore';
+
+// Dynamically resolves host IP so physical devices on Expo Go can communicate with backend
+const hostUri = Constants.expoConfig?.hostUri;
+const host = hostUri ? hostUri.split(':')[0] : 'localhost';
+export const DEFAULT_API_BASE =
+  process.env.EXPO_PUBLIC_API_URL && !process.env.EXPO_PUBLIC_API_URL.includes('localhost')
+    ? process.env.EXPO_PUBLIC_API_URL
+    : `http://${host}:4000/api/v1`;
+
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (err: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else if (token) {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+/**
+ * Auto-refreshing fetch wrapper.
+ * Intercepts 401 Unauthorized responses, attempts a refresh using the stored
+ * refreshToken, updates tokens in cookies/storage, and seamlessly retries the original request.
+ */
+export async function apiFetch(
+  endpoint: string,
+  options: RequestInit = {},
+  isRetry = false
+): Promise<Response> {
+  const url = endpoint.startsWith('http') ? endpoint : `${DEFAULT_API_BASE}${endpoint}`;
+
+  // Attach current access token
+  const token = await TokenStorage.getAccessToken();
+  const headers = new Headers(options.headers || {});
+
+  if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(url, { ...options, headers });
+  } catch (netErr) {
+    throw netErr;
+  }
+
+  // If 401 Unauthorized and not already retrying, try to refresh tokens automatically
+  if (response.status === 401 && !isRetry) {
+    const refreshToken = await TokenStorage.getRefreshToken();
+    if (!refreshToken) {
+      return response;
+    }
+
+    if (isRefreshing) {
+      // If another request already triggered refresh, wait for the new token
+      return new Promise<Response>((resolve, reject) => {
+        failedQueue.push({
+          resolve: async (newToken: string) => {
+            const retryHeaders = new Headers(options.headers || {});
+            if (!retryHeaders.has('Content-Type') && !(options.body instanceof FormData)) {
+              retryHeaders.set('Content-Type', 'application/json');
+            }
+            retryHeaders.set('Authorization', `Bearer ${newToken}`);
+            try {
+              const res = await fetch(url, { ...options, headers: retryHeaders });
+              resolve(res);
+            } catch (err) {
+              reject(err);
+            }
+          },
+          reject: (err: any) => {
+            reject(err);
+          }
+        });
+      });
+    }
+
+    isRefreshing = true;
+
+    try {
+      const refreshRes = await fetch(`${DEFAULT_API_BASE}/auth/refresh-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken })
+      });
+
+      const refreshJson = await refreshRes.json();
+
+      if (!refreshRes.ok || !refreshJson.data?.tokens) {
+        throw new Error('Refresh token expired or invalid');
+      }
+
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = refreshJson.data.tokens;
+      await TokenStorage.saveTokens(newAccessToken, newRefreshToken);
+
+      processQueue(null, newAccessToken);
+
+      // Retry original request with newly acquired access token
+      const retryHeaders = new Headers(options.headers || {});
+      if (!retryHeaders.has('Content-Type') && !(options.body instanceof FormData)) {
+        retryHeaders.set('Content-Type', 'application/json');
+      }
+      retryHeaders.set('Authorization', `Bearer ${newAccessToken}`);
+
+      return fetch(url, { ...options, headers: retryHeaders });
+    } catch (refreshErr) {
+      processQueue(refreshErr, null);
+      await TokenStorage.clearAll();
+      return response;
+    } finally {
+      isRefreshing = false;
+    }
+  }
+
+  return response;
+}

@@ -1,35 +1,19 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { TokenStorage } from '../../../shared/storage/secureStore';
+import { apiFetch } from '../../../shared/api/apiClient';
 import {
   AssessmentPayload,
   AssessmentResponse
 } from '../types/assessment.types';
-
-// Dynamically resolves host IP so physical devices on Expo Go can communicate with backend
-const hostUri = Constants.expoConfig?.hostUri;
-const host = hostUri ? hostUri.split(':')[0] : 'localhost';
-const DEFAULT_API_BASE =
-  process.env.EXPO_PUBLIC_API_URL && !process.env.EXPO_PUBLIC_API_URL.includes('localhost')
-    ? process.env.EXPO_PUBLIC_API_URL
-    : `http://${host}:4000/api/v1`;
 
 export const AssessmentApi = {
   /**
    * Submit questionnaire responses to the backend
    */
   async submitAssessment(payload: AssessmentPayload): Promise<AssessmentResponse> {
-    const token = await TokenStorage.getAccessToken();
-    if (!token) {
-      throw new Error('Authentication required. Please sign in to submit your assessment.');
-    }
-
-    const res = await fetch(`${DEFAULT_API_BASE}/assessments`, {
+    const res = await apiFetch(`/assessments`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
       body: JSON.stringify(payload)
     });
 
@@ -49,18 +33,11 @@ export const AssessmentApi = {
    * Retrieve latest assessment record for the user
    */
   async getLatestAssessment(): Promise<any | null> {
-    const token = await TokenStorage.getAccessToken();
-    if (!token) return null;
-
-    const res = await fetch(`${DEFAULT_API_BASE}/assessments/latest`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
+    const res = await apiFetch(`/assessments/latest`, {
+      method: 'GET'
     });
 
-    if (res.status === 404) return null;
+    if (res.status === 404 || res.status === 401) return null;
 
     const json = await res.json();
     if (!res.ok) {
@@ -74,16 +51,11 @@ export const AssessmentApi = {
    * Retrieve paginated history of assessments
    */
   async getAssessmentHistory(page = 1, limit = 10): Promise<any> {
-    const token = await TokenStorage.getAccessToken();
-    if (!token) return { data: [], pagination: { total: 0, page: 1, pages: 1 } };
-
-    const res = await fetch(`${DEFAULT_API_BASE}/assessments/history?page=${page}&limit=${limit}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
+    const res = await apiFetch(`/assessments/history?page=${page}&limit=${limit}`, {
+      method: 'GET'
     });
+
+    if (res.status === 401) return { data: [], pagination: { total: 0, page: 1, pages: 1 } };
 
     const json = await res.json();
     if (!res.ok) {

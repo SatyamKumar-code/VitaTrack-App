@@ -19,23 +19,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Initialize session from SecureStore on startup
+  // Initialize session from storage / cookies on startup
   useEffect(() => {
     async function initSession() {
       try {
         const storedUser = await TokenStorage.getUserData<UserProfile>();
         const accessToken = await TokenStorage.getAccessToken();
+        const refreshToken = await TokenStorage.getRefreshToken();
 
-        if (accessToken && storedUser) {
+        if (storedUser) {
           setUser(storedUser);
-          // Try to sync fresh profile from API in background
+        }
+
+        // If either token exists, try to sync fresh profile or automatically refresh
+        if (accessToken || refreshToken) {
           try {
+            // apiFetch inside getProfile automatically triggers refresh-token if accessToken is expired
             const freshProfile = await AuthApi.getProfile();
             setUser(freshProfile);
             await TokenStorage.saveUserData(freshProfile);
           } catch {
-            // Offline or token expired; attempt refresh if available
-            const refreshToken = await TokenStorage.getRefreshToken();
             if (refreshToken) {
               try {
                 const refreshed = await AuthApi.refreshToken(refreshToken);
@@ -47,8 +50,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setUser(fresh);
                 await TokenStorage.saveUserData(fresh);
               } catch {
-                // If refresh fails, keep cached user or clear
+                // If refresh failed (token expired/revoked), clear invalid session
+                await TokenStorage.clearAll();
+                setUser(null);
               }
+            } else if (!storedUser) {
+              await TokenStorage.clearAll();
+              setUser(null);
             }
           }
         }
@@ -91,8 +99,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     try {
       await AuthApi.logout();
-      setUser(null);
+    } catch {
+      // Ignore network errors on logout
     } finally {
+      await TokenStorage.clearAll();
+      setUser(null);
       setIsLoading(false);
     }
   };

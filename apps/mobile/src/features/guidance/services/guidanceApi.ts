@@ -1,18 +1,10 @@
-import Constants from 'expo-constants';
-import { TokenStorage } from '../../../shared/storage/secureStore';
+import { apiFetch } from '../../../shared/api/apiClient';
 import {
   DietaryPreference,
   SkinType,
   PersonalizedGuidancePayload,
   EducationalArticle
 } from '../types/guidance.types';
-
-const hostUri = Constants.expoConfig?.hostUri;
-const host = hostUri ? hostUri.split(':')[0] : 'localhost';
-const DEFAULT_API_BASE =
-  process.env.EXPO_PUBLIC_API_URL && !process.env.EXPO_PUBLIC_API_URL.includes('localhost')
-    ? process.env.EXPO_PUBLIC_API_URL
-    : `http://${host}:4000/api/v1`;
 
 export const GuidanceApi = {
   /**
@@ -22,24 +14,14 @@ export const GuidanceApi = {
     diet?: DietaryPreference,
     skinType?: SkinType
   ): Promise<PersonalizedGuidancePayload> {
-    const token = await TokenStorage.getAccessToken();
-
     const queryParams: string[] = [];
     if (diet) queryParams.push(`diet=${diet}`);
     if (skinType) queryParams.push(`skinType=${skinType}`);
     const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
-    };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
     try {
-      const res = await fetch(`${DEFAULT_API_BASE}/recommendations/current${queryString}`, {
-        method: 'GET',
-        headers
+      const res = await apiFetch(`/recommendations/current${queryString}`, {
+        method: 'GET'
       });
 
       if (!res.ok) {
@@ -62,11 +44,8 @@ export const GuidanceApi = {
   ): Promise<EducationalArticle[]> {
     const query = category ? `?category=${category}` : '';
     try {
-      const res = await fetch(`${DEFAULT_API_BASE}/recommendations/education${query}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const res = await apiFetch(`/recommendations/education${query}`, {
+        method: 'GET'
       });
 
       if (!res.ok) {

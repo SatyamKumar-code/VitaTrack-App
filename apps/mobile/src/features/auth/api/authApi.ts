@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { TokenStorage } from '../../../shared/storage/secureStore';
+import { apiFetch } from '../../../shared/api/apiClient';
 
 // Dynamically resolves host IP so physical devices on Expo Go can communicate with backend
 const hostUri = Constants.expoConfig?.hostUri;
@@ -120,13 +121,8 @@ export const AuthApi = {
   },
 
   async getProfile(): Promise<UserProfile> {
-    const token = await TokenStorage.getAccessToken();
-    const res = await fetch(`${DEFAULT_API_BASE}/users/profile`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
+    const res = await apiFetch(`/users/profile`, {
+      method: 'GET'
     });
 
     const json = await res.json();
@@ -137,13 +133,8 @@ export const AuthApi = {
   },
 
   async updateProfile(updates: Partial<UserProfile>): Promise<UserProfile> {
-    const token = await TokenStorage.getAccessToken();
-    const res = await fetch(`${DEFAULT_API_BASE}/users/profile`, {
+    const res = await apiFetch(`/users/profile`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
       body: JSON.stringify(updates)
     });
 

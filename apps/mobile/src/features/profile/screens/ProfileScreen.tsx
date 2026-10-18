@@ -7,7 +7,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
-  Alert
+  Alert,
+  Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -60,24 +61,35 @@ export default function ProfileScreen() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
-      setFullName(user.fullName || '');
-      if (user.dateOfBirth) {
-        setDateOfBirth(new Date(user.dateOfBirth).toISOString().split('T')[0]);
-      }
-      if (user.biologicalSex) {
-        setBiologicalSex(user.biologicalSex);
-      }
-      if (user.skinType) {
-        setSkinType(user.skinType);
-      }
-      if (user.dietaryPreference) {
-        setDietaryPreference(user.dietaryPreference);
-      }
-      if (user.medicalConditions) {
-        setSelectedConditions(user.medicalConditions);
+    async function loadData() {
+      if (user) {
+        setFullName(user.fullName || '');
+        if (user.dateOfBirth) {
+          setDateOfBirth(new Date(user.dateOfBirth).toISOString().split('T')[0]);
+        }
+        if (user.biologicalSex) {
+          setBiologicalSex(user.biologicalSex);
+        }
+        if (user.skinType) {
+          setSkinType(user.skinType);
+        }
+        if (user.dietaryPreference) {
+          setDietaryPreference(user.dietaryPreference);
+        }
+        if (user.medicalConditions) {
+          setSelectedConditions(user.medicalConditions);
+        }
+      } else {
+        // For guest user, load locally stored checkup options if already configured
+        const saved = await HealthProfileStorage.getHealthProfile();
+        if (saved) {
+          if (saved.skinType) setSkinType(saved.skinType);
+          if (saved.dietaryPreference) setDietaryPreference(saved.dietaryPreference);
+          if (saved.medicalConditions) setSelectedConditions(saved.medicalConditions);
+        }
       }
     }
+    loadData();
   }, [user]);
 
   const toggleCondition = (condId: string) => {
@@ -87,35 +99,56 @@ export default function ProfileScreen() {
   };
 
   const handleSave = async () => {
-    if (!fullName.trim()) {
-      Alert.alert('Required', 'Please enter your full name.');
-      return;
-    }
-
     setSaving(true);
     setStatusMessage(null);
 
     try {
-      await updateProfile({
-        fullName: fullName.trim(),
-        dateOfBirth,
-        biologicalSex,
-        skinType: skinType as any,
-        dietaryPreference: dietaryPreference as any,
-        medicalConditions: selectedConditions
-      });
-      await HealthProfileStorage.setCompleted(user?.id);
-      setStatusMessage('Profile updated successfully! Health profile is ready for checkup.');
+      if (user) {
+        await updateProfile({
+          ...(fullName.trim() ? { fullName: fullName.trim() } : {}),
+          dateOfBirth,
+          biologicalSex,
+          skinType: skinType as any,
+          dietaryPreference: dietaryPreference as any,
+          medicalConditions: selectedConditions
+        });
+        await HealthProfileStorage.saveHealthProfile(
+          {
+            skinType,
+            dietaryPreference,
+            medicalConditions: selectedConditions
+          },
+          user.id
+        );
+      } else {
+        // Guest user: save checkup options locally
+        await HealthProfileStorage.saveHealthProfile({
+          skinType,
+          dietaryPreference,
+          medicalConditions: selectedConditions
+        });
+      }
+
+      setStatusMessage('Checkup health profile saved successfully! Ready for checkup.');
       setTimeout(() => setStatusMessage(null), 3000);
     } catch (err) {
       const msg = getFriendlyErrorMessage(err);
-      Alert.alert('Update Failed', msg);
+      Alert.alert('Save Failed', msg);
     } finally {
       setSaving(false);
     }
   };
 
   const handleLogout = async () => {
+    if (Platform.OS === 'web') {
+      const confirmed = typeof window !== 'undefined' ? window.confirm('Are you sure you want to log out of VitaTrack?') : true;
+      if (confirmed) {
+        await logout();
+        router.replace('/');
+      }
+      return;
+    }
+
     Alert.alert('Sign Out', 'Are you sure you want to log out of VitaTrack?', [
       { text: 'Cancel', style: 'cancel' },
       {
@@ -398,13 +431,15 @@ export default function ProfileScreen() {
             {saving ? (
               <ActivityIndicator color="#0B0F19" />
             ) : (
-              <Text style={styles.saveButtonText}>Save Profile Changes</Text>
+              <Text style={styles.saveButtonText}>Save Checkup Health Profile</Text>
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Sign Out of VitaTrack</Text>
-          </TouchableOpacity>
+          {user ? (
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>Sign Out of VitaTrack</Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
 
         <View style={styles.privacyNote}>

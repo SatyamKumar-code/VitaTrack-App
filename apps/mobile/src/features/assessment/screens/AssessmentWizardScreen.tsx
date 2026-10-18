@@ -54,13 +54,14 @@ export const AssessmentWizardScreen: React.FC = () => {
   const [submissionResult, setSubmissionResult] = useState<AssessmentResponse | null>(null);
   const [profileIncomplete, setProfileIncomplete] = useState<boolean>(false);
 
-  // Check if health profile is complete for authenticated users
+  // Check if health profile is complete for authenticated users or guests
   const checkHealthProfileStatus = useCallback(async () => {
     if (isAuthenticated && user) {
       const isCompleted = await HealthProfileStorage.isCompleted(user.id);
       setProfileIncomplete(!isCompleted);
     } else {
-      setProfileIncomplete(false);
+      const isCompleted = await HealthProfileStorage.isCompleted();
+      setProfileIncomplete(!isCompleted);
     }
   }, [isAuthenticated, user]);
 
@@ -144,6 +145,7 @@ export const AssessmentWizardScreen: React.FC = () => {
     try {
       if (!isAuthenticated || isGuest) {
         // STRICT ZERO-DB POLICY: Compute locally on client, ZERO writes to MongoDB
+        const savedHealth = await HealthProfileStorage.getHealthProfile(user?.id);
         const { results, aiExplanation, primaryContributors } = ClientScoringEngine.computeScore(
           {
             symptoms: draft.symptoms,
@@ -151,8 +153,8 @@ export const AssessmentWizardScreen: React.FC = () => {
             dietaryHabits: draft.dietaryHabits
           },
           {
-            skinType: user?.skinType,
-            dietaryPreference: user?.dietaryPreference
+            skinType: user?.skinType || savedHealth?.skinType,
+            dietaryPreference: user?.dietaryPreference || savedHealth?.dietaryPreference
           }
         );
 
