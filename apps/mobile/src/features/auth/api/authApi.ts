@@ -1,15 +1,5 @@
-import { Platform } from 'react-native';
-import Constants from 'expo-constants';
 import { TokenStorage } from '../../../shared/storage/secureStore';
-import { apiFetch } from '../../../shared/api/apiClient';
-
-// Dynamically resolves host IP so physical devices on Expo Go can communicate with backend
-const hostUri = Constants.expoConfig?.hostUri;
-const host = hostUri ? hostUri.split(':')[0] : 'localhost';
-const DEFAULT_API_BASE =
-  process.env.EXPO_PUBLIC_API_URL && !process.env.EXPO_PUBLIC_API_URL.includes('localhost')
-    ? process.env.EXPO_PUBLIC_API_URL
-    : `http://${host}:4000/api/v1`;
+import { apiFetch, DEFAULT_API_BASE } from '../../../shared/api/apiClient';
 
 export interface UserProfile {
   id: string;

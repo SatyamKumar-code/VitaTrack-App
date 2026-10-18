@@ -1,16 +1,8 @@
-import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { TokenStorage } from '../../../shared/storage/secureStore';
-import { apiFetch } from '../../../shared/api/apiClient';
+import { apiFetch, DEFAULT_API_BASE } from '../../../shared/api/apiClient';
 import { ReminderPreferences, ReminderType } from '../types/reminder.types';
-
-const hostUri = Constants.expoConfig?.hostUri;
-const host = hostUri ? hostUri.split(':')[0] : 'localhost';
-const DEFAULT_API_BASE =
-  process.env.EXPO_PUBLIC_API_URL && !process.env.EXPO_PUBLIC_API_URL.includes('localhost')
-    ? process.env.EXPO_PUBLIC_API_URL
-    : `http://${host}:4000/api/v1`;
 
 const LOCAL_PREFS_KEY = 'vitatrack_local_reminder_prefs';
 

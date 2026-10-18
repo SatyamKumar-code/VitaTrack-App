@@ -2,13 +2,62 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { TokenStorage } from '../storage/secureStore';
 
-// Dynamically resolves host IP so physical devices on Expo Go can communicate with backend
-const hostUri = Constants.expoConfig?.hostUri;
-const host = hostUri ? hostUri.split(':')[0] : 'localhost';
-export const DEFAULT_API_BASE =
-  process.env.EXPO_PUBLIC_API_URL && !process.env.EXPO_PUBLIC_API_URL.includes('localhost')
-    ? process.env.EXPO_PUBLIC_API_URL
-    : `http://${host}:4000/api/v1`;
+// Dynamically resolves backend API URL for Cloud (Render), Mobile Web, and Expo Go physical devices
+const resolveApiBase = (): string => {
+  // 1. Runtime injection via window.__VITATRACK_ENV__ (Docker runtime env injected by Nginx in mobile web)
+  if (typeof window !== 'undefined' && (window as any).__VITATRACK_ENV__?.apiUrl) {
+    const runtimeUrl = String((window as any).__VITATRACK_ENV__.apiUrl).trim();
+    if (runtimeUrl && !runtimeUrl.includes('localhost')) {
+      const trimmed = runtimeUrl.replace(/\/$/, '');
+      return trimmed.endsWith('/api/v1') ? trimmed : `${trimmed}/api/v1`;
+    }
+  }
+
+  // 2. Query param or LocalStorage override in browser web runtime (?apiUrl=https://backend.onrender.com)
+  if (typeof window !== 'undefined') {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const queryApi = params.get('apiUrl') || params.get('backendUrl');
+      if (queryApi) {
+        localStorage.setItem('vitatrack_backend_url', queryApi);
+      }
+      const saved = localStorage.getItem('vitatrack_backend_url');
+      if (saved && !saved.includes('localhost')) {
+        const trimmed = saved.trim().replace(/\/$/, '');
+        return trimmed.endsWith('/api/v1') ? trimmed : `${trimmed}/api/v1`;
+      }
+    } catch {
+      // Ignore storage errors in non-standard runtimes
+    }
+  }
+
+  // 3. Explicit environment variable set and not pointing to localhost (build-time)
+  const envUrl = process.env.EXPO_PUBLIC_API_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim() && !envUrl.includes('localhost')) {
+    const trimmed = envUrl.trim().replace(/\/$/, '');
+    return trimmed.endsWith('/api/v1') ? trimmed : `${trimmed}/api/v1`;
+  }
+
+  // 4. Browser web runtime auto-detection (e.g. vitatrack-mobile-web.onrender.com -> vitatrack-backend.onrender.com)
+  if (
+    typeof window !== 'undefined' &&
+    window.location &&
+    window.location.hostname &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+  ) {
+    const host = window.location.hostname;
+    const backendHost = host.replace('mobile-web', 'backend').replace('mobile', 'backend');
+    return `${window.location.protocol}//${backendHost}/api/v1`;
+  }
+
+  // 5. Expo Go physical device dynamic IP resolver
+  const hostUri = Constants.expoConfig?.hostUri;
+  const host = hostUri ? hostUri.split(':')[0] : 'localhost';
+  return `http://${host}:4000/api/v1`;
+};
+
+export const DEFAULT_API_BASE = resolveApiBase();
 
 let isRefreshing = false;
 let failedQueue: Array<{

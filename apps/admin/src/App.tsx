@@ -18,7 +18,7 @@ import { MacroAnalyticsView } from './components/MacroAnalyticsView';
 import { AuditTrailView } from './components/AuditTrailView';
 import { AdminLoginModal } from './components/AdminLoginModal';
 import { ServerIncidentScreen, ServerIncidentDetails } from './components/ServerIncidentScreen';
-import { AdminApiService } from './services/adminApi.service';
+import { AdminApiService, API_BASE, HEALTH_BASE } from './services/adminApi.service';
 import {
   AdminHealthData,
   AdminMetricsData,
@@ -80,17 +80,17 @@ export default function App() {
           type: 'process_down',
           title: 'Backend API Process Offline / Terminated',
           reason:
-            'Node.js backend server at http://localhost:4000 is not reachable. The server process was stopped (e.g., Ctrl+C / SIGINT) or has crashed.',
+            `Node.js backend server at ${HEALTH_BASE} is not reachable. The server process was stopped (e.g., Ctrl+C / SIGINT) or has crashed.`,
           technicalError: probe.rawError || 'TypeError: Failed to fetch (ECONNREFUSED)',
-          targetUrl: 'http://localhost:4000/health',
+          targetUrl: `${HEALTH_BASE}/health`,
           timestamp: new Date().toISOString(),
           serverProcessStatus: 'offline',
           serverUptimeSeconds: null,
           databaseStatus: 'unknown',
           databaseError: null,
           suggestedFix: [
-            'In terminal, run: npm run backend:dev',
-            'If you see "Error: listen EADDRINUSE: :::4000", an orphan node process is holding port 4000. Run: npx kill-port 4000',
+            'In terminal, run: npm run backend:dev (or check Render backend service logs)',
+            'If local, check port 4000. On cloud, ensure backend service is active and deployed',
             'Check terminal logs to see why the process stopped'
           ],
           retryCount: retryCountRef.current
@@ -106,7 +106,7 @@ export default function App() {
           reason:
             'Node.js backend server is running, but the MongoDB database connection is disconnected or failed to connect.',
           technicalError: `Database Error: ${dbErr}`,
-          targetUrl: 'http://localhost:4000/health',
+          targetUrl: `${HEALTH_BASE}/health`,
           timestamp: new Date().toISOString(),
           serverProcessStatus: 'online',
           serverUptimeSeconds: probe.healthData.uptimeSeconds,
@@ -130,7 +130,7 @@ export default function App() {
           reason:
             'Backend server and MongoDB are both ONLINE, but the admin session token was rejected. (Server may have been restarted, resetting tokens).',
           technicalError: `HTTP ${code} Unauthorized: ${detail}`,
-          targetUrl: 'http://localhost:4000/api/v1/admin/*',
+          targetUrl: `${API_BASE}/admin/*`,
           timestamp: new Date().toISOString(),
           serverProcessStatus: 'online',
           serverUptimeSeconds: probe.healthData?.uptimeSeconds ?? null,
@@ -151,7 +151,7 @@ export default function App() {
           title: 'Backend Route Execution Error',
           reason: 'Backend server returned an error while processing administrative telemetry.',
           technicalError: detail,
-          targetUrl: 'http://localhost:4000/api/v1/admin/metrics',
+          targetUrl: `${API_BASE}/admin/metrics`,
           timestamp: new Date().toISOString(),
           serverProcessStatus: 'online',
           serverUptimeSeconds: probe.healthData?.uptimeSeconds ?? null,

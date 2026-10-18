@@ -1,6 +1,56 @@
 import { AdminHealthData, AdminMetricsData, AdminAuditLogEntry, AdminUser } from '../types/admin.types';
 
-const API_BASE = 'http://localhost:4000/api/v1';
+// Dynamically resolve Backend API Base URL from runtime env, query params, Vite env, or window hostname
+const resolveApiBase = (): string => {
+  // 1. Runtime injection via window.__VITATRACK_ENV__ (Docker runtime env injected by Nginx)
+  if (typeof window !== 'undefined' && (window as any).__VITATRACK_ENV__?.apiUrl) {
+    const runtimeUrl = String((window as any).__VITATRACK_ENV__.apiUrl).trim();
+    if (runtimeUrl && !runtimeUrl.includes('localhost')) {
+      const trimmed = runtimeUrl.replace(/\/$/, '');
+      return trimmed.endsWith('/api/v1') ? trimmed : `${trimmed}/api/v1`;
+    }
+  }
+
+  // 2. Query param or LocalStorage override (?apiUrl=https://backend.onrender.com)
+  if (typeof window !== 'undefined') {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const queryApi = params.get('apiUrl') || params.get('backendUrl');
+      if (queryApi) {
+        localStorage.setItem('vitatrack_backend_url', queryApi);
+      }
+      const saved = localStorage.getItem('vitatrack_backend_url');
+      if (saved && !saved.includes('localhost')) {
+        const trimmed = saved.trim().replace(/\/$/, '');
+        return trimmed.endsWith('/api/v1') ? trimmed : `${trimmed}/api/v1`;
+      }
+    } catch {
+      // Ignore localStorage access issues
+    }
+  }
+
+  // 3. Explicit Vite env variable (build-time)
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim() && !envUrl.includes('localhost')) {
+    const trimmed = envUrl.trim().replace(/\/$/, '');
+    return trimmed.endsWith('/api/v1') ? trimmed : `${trimmed}/api/v1`;
+  }
+
+  // 4. Browser window auto-detection (e.g. vitatrack-admin.onrender.com -> vitatrack-backend.onrender.com)
+  if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+    const host = window.location.hostname;
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      const backendHost = host.replace('admin', 'backend');
+      return `${window.location.protocol}//${backendHost}/api/v1`;
+    }
+  }
+
+  // 5. Local fallback
+  return 'http://localhost:4000/api/v1';
+};
+
+export const API_BASE = resolveApiBase();
+export const HEALTH_BASE = API_BASE.replace(/\/api\/v1\/?$/, '');
 
 export class AdminApiService {
   private static tokenKey = 'vitatrack_admin_token';
@@ -78,7 +128,7 @@ export class AdminApiService {
     } | null;
   }> {
     try {
-      const res = await fetch('http://localhost:4000/health');
+      const res = await fetch(`${HEALTH_BASE}/health`);
       const data = await res.json();
       return {
         isProcessRunning: true,

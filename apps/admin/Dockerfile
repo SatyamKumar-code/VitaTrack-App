@@ -3,6 +3,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Accept optional build argument for backend API URL
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 COPY package*.json ./
 COPY tsconfig*.json ./
 COPY vite.config.ts ./
@@ -31,6 +35,10 @@ RUN echo 'server { \
         try_files $uri $uri/ /index.html; \
     } \
 }' > /etc/nginx/conf.d/default.conf
+
+# Dynamic runtime environment injection script for Nginx container startup
+RUN printf '#!/bin/sh\nAPI="${VITE_API_URL:-${BACKEND_URL:-}}"\necho "window.__VITATRACK_ENV__ = { apiUrl: \\"${API}\\" };" > /usr/share/nginx/html/env-config.js\n' > /docker-entrypoint.d/40-env-config.sh && \
+    chmod +x /docker-entrypoint.d/40-env-config.sh
 
 EXPOSE 80
 
