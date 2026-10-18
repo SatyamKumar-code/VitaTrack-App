@@ -18,9 +18,8 @@ export const DietGuidanceCard: React.FC<DietGuidanceCardProps> = ({
   onDietChange
 }) => {
   const DIET_OPTIONS: { key: DietaryPreference; label: string; icon: string }[] = [
-    { key: 'omnivore', label: 'Omnivore', icon: '🐟' },
     { key: 'vegetarian', label: 'Vegetarian', icon: '🥛' },
-    { key: 'vegan', label: 'Vegan', icon: '🌱' }
+    { key: 'omnivore', label: 'Non-Vegetarian', icon: '🍗' }
   ];
 
   return (
@@ -66,7 +65,7 @@ export const DietGuidanceCard: React.FC<DietGuidanceCardProps> = ({
       {/* Priority Vitamin D Rich Foods */}
       <View style={styles.foodsSection}>
         <Text style={styles.foodsTitle}>
-          High-Bioavailability Foods ({selectedDiet.toUpperCase()})
+          High-Bioavailability Foods ({selectedDiet === 'omnivore' ? 'NON-VEGETARIAN' : 'VEGETARIAN'})
         </Text>
 
         {nutrition.priorityFoods.map((food, idx) => (

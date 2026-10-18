@@ -202,9 +202,9 @@ export const SummaryReviewStep: React.FC<SummaryReviewStepProps> = ({
                 <Text style={styles.modalIconText}>☀️</Text>
               </View>
 
-              <Text style={styles.modalTitle}>Assessment Recorded!</Text>
+              <Text style={styles.modalTitle}>Assessment Evaluated!</Text>
               <Text style={styles.modalSubtitle}>
-                Your multi-factor assessment has been securely persisted to the clinical registry.
+                Your multi-factor Vitamin D risk evaluation is ready to view.
               </Text>
 
               {/* Score Preview Pill */}

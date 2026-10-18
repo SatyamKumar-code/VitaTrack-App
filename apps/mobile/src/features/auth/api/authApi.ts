@@ -35,8 +35,8 @@ export interface RegisterPayload {
   fullName: string;
   dateOfBirth: string;
   biologicalSex: 'male' | 'female' | 'other';
-  skinType: string;
-  dietaryPreference: string;
+  skinType?: string;
+  dietaryPreference?: string;
   medicalConditions?: string[];
 }
 

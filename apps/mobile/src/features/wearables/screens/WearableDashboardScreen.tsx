@@ -23,6 +23,7 @@ import { BiometricMetricCard } from '../components/BiometricMetricCard';
 import { WearableCorrelationCard } from '../components/WearableCorrelationCard';
 import { WearableHistorySparkline } from '../components/WearableHistorySparkline';
 import { VendorGuideSection } from '../components/VendorGuideSection';
+import { getFriendlyErrorMessage } from '../../../shared/utils/errorMasking';
 
 export const WearableDashboardScreen: React.FC = () => {
   const router = useRouter();
@@ -100,7 +101,7 @@ export const WearableDashboardScreen: React.FC = () => {
         `Successfully synced biometric data from ${selectedDevice.manufacturer} ${selectedDevice.model} via Android Health Connect.`
       );
     } catch (err: any) {
-      Alert.alert('Sync Notice', err.message || 'Saved to offline queue.');
+      Alert.alert('Sync Notice', getFriendlyErrorMessage(err));
     } finally {
       setSyncing(false);
     }
@@ -136,7 +137,7 @@ export const WearableDashboardScreen: React.FC = () => {
             <Text style={styles.backButtonText}>&larr; Back</Text>
           </TouchableOpacity>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>Phase 8 Wearable Ingestion</Text>
+            <Text style={styles.badgeText}>Connected Telemetry</Text>
           </View>
         </View>
 

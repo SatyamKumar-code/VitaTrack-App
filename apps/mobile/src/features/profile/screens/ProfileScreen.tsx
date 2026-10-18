@@ -13,21 +13,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../auth/context/AuthContext';
 import { Colors } from '../../../shared/theme/colors';
+import { getFriendlyErrorMessage } from '../../../shared/utils/errorMasking';
+import { HealthProfileStorage } from '../../../shared/storage/secureStore';
 
 const SKIN_TYPES = [
-  { id: 'type_1', label: 'Type I', desc: 'Pale white skin, burns easily, never tans' },
-  { id: 'type_2', label: 'Type II', desc: 'Fair skin, burns easily, tans minimally' },
-  { id: 'type_3', label: 'Type III', desc: 'Medium white/olive, burns moderately, tans gradually' },
-  { id: 'type_4', label: 'Type IV', desc: 'Olive skin, rarely burns, tans easily' },
-  { id: 'type_5', label: 'Type V', desc: 'Brown skin, very rarely burns, tans profusely' },
-  { id: 'type_6', label: 'Type VI', desc: 'Deeply pigmented dark skin, never burns' }
+  { id: 'type_3', label: 'Normal Skin', emoji: '✨', desc: 'Balanced, smooth texture, neither too dry nor too oily' },
+  { id: 'type_5', label: 'Oily Skin', emoji: '💧', desc: 'Excess shine, enlarged pores, prone to oiliness' },
+  { id: 'type_2', label: 'Dry Skin', emoji: '🌵', desc: 'Feels tight, rough or flaky, needs extra hydration' },
+  { id: 'type_1', label: 'Sensitive Skin', emoji: '🌸', desc: 'Easily irritated, prone to redness or fast reactions' },
+  { id: 'type_4', label: 'Combination Skin', emoji: '⚖️', desc: 'Oily T-zone (forehead/nose) and dry or normal cheeks' }
 ];
 
 const DIETARY_OPTIONS = [
-  { id: 'omnivore', label: 'Omnivore', desc: 'Fish, meat, dairy, eggs & plants' },
-  { id: 'pescatarian', label: 'Pescatarian', desc: 'Fish, dairy, eggs & plants' },
-  { id: 'vegetarian', label: 'Vegetarian', desc: 'Dairy, eggs & plants (no meat/fish)' },
-  { id: 'vegan', label: 'Vegan', desc: 'Exclusively plant-based' }
+  { id: 'vegetarian', label: 'Vegetarian', desc: 'Plant-based foods, dairy, pulses, grains & nuts' },
+  { id: 'omnivore', label: 'Non-Vegetarian', desc: 'Includes poultry, fish, meat, eggs & dairy' }
 ];
 
 const MEDICAL_CONDITIONS = [
@@ -105,10 +104,11 @@ export default function ProfileScreen() {
         dietaryPreference: dietaryPreference as any,
         medicalConditions: selectedConditions
       });
-      setStatusMessage('Profile updated successfully!');
+      await HealthProfileStorage.setCompleted(user?.id);
+      setStatusMessage('Profile updated successfully! Health profile is ready for checkup.');
       setTimeout(() => setStatusMessage(null), 3000);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to update profile.';
+      const msg = getFriendlyErrorMessage(err);
       Alert.alert('Update Failed', msg);
     } finally {
       setSaving(false);
@@ -139,17 +139,100 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           <View style={styles.avatarCircle}>
             <Text style={styles.avatarText}>
-              {fullName ? fullName.charAt(0).toUpperCase() : 'U'}
+              {fullName ? fullName.charAt(0).toUpperCase() : 'G'}
             </Text>
           </View>
-          <Text style={styles.userName}>{fullName || 'Patient Profile'}</Text>
-          <Text style={styles.userEmail}>{user?.email || 'patient@example.com'}</Text>
-          <View style={styles.roleBadge}>
-            <Text style={styles.roleBadgeText}>
-              {user?.role === 'admin' ? 'System Administrator' : 'Verified Patient Account'}
+          <Text style={styles.userName}>{user ? (fullName || 'Patient Profile') : 'Guest Explorer'}</Text>
+          <Text style={styles.userEmail}>{user?.email || 'Exploring without account'}</Text>
+          <View
+            style={[
+              styles.roleBadge,
+              !user && {
+                backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                borderColor: 'rgba(245, 158, 11, 0.35)'
+              }
+            ]}
+          >
+            <Text
+              style={[
+                styles.roleBadgeText,
+                !user && { color: Colors.primary.amber }
+              ]}
+            >
+              {user?.role === 'admin'
+                ? 'System Administrator'
+                : user
+                ? 'Verified Patient Account'
+                : 'Guest Exploration (Zero Cloud Storage)'}
             </Text>
           </View>
         </View>
+
+        {!user && (
+          <View
+            style={{
+              backgroundColor: 'rgba(15, 23, 42, 0.85)',
+              borderRadius: 16,
+              borderWidth: 1.5,
+              borderColor: 'rgba(245, 158, 11, 0.35)',
+              padding: 16,
+              marginBottom: 20
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: '800',
+                color: Colors.slate.textMain,
+                marginBottom: 4
+              }}
+            >
+              You are exploring as a Guest
+            </Text>
+            <Text
+              style={{
+                fontSize: 12,
+                color: Colors.slate.textMuted,
+                lineHeight: 18,
+                marginBottom: 12
+              }}
+            >
+              Create an account or sign in to save your assessments, unlock longitudinal trends, and enable cloud synchronization.
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: Colors.primary.amber,
+                  borderRadius: 10,
+                  paddingVertical: 10,
+                  alignItems: 'center'
+                }}
+                onPress={() => router.push('/(auth)/login')}
+              >
+                <Text style={{ fontSize: 13, fontWeight: '800', color: '#0B0F19' }}>
+                  Sign In &rarr;
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: 'rgba(30, 41, 59, 0.80)',
+                  borderWidth: 1,
+                  borderColor: Colors.slate.cardBorder,
+                  borderRadius: 10,
+                  paddingVertical: 10,
+                  alignItems: 'center'
+                }}
+                onPress={() => router.push('/(auth)/register')}
+              >
+                <Text style={{ fontSize: 13, fontWeight: '700', color: Colors.slate.textMain }}>
+                  Create Account
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         {statusMessage ? (
           <View style={styles.successBanner}>
@@ -206,16 +289,18 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Fitzpatrick Skin Phototype */}
+        {/* Skin Type */}
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Fitzpatrick Skin Phototype</Text>
+          <Text style={styles.sectionTitle}>Skin Type</Text>
           <Text style={styles.sectionDesc}>
-            Used to calibrate minimum erythemal dose (MED) and safe solar synthesis minutes.
+            Select your skin type to personalize your daily sunlight and wellness guidance.
           </Text>
 
           <View style={styles.selectorGrid}>
             {SKIN_TYPES.map((type) => {
-              const isSelected = skinType === type.id;
+              const isSelected =
+                skinType === type.id ||
+                (type.id === 'type_5' && skinType === 'type_6');
               return (
                 <TouchableOpacity
                   key={type.id}
@@ -223,9 +308,12 @@ export default function ProfileScreen() {
                   onPress={() => setSkinType(type.id)}
                 >
                   <View style={styles.cardHeaderRow}>
-                    <Text style={[styles.optionTitle, isSelected && styles.selectedOptionTitle]}>
-                      {type.label}
-                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Text style={{ fontSize: 18 }}>{type.emoji}</Text>
+                      <Text style={[styles.optionTitle, isSelected && styles.selectedOptionTitle]}>
+                        {type.label}
+                      </Text>
+                    </View>
                     <View style={[styles.radioCircle, isSelected && styles.selectedRadioCircle]}>
                       {isSelected ? <View style={styles.radioInner} /> : null}
                     </View>
@@ -242,7 +330,10 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>Dietary Orientation</Text>
           <View style={styles.selectorGrid}>
             {DIETARY_OPTIONS.map((diet) => {
-              const isSelected = dietaryPreference === diet.id;
+              const isSelected =
+                dietaryPreference === diet.id ||
+                (diet.id === 'vegetarian' && dietaryPreference === 'vegan') ||
+                (diet.id === 'omnivore' && dietaryPreference === 'pescatarian');
               return (
                 <TouchableOpacity
                   key={diet.id}

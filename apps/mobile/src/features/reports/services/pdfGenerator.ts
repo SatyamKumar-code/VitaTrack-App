@@ -355,12 +355,22 @@ export const PdfGenerator = {
     <div class="grid-col">
       <div class="card">
         <div class="meta-row">
-          <span class="meta-label">Fitzpatrick Skin Phototype:</span>
-          <span class="meta-value">${(patient.skinType || 'Type III').toUpperCase()}</span>
+          <span class="meta-label">Skin Type:</span>
+          <span class="meta-value">${(() => {
+            const map: Record<string, string> = {
+              type_1: 'Sensitive Skin (Type I)',
+              type_2: 'Dry Skin (Type II)',
+              type_3: 'Normal Skin (Type III)',
+              type_4: 'Combination Skin (Type IV)',
+              type_5: 'Oily Skin (Type V)',
+              type_6: 'Oily Skin (Type VI)'
+            };
+            return (map[patient.skinType || ''] || 'Normal Skin').toUpperCase();
+          })()}</span>
         </div>
         <div class="meta-row">
           <span class="meta-label">Dietary Preference:</span>
-          <span class="meta-value">${(patient.dietaryPreference || 'Omnivore').toUpperCase()}</span>
+          <span class="meta-value">${(patient.dietaryPreference === 'omnivore' ? 'Non-Vegetarian' : (patient.dietaryPreference || 'Vegetarian')).toUpperCase()}</span>
         </div>
         <div class="meta-row">
           <span class="meta-label">Reported Medical Conditions:</span>

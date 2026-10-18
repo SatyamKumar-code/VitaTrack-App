@@ -260,30 +260,30 @@ graph TB
 ## 7. Implementation Roadmap & Execution Checklist
 
 ### Phase A: Mobile Navigation & Shell Revamp (Immediate Priority)
-- [ ] Implement Expo Router `(tabs)` bottom navigation bar with 5 polished tabs:
+- [x] Implement Expo Router `(tabs)` bottom navigation bar with 5 polished tabs:
   - 🏠 Home (`apps/mobile/app/(tabs)/index.tsx`)
   - 📝 Checkup (`apps/mobile/app/(tabs)/assessment.tsx`)
   - ☀️ Guidance (`apps/mobile/app/(tabs)/guidance.tsx`)
   - 📊 Trends (`apps/mobile/app/(tabs)/history.tsx`)
   - 👤 Profile (`apps/mobile/app/(tabs)/profile.tsx`)
-- [ ] Design sleek custom icons, active solar amber pill indicators, and haptic tab-press feedback.
+- [x] Design sleek custom icons, active solar amber pill indicators, and haptic tab-press feedback.
 
 ### Phase B: Home Screen Human-Stylist Polish
-- [ ] Strip out all phase status cards and developer debug text from `index.tsx`.
-- [ ] Build a stunning Hero Card: Daily Solar synthesis score ring, local UV index indicator, quick "Start Checkup" CTA.
-- [ ] Add Daily Wellness Insight card with rotating human-friendly health tips.
-- [ ] Add Wearable Activity preview card (realistic preview numbers for guests; synced Health Connect metrics for logged-in users).
+- [x] Strip out all phase status cards and developer debug text from `index.tsx`.
+- [x] Build a stunning Hero Card: Daily Solar synthesis score ring, local UV index indicator, quick "Start Checkup" CTA.
+- [x] Add Daily Wellness Insight card with rotating human-friendly health tips.
+- [x] Add Wearable Activity preview card (realistic preview numbers for guests; synced Health Connect metrics for logged-in users).
 
 ### Phase C: Guest Mode (Bin Login) & Strict Zero-DB Rule
-- [ ] Update `AuthContext` to support a `guest` state without requiring email/password.
-- [ ] Guest users can complete the checkup wizard and see their instant score without login.
-- [ ] Ensure assessment submit logic blocks backend API POST when user is in guest mode; keep data in client memory only.
-- [ ] Present non-intrusive "Save to Profile" modal on the results screen.
-- [ ] Only persist to MongoDB after the user signs in or creates an account.
+- [x] Update `AuthContext` to support a `guest` state without requiring email/password.
+- [x] Guest users can complete the checkup wizard and see their instant score without login.
+- [x] Ensure assessment submit logic blocks backend API POST when user is in guest mode; keep data in client memory only.
+- [x] Present non-intrusive "Save to Profile" modal on the results screen.
+- [x] Only persist to MongoDB after the user signs in or creates an account.
 
 ### Phase D: Sensitive Error Masking & Copy Polish
-- [ ] Implement `FriendlyErrorToast` and global error boundary that catches errors and presents warm, polite messages.
-- [ ] Audit all strings in `assessment`, `results`, `guidance`, `history`, `reminders`, `wearables`, and `profile` to guarantee natural, compassionate, human-first medical language.
+- [x] Implement `FriendlyErrorToast` and global error boundary that catches errors and presents warm, polite messages.
+- [x] Audit all strings in `assessment`, `results`, `guidance`, `history`, `reminders`, `wearables`, and `profile` to guarantee natural, compassionate, human-first medical language.
 
 ### Phase E: Backend Redis Caching & Reverse Proxy Load Balancing Spec
 - [ ] Document Docker Compose setup for Redis service.

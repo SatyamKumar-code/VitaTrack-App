@@ -84,7 +84,7 @@ export const PersonalizedGuidanceScreen: React.FC = () => {
             <Text style={styles.backButtonText}>&larr; Dashboard</Text>
           </TouchableOpacity>
           <View style={styles.badgePill}>
-            <Text style={styles.badgePillText}>Phase 5 Active</Text>
+            <Text style={styles.badgePillText}>Clinical Guidance</Text>
           </View>
         </View>
 

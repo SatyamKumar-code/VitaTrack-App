@@ -96,7 +96,7 @@ export const SunlightExposureTracker: React.FC<SunlightExposureTrackerProps> = (
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Solar Photobiology & Synthesis</Text>
         <Text style={styles.sectionSubtitle}>
-          Exposure calibrated to your Fitzpatrick phototype to prevent sunburn:
+          Exposure calibrated to your skin sensitivity to prevent sunburn:
         </Text>
       </View>
 

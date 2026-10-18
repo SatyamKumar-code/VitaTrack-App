@@ -37,7 +37,7 @@ const SLIDES: Slide[] = [
     title: 'Wearable Sync & Clinician Reports',
     subtitle:
       'Track resting heart rate, sleep quality, and outdoor steps, then export comprehensive PDF summaries for your doctor.',
-    highlight: 'Zero-PHI Privacy Architecture'
+    highlight: 'Privacy & Device-Level Protection'
   }
 ];
 

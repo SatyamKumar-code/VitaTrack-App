@@ -15,6 +15,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import { Colors } from '../../../shared/theme/colors';
+import { GuestStore } from '../../assessment/storage/guestStore';
+import { AssessmentApi } from '../../assessment/services/assessmentApi';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -37,6 +39,24 @@ export default function LoginScreen() {
 
     try {
       await login({ email: email.trim(), password });
+
+      // If user had a guest evaluation waiting, persist to MongoDB now that authenticated
+      const pendingGuest = GuestStore.getGuestAssessment();
+      if (pendingGuest) {
+        try {
+          await AssessmentApi.submitAssessment({
+            symptoms: pendingGuest.draft.symptoms,
+            sunExposure: pendingGuest.draft.sunExposure,
+            dietaryHabits: pendingGuest.draft.dietaryHabits
+          });
+          GuestStore.clearGuestAssessment();
+          router.replace('/results');
+          return;
+        } catch {
+          // Graceful non-blocking fallback
+        }
+      }
+
       router.replace('/profile');
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Invalid login credentials.';
@@ -138,7 +158,7 @@ export default function LoginScreen() {
           {/* Clinical Note */}
           <View style={styles.disclaimerBox}>
             <Text style={styles.disclaimerText}>
-              🔒 Protected Health Information (PHI) is cryptographically isolated. Sessions are backed by hardware keystore tokens.
+              🔒 Privacy &amp; Data Security. Your health evaluations remain private and protected on your device.
             </Text>
           </View>
         </ScrollView>

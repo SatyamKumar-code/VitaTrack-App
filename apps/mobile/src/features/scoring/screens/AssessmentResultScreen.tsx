@@ -15,7 +15,11 @@ import { RiskScoreGauge } from '../components/RiskScoreGauge';
 import { RiskLevelBadge } from '../components/RiskLevelBadge';
 import { DoctorAlertBanner } from '../components/DoctorAlertBanner';
 import { KeyContributorsCard } from '../components/KeyContributorsCard';
+import { SaveToProfileCard } from '../components/SaveToProfileCard';
 import { AssessmentApi } from '../../assessment/services/assessmentApi';
+import { useAuth } from '../../auth/context/AuthContext';
+import { GuestStore } from '../../assessment/storage/guestStore';
+import { getFriendlyErrorMessage } from '../../../shared/utils/errorMasking';
 
 interface AssessmentResultScreenProps {
   initialData?: AssessmentResultData | null;
@@ -23,6 +27,7 @@ interface AssessmentResultScreenProps {
 
 export const AssessmentResultScreen: React.FC<AssessmentResultScreenProps> = ({ initialData }) => {
   const router = useRouter();
+  const { isAuthenticated, isGuest } = useAuth();
   const [data, setData] = useState<AssessmentResultData | null>(initialData || null);
   const [loading, setLoading] = useState<boolean>(!initialData);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +39,35 @@ export const AssessmentResultScreen: React.FC<AssessmentResultScreenProps> = ({ 
       return;
     }
 
+    // 1. Check if ephemeral guest assessment exists (Zero-DB mode)
+    const guestData = GuestStore.getGuestAssessment();
+    if (guestData) {
+      setData({
+        assessmentId: 'guest-session',
+        timestamp: guestData.timestamp,
+        results: guestData.results,
+        aiExplanation: {
+          summary: guestData.aiExplanation,
+          keyContributors: [
+            guestData.results.riskTier === 'high'
+              ? 'Multi-factor inputs indicate significant vitamin D deficiency indicators.'
+              : guestData.results.riskTier === 'moderate'
+              ? 'Suboptimal sun exposure and dietary habits reflect moderate deficiency risk.'
+              : 'Consistent daytime sunlight and balanced nutrition support baseline levels.'
+          ]
+        }
+      });
+      setLoading(false);
+      return;
+    }
+
+    // 2. If guest with no assessment, show empty state without API call
+    if (!isAuthenticated || isGuest) {
+      setLoading(false);
+      return;
+    }
+
+    // 3. Authenticated: Fetch latest from API
     const fetchLatest = async () => {
       try {
         setLoading(true);
@@ -51,14 +85,14 @@ export const AssessmentResultScreen: React.FC<AssessmentResultScreenProps> = ({ 
           setData(null);
         }
       } catch (err: any) {
-        setError(err?.message || 'Failed to retrieve assessment results.');
+        setError(getFriendlyErrorMessage(err));
       } finally {
         setLoading(false);
       }
     };
 
     fetchLatest();
-  }, [initialData]);
+  }, [initialData, isAuthenticated, isGuest]);
 
   if (loading) {
     return (
@@ -150,6 +184,11 @@ export const AssessmentResultScreen: React.FC<AssessmentResultScreenProps> = ({ 
           riskTier={results.riskTier}
           disclaimer={results.disclaimer}
         />
+
+        {/* Phase C: Non-Intrusive Save to Profile Prompt for Guests */}
+        {(!isAuthenticated || isGuest || GuestStore.hasGuestAssessment()) && (
+          <SaveToProfileCard />
+        )}
 
         {/* AI Explainer Synthesis Card */}
         {aiExplanation && <KeyContributorsCard explanation={aiExplanation} />}

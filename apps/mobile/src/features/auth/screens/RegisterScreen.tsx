@@ -15,30 +15,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import { Colors } from '../../../shared/theme/colors';
-
-const SKIN_TYPES = [
-  { id: 'type_1', label: 'Type I', desc: 'Pale white skin, burns easily, never tans' },
-  { id: 'type_2', label: 'Type II', desc: 'Fair skin, burns easily, tans minimally' },
-  { id: 'type_3', label: 'Type III', desc: 'Medium white/olive, burns moderately, tans gradually' },
-  { id: 'type_4', label: 'Type IV', desc: 'Olive skin, rarely burns, tans easily' },
-  { id: 'type_5', label: 'Type V', desc: 'Brown skin, very rarely burns, tans profusely' },
-  { id: 'type_6', label: 'Type VI', desc: 'Deeply pigmented dark skin, never burns' }
-];
-
-const DIETARY_OPTIONS = [
-  { id: 'omnivore', label: 'Omnivore', desc: 'Fish, meat, dairy, eggs & plants' },
-  { id: 'pescatarian', label: 'Pescatarian', desc: 'Fish, dairy, eggs & plants' },
-  { id: 'vegetarian', label: 'Vegetarian', desc: 'Dairy, eggs & plants (no meat/fish)' },
-  { id: 'vegan', label: 'Vegan', desc: 'Exclusively plant-based' }
-];
-
-const COMMON_CONDITIONS = [
-  { id: 'celiac', label: 'Celiac Disease' },
-  { id: 'crohns', label: 'Crohn’s / IBD' },
-  { id: 'malabsorption', label: 'Malabsorption' },
-  { id: 'kidney_disease', label: 'Kidney Disease' },
-  { id: 'obesity', label: 'High BMI (Obesity)' }
-];
+import { GuestStore } from '../../assessment/storage/guestStore';
+import { AssessmentApi } from '../../assessment/services/assessmentApi';
+import { HealthProfileStorage } from '../../../shared/storage/secureStore';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -49,18 +28,9 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('1996-05-20');
   const [biologicalSex, setBiologicalSex] = useState<'male' | 'female' | 'other'>('female');
-  const [skinType, setSkinType] = useState('type_3');
-  const [dietaryPreference, setDietaryPreference] = useState('omnivore');
-  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const toggleCondition = (condId: string) => {
-    setSelectedConditions((prev) =>
-      prev.includes(condId) ? prev.filter((id) => id !== condId) : [...prev, condId]
-    );
-  };
 
   const handleRegister = async () => {
     if (!fullName.trim() || !email.trim() || !password) {
@@ -77,17 +47,50 @@ export default function RegisterScreen() {
     setErrorMessage(null);
 
     try {
-      await register({
+      const registeredUser = await register({
         fullName: fullName.trim(),
         email: email.trim(),
         password,
         dateOfBirth,
-        biologicalSex,
-        skinType,
-        dietaryPreference,
-        medicalConditions: selectedConditions
+        biologicalSex
       });
-      router.replace('/profile');
+
+      // Mark health profile as incomplete so checkup prompts user if skipped
+      await HealthProfileStorage.setIncomplete(registeredUser?.id);
+
+      // If user had a guest evaluation waiting, persist to MongoDB now that authenticated
+      const pendingGuest = GuestStore.getGuestAssessment();
+      if (pendingGuest) {
+        try {
+          await AssessmentApi.submitAssessment({
+            symptoms: pendingGuest.draft.symptoms,
+            sunExposure: pendingGuest.draft.sunExposure,
+            dietaryHabits: pendingGuest.draft.dietaryHabits
+          });
+          GuestStore.clearGuestAssessment();
+        } catch {
+          // Graceful non-blocking fallback
+        }
+      }
+
+      // Prompt to configure health profile with Skip option
+      Alert.alert(
+        'Setup Health Profile',
+        'Account created! Would you like to set your Skin Type and Dietary Orientation now for accurate checkup calculations?',
+        [
+          {
+            text: 'Skip for Now',
+            style: 'cancel',
+            onPress: () => router.replace('/')
+          },
+          {
+            text: 'Set Up Now',
+            style: 'default',
+            onPress: () => router.replace('/profile')
+          }
+        ],
+        { cancelable: false }
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Registration failed.';
       setErrorMessage(msg);
@@ -202,90 +205,6 @@ export default function RegisterScreen() {
             </View>
           </View>
 
-          {/* Fitzpatrick Skin Phototype */}
-          <View style={styles.section}>
-            <Text style={styles.sectionHeader}>Fitzpatrick Skin Phototype</Text>
-            <Text style={styles.sectionHint}>
-              Crucial for calculating safe ultraviolet (UV) exposure minutes without causing erythema/sunburn.
-            </Text>
-
-            <View style={styles.cardList}>
-              {SKIN_TYPES.map((type) => {
-                const isSelected = skinType === type.id;
-                return (
-                  <TouchableOpacity
-                    key={type.id}
-                    style={[styles.selectorCard, isSelected && styles.selectedCard]}
-                    onPress={() => setSkinType(type.id)}
-                  >
-                    <View style={styles.cardHeaderRow}>
-                      <Text style={[styles.cardTitle, isSelected && styles.selectedCardTitle]}>
-                        {type.label}
-                      </Text>
-                      <View style={[styles.radioCircle, isSelected && styles.selectedRadioCircle]}>
-                        {isSelected ? <View style={styles.radioInner} /> : null}
-                      </View>
-                    </View>
-                    <Text style={styles.cardDesc}>{type.desc}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* Dietary Preference */}
-          <View style={styles.section}>
-            <Text style={styles.sectionHeader}>Dietary Orientation</Text>
-            <View style={styles.cardList}>
-              {DIETARY_OPTIONS.map((diet) => {
-                const isSelected = dietaryPreference === diet.id;
-                return (
-                  <TouchableOpacity
-                    key={diet.id}
-                    style={[styles.selectorCard, isSelected && styles.selectedCard]}
-                    onPress={() => setDietaryPreference(diet.id)}
-                  >
-                    <View style={styles.cardHeaderRow}>
-                      <Text style={[styles.cardTitle, isSelected && styles.selectedCardTitle]}>
-                        {diet.label}
-                      </Text>
-                      <View style={[styles.radioCircle, isSelected && styles.selectedRadioCircle]}>
-                        {isSelected ? <View style={styles.radioInner} /> : null}
-                      </View>
-                    </View>
-                    <Text style={styles.cardDesc}>{diet.desc}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* Medical History Conditions */}
-          <View style={styles.section}>
-            <Text style={styles.sectionHeader}>Relevant Medical Flags (Optional)</Text>
-            <Text style={styles.sectionHint}>
-              Certain gastrointestinal or metabolic factors reduce intestinal absorption of Vitamin D.
-            </Text>
-
-            <View style={styles.badgeRow}>
-              {COMMON_CONDITIONS.map((cond) => {
-                const isChecked = selectedConditions.includes(cond.id);
-                return (
-                  <TouchableOpacity
-                    key={cond.id}
-                    style={[styles.tagBadge, isChecked && styles.selectedTagBadge]}
-                    onPress={() => toggleCondition(cond.id)}
-                  >
-                    <Text style={[styles.tagText, isChecked && styles.selectedTagText]}>
-                      {isChecked ? '✓ ' : '+ '}
-                      {cond.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
           {/* Submit */}
           <TouchableOpacity
             style={[styles.submitButton, loading && styles.buttonDisabled]}
@@ -295,7 +214,7 @@ export default function RegisterScreen() {
             {loading ? (
               <ActivityIndicator color="#0B0F19" />
             ) : (
-              <Text style={styles.submitButtonText}>Create Account &amp; Save Profile</Text>
+              <Text style={styles.submitButtonText}>Create Account &rarr;</Text>
             )}
           </TouchableOpacity>
 

@@ -50,15 +50,15 @@ export default function ForgotPasswordScreen() {
           </View>
           <Text style={styles.title}>Password Recovery</Text>
           <Text style={styles.subtitle}>
-            Enter your account email to receive cryptographic recovery instructions
+            Enter your registered email address to receive secure password reset instructions
           </Text>
         </View>
 
         {submitted ? (
           <View style={styles.successBox}>
-            <Text style={styles.successTitle}>Request Initiated</Text>
+            <Text style={styles.successTitle}>Check Your Inbox</Text>
             <Text style={styles.successMessage}>
-              If an account with that email exists in the VitaTrack database, password recovery instructions have been dispatched.
+              If an account with that email exists, password reset instructions have been sent to your email address.
             </Text>
             <TouchableOpacity
               style={styles.returnButton}

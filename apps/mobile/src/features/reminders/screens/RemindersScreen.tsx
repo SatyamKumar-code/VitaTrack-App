@@ -16,6 +16,7 @@ import { NotificationService } from '../services/notificationService';
 import { RemindersApi } from '../services/remindersApi';
 import { ReminderPreferences, ReminderType } from '../types/reminder.types';
 import { useAuth } from '../../auth/context/AuthContext';
+import { getFriendlyErrorMessage } from '../../../shared/utils/errorMasking';
 
 export default function RemindersScreen() {
   const router = useRouter();
@@ -100,7 +101,7 @@ export default function RemindersScreen() {
       setStatusMessage('✅ Reminders saved & local schedules synchronized!');
       setTimeout(() => setStatusMessage(null), 4000);
     } catch (err: any) {
-      Alert.alert('Save Failed', err.message || 'Could not synchronize reminder settings.');
+      Alert.alert('Save Failed', getFriendlyErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -121,7 +122,7 @@ export default function RemindersScreen() {
 
       setTimeout(() => setStatusMessage(null), 5000);
     } catch (err: any) {
-      Alert.alert('Preview Failed', err.message || 'Could not fire test alert.');
+      Alert.alert('Preview Failed', getFriendlyErrorMessage(err));
     }
   };
 
@@ -145,7 +146,7 @@ export default function RemindersScreen() {
             <Text style={styles.backButtonText}>&larr; Back</Text>
           </TouchableOpacity>
           <View style={styles.phaseBadge}>
-            <Text style={styles.phaseBadgeText}>Phase 7 Active</Text>
+            <Text style={styles.phaseBadgeText}>Active Schedulers</Text>
           </View>
         </View>
 
@@ -198,7 +199,7 @@ export default function RemindersScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Solar Exposure Schedulers</Text>
           <Text style={styles.sectionSubtitle}>
-            Personalized based on Fitzpatrick Phototype {user?.skinType?.toUpperCase() || 'III'}
+            Calibrated for your skin sensitivity to safely synthesize Vitamin D
           </Text>
         </View>
 
@@ -223,7 +224,7 @@ export default function RemindersScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Nutrient &amp; Supplement Alerts</Text>
           <Text style={styles.sectionSubtitle}>
-            Calibrated to your {user?.dietaryPreference || 'Omnivore'} nutrition profile
+            Calibrated to your {user?.dietaryPreference === 'omnivore' ? 'Non-Vegetarian' : (user?.dietaryPreference ? user.dietaryPreference.charAt(0).toUpperCase() + user.dietaryPreference.slice(1) : 'Vegetarian')} nutrition profile
           </Text>
         </View>
 

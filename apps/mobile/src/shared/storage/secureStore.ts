@@ -79,3 +79,31 @@ export const TokenStorage = {
     await deleteItem(STORAGE_KEYS.USER_DATA);
   }
 };
+
+const HEALTH_PROFILE_KEY = 'VitaTrack_health_profile_completed';
+
+export const HealthProfileStorage = {
+  async isCompleted(userId?: string): Promise<boolean> {
+    const key = userId ? `${HEALTH_PROFILE_KEY}_${userId}` : HEALTH_PROFILE_KEY;
+    const val = await getItem(key);
+    if (val === 'false') return false;
+    if (val === 'true') return true;
+    return false;
+  },
+
+  async setCompleted(userId?: string): Promise<void> {
+    const key = userId ? `${HEALTH_PROFILE_KEY}_${userId}` : HEALTH_PROFILE_KEY;
+    await setItem(key, 'true');
+  },
+
+  async setIncomplete(userId?: string): Promise<void> {
+    const key = userId ? `${HEALTH_PROFILE_KEY}_${userId}` : HEALTH_PROFILE_KEY;
+    await setItem(key, 'false');
+  },
+
+  async clear(userId?: string): Promise<void> {
+    const key = userId ? `${HEALTH_PROFILE_KEY}_${userId}` : HEALTH_PROFILE_KEY;
+    await deleteItem(key);
+  }
+};
+

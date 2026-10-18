@@ -24,12 +24,13 @@ import { LongitudinalTrendChart } from '../components/LongitudinalTrendChart';
 import { TrendMetricsHeader } from '../components/TrendMetricsHeader';
 import { AssessmentHistoryCard } from '../components/AssessmentHistoryCard';
 import { Colors } from '../../../shared/theme/colors';
+import { getFriendlyErrorMessage } from '../../../shared/utils/errorMasking';
 
 type DateFilter = 'all' | '90d' | '30d';
 
 export const AssessmentHistoryScreen: React.FC = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isAuthenticated, isGuest } = useAuth();
 
   const [assessments, setAssessments] = useState<AssessmentHistoryItem[]>([]);
   const [metrics, setMetrics] = useState<TrendSummaryMetrics | null>(null);
@@ -42,6 +43,14 @@ export const AssessmentHistoryScreen: React.FC = () => {
 
   const fetchHistory = useCallback(
     async (filter: DateFilter = activeFilter) => {
+      // Ephemeral Guest Mode: Zero DB writes or reads
+      if (!isAuthenticated || isGuest) {
+        setLoading(false);
+        setRefreshing(false);
+        setAssessments([]);
+        return;
+      }
+
       try {
         setErrorMsg(null);
         let startDate: string | undefined;
@@ -64,13 +73,13 @@ export const AssessmentHistoryScreen: React.FC = () => {
         setAssessments(res.data);
         setMetrics(res.summary);
       } catch (err: any) {
-        setErrorMsg(err.message || 'Failed to load assessment history.');
+        setErrorMsg(getFriendlyErrorMessage(err));
       } finally {
         setLoading(false);
         setRefreshing(false);
       }
     },
-    [activeFilter]
+    [activeFilter, isAuthenticated, isGuest]
   );
 
   useEffect(() => {
@@ -116,7 +125,7 @@ export const AssessmentHistoryScreen: React.FC = () => {
       const { uri } = await PdfGenerator.generateClinicianReportPdf(reportPayload);
       await PdfSharing.shareReportPdf(uri, `VitaTrack Clinician Report - ${user?.fullName || 'Patient'}`);
     } catch (err: any) {
-      Alert.alert('Export Error', err.message || 'Could not generate clinician PDF report.');
+      Alert.alert('Export Error', getFriendlyErrorMessage(err));
     } finally {
       setIsExportingFullPdf(false);
     }
@@ -166,7 +175,7 @@ export const AssessmentHistoryScreen: React.FC = () => {
       const { uri } = await PdfGenerator.generateClinicianReportPdf(reportPayload);
       await PdfSharing.shareReportPdf(uri, `VitaTrack Assessment Summary - ${item.date}`);
     } catch (err: any) {
-      Alert.alert('Export Error', err.message || 'Could not generate assessment report.');
+      Alert.alert('Export Error', getFriendlyErrorMessage(err));
     } finally {
       setExportingItemId(null);
     }
@@ -282,10 +291,13 @@ export const AssessmentHistoryScreen: React.FC = () => {
             <View style={styles.emptyEmblem}>
               <Text style={{ fontSize: 36 }}>📊</Text>
             </View>
-            <Text style={styles.emptyTitle}>No Assessments Recorded Yet</Text>
+            <Text style={styles.emptyTitle}>
+              {!isAuthenticated || isGuest ? 'Track Progress Over Time' : 'No Assessments Recorded Yet'}
+            </Text>
             <Text style={styles.emptySubtitle}>
-              Complete your first clinical multi-factor self-assessment questionnaire to evaluate
-              your risk score and start tracking your longitudinal health progression.
+              {!isAuthenticated || isGuest
+                ? 'Create a free account or sign in to save assessments, track longitudinal risk trajectory charts, and export clinician PDF summaries.'
+                : 'Complete your first clinical multi-factor self-assessment questionnaire to evaluate your risk score and start tracking your longitudinal health progression.'}
             </Text>
             <TouchableOpacity
               style={styles.startAssessmentButton}
@@ -295,6 +307,25 @@ export const AssessmentHistoryScreen: React.FC = () => {
                 Start Clinical Self-Assessment &rarr;
               </Text>
             </TouchableOpacity>
+
+            {(!isAuthenticated || isGuest) && (
+              <TouchableOpacity
+                style={[
+                  styles.startAssessmentButton,
+                  {
+                    backgroundColor: Colors.slate.card,
+                    borderWidth: 1,
+                    borderColor: Colors.primary.amber,
+                    marginTop: 10
+                  }
+                ]}
+                onPress={() => router.push('/(auth)/login')}
+              >
+                <Text style={[styles.startAssessmentButtonText, { color: Colors.primary.amber }]}>
+                  Sign In to Sync History &rarr;
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         ) : (
           /* Content: Summary Metrics, Trend Chart & History Cards */

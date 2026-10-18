@@ -5,9 +5,10 @@ import { TokenStorage } from '../../../shared/storage/secureStore';
 interface AuthContextType {
   user: UserProfile | null;
   isAuthenticated: boolean;
+  isGuest: boolean;
   isLoading: boolean;
   login: (payload: LoginPayload) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  register: (payload: RegisterPayload) => Promise<UserProfile>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
 }
@@ -80,6 +81,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await TokenStorage.saveTokens(tokens.accessToken, tokens.refreshToken);
       await TokenStorage.saveUserData(registeredUser);
       setUser(registeredUser);
+      return registeredUser;
     } finally {
       setIsLoading(false);
     }
@@ -111,6 +113,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       value={{
         user,
         isAuthenticated: !!user,
+        isGuest: !user && !isLoading,
         isLoading,
         login,
         register,

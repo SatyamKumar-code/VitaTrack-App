@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Colors } from '../../../shared/theme/colors';
 import {
   AssessmentDraft,
@@ -18,6 +18,11 @@ import { SymptomStep } from '../components/SymptomStep';
 import { SolarExposureStep } from '../components/SolarExposureStep';
 import { DietaryHabitsStep } from '../components/DietaryHabitsStep';
 import { SummaryReviewStep } from '../components/SummaryReviewStep';
+import { useAuth } from '../../auth/context/AuthContext';
+import { ClientScoringEngine } from '../../scoring/services/clientScoringEngine';
+import { GuestStore } from '../storage/guestStore';
+import { getFriendlyErrorMessage } from '../../../shared/utils/errorMasking';
+import { HealthProfileStorage } from '../../../shared/storage/secureStore';
 
 const STEP_INFO = [
   {
@@ -40,12 +45,30 @@ const STEP_INFO = [
 
 export const AssessmentWizardScreen: React.FC = () => {
   const router = useRouter();
+  const { isAuthenticated, user, isGuest } = useAuth();
 
   const [draft, setDraft] = useState<AssessmentDraft>(INITIAL_ASSESSMENT_DRAFT);
   const [existingDraftFound, setExistingDraftFound] = useState<AssessmentDraft | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [submissionResult, setSubmissionResult] = useState<AssessmentResponse | null>(null);
+  const [profileIncomplete, setProfileIncomplete] = useState<boolean>(false);
+
+  // Check if health profile is complete for authenticated users
+  const checkHealthProfileStatus = useCallback(async () => {
+    if (isAuthenticated && user) {
+      const isCompleted = await HealthProfileStorage.isCompleted(user.id);
+      setProfileIncomplete(!isCompleted);
+    } else {
+      setProfileIncomplete(false);
+    }
+  }, [isAuthenticated, user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      checkHealthProfileStatus();
+    }, [checkHealthProfileStatus])
+  );
 
   // Check for saved offline draft on mount (TASK-P3-06)
   useEffect(() => {
@@ -113,25 +136,62 @@ export const AssessmentWizardScreen: React.FC = () => {
     autoSave({ ...draft, dietaryHabits });
   };
 
-  // Submission handler (TASK-P3-02)
+  // Submission handler (TASK-P3-02 & Phase C Zero-DB Policy)
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setSubmissionError(null);
 
     try {
-      const payload = {
-        symptoms: draft.symptoms,
-        sunExposure: draft.sunExposure,
-        dietaryHabits: draft.dietaryHabits
-      };
+      if (!isAuthenticated || isGuest) {
+        // STRICT ZERO-DB POLICY: Compute locally on client, ZERO writes to MongoDB
+        const { results, aiExplanation, primaryContributors } = ClientScoringEngine.computeScore(
+          {
+            symptoms: draft.symptoms,
+            sunExposure: draft.sunExposure,
+            dietaryHabits: draft.dietaryHabits
+          },
+          {
+            skinType: user?.skinType,
+            dietaryPreference: user?.dietaryPreference
+          }
+        );
 
-      const result = await AssessmentApi.submitAssessment(payload);
-      setSubmissionResult(result);
+        GuestStore.setGuestAssessment({
+          draft,
+          results,
+          aiExplanation,
+          timestamp: new Date().toISOString()
+        });
 
-      // Successfully submitted -> Clear offline draft
-      await DraftStorage.clearDraft();
+        // Set local submission result to advance confirmation modal
+        setSubmissionResult({
+          assessmentId: 'guest-preview-session',
+          timestamp: new Date().toISOString(),
+          results: results,
+          aiExplanation: {
+            summary: aiExplanation,
+            keyContributors: primaryContributors
+          }
+        });
+
+        // Successfully evaluated -> Clear offline draft
+        await DraftStorage.clearDraft();
+      } else {
+        // Authenticated user: Synchronize to MongoDB via Bearer token
+        const payload = {
+          symptoms: draft.symptoms,
+          sunExposure: draft.sunExposure,
+          dietaryHabits: draft.dietaryHabits
+        };
+
+        const result = await AssessmentApi.submitAssessment(payload);
+        setSubmissionResult(result);
+
+        // Successfully submitted -> Clear offline draft
+        await DraftStorage.clearDraft();
+      }
     } catch (err: any) {
-      setSubmissionError(err?.message || 'Failed to submit clinical assessment.');
+      setSubmissionError(getFriendlyErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -142,6 +202,38 @@ export const AssessmentWizardScreen: React.FC = () => {
   };
 
   const currentInfo = STEP_INFO[draft.currentStep - 1] || STEP_INFO[0];
+
+  if (profileIncomplete) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.prereqContainer}>
+          <View style={styles.prereqIconBox}>
+            <Text style={styles.prereqIcon}>📋</Text>
+          </View>
+          <Text style={styles.prereqTitle}>Health Profile Required</Text>
+          <Text style={styles.prereqSubtitle}>
+            To calculate your accurate clinical Vitamin D deficiency risk, please configure your Skin Type and Dietary Orientation before starting the checkup.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.primaryBtn}
+            onPress={() => router.push('/profile')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.primaryBtnText}>Set Up Health Profile &rarr;</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() => router.replace('/')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.secondaryBtnText}>Back to Dashboard</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -286,5 +378,68 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     flex: 1
+  },
+  prereqContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 28
+  },
+  prereqIconBox: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    borderWidth: 1,
+    borderColor: Colors.primary.amber,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20
+  },
+  prereqIcon: {
+    fontSize: 32
+  },
+  prereqTitle: {
+    color: Colors.slate.textMain,
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 10,
+    textAlign: 'center'
+  },
+  prereqSubtitle: {
+    color: Colors.slate.textMuted,
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 32
+  },
+  primaryBtn: {
+    backgroundColor: Colors.primary.amber,
+    borderRadius: 14,
+    paddingVertical: 15,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 12
+  },
+  primaryBtnText: {
+    color: '#0B0F19',
+    fontSize: 15,
+    fontWeight: '700'
+  },
+  secondaryBtn: {
+    backgroundColor: Colors.slate.card,
+    borderWidth: 1,
+    borderColor: Colors.slate.cardBorder,
+    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+    width: '100%'
+  },
+  secondaryBtnText: {
+    color: Colors.slate.textMuted,
+    fontSize: 14,
+    fontWeight: '600'
   }
 });
