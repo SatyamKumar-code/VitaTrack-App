@@ -285,7 +285,7 @@ graph TB
 - [x] Implement `FriendlyErrorToast` and global error boundary that catches errors and presents warm, polite messages.
 - [x] Audit all strings in `assessment`, `results`, `guidance`, `history`, `reminders`, `wearables`, and `profile` to guarantee natural, compassionate, human-first medical language.
 
-### Phase E: Backend Redis Caching & Reverse Proxy Load Balancing Spec
-- [ ] Document Docker Compose setup for Redis service.
-- [ ] Implement Redis adapter for express-rate-limit and UV weather cache.
-- [ ] Add Nginx reverse proxy configuration template.
+### Phase E: Backend Redis Caching & Reverse Proxy Load Balancing Spec (**COMPLETED**)
+- [x] Document Docker Compose setup for Redis service (`redis:7.2-alpine` with healthcheck, memory limits & volume).
+- [x] Implement Redis adapter for express-rate-limit and UV weather cache (`RedisManager`, `AdaptiveRedisRateLimitStore`, `UvWeatherCacheService`, `content:diet:{category}`, `token:blacklist:{jti}`).
+- [x] Add Nginx reverse proxy configuration template (`nginx/nginx.conf`, `nginx/conf.d/vitatrack.conf` with least_conn, SSL offload, rate limit headers).

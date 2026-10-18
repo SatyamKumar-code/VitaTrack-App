@@ -1,12 +1,18 @@
 import { createApp } from './app';
 import { config } from './core/config/env';
 import { DatabaseManager } from './core/database/mongooseConnection';
+import { RedisManager } from './core/cache/redisClient';
 import { logger } from './core/logger/logger';
 
 async function bootstrap() {
   const app = createApp();
 
-  // Attempt database connection in background so app starts even if DB is spinning up
+  // 1. Initialize Redis In-Memory Cache & Adaptive Rate Limiter (Phase E)
+  RedisManager.connect().catch((err) => {
+    logger.warn('Initial Redis connection deferred, operating on in-memory standby:', err);
+  });
+
+  // 2. Attempt database connection in background so app starts even if DB is spinning up
   DatabaseManager.connect({
     uri: config.mongoUri,
     maxRetries: 3,
@@ -36,6 +42,7 @@ async function bootstrap() {
     logger.info(`Received ${signal}. Shutting down gracefully...`);
     server.close(async () => {
       logger.info('HTTP server closed.');
+      await RedisManager.disconnect();
       await DatabaseManager.disconnect();
       process.exit(0);
     });

@@ -85,6 +85,10 @@ export interface AppConfig {
   jwtAccessSecret: string;
   jwtRefreshSecret: string;
   loadedEnvPath: string | null;
+  redisUrl?: string;
+  redisHost: string;
+  redisPort: number;
+  redisPassword?: string;
 }
 
 export const config: AppConfig = {
@@ -97,5 +101,9 @@ export const config: AppConfig = {
     : ['http://localhost:5173', 'http://localhost:8081'],
   jwtAccessSecret: (process.env.JWT_ACCESS_SECRET || '').trim(),
   jwtRefreshSecret: (process.env.JWT_REFRESH_SECRET || '').trim(),
-  loadedEnvPath
+  loadedEnvPath,
+  redisUrl: process.env.REDIS_URL?.trim() || undefined,
+  redisHost: process.env.REDIS_HOST?.trim() || '127.0.0.1',
+  redisPort: parseInt(process.env.REDIS_PORT?.trim() || '6379', 10),
+  redisPassword: process.env.REDIS_PASSWORD?.trim() || undefined
 };

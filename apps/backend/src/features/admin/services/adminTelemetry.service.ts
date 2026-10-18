@@ -85,11 +85,15 @@ export class AdminTelemetryService {
     const dbStatusString =
       readyState === 1 ? 'connected' : readyState === 2 ? 'connecting' : 'disconnected';
 
+    // Redis cluster/adapter status (Phase E)
+    const { RedisManager } = await import('../../../core/cache/redisClient');
+    const redisStatus = RedisManager.getStatus();
+
     return {
       services: {
         api: 'online',
         database: dbStatusString,
-        redis: 'active',
+        redis: redisStatus,
         aiProxy: 'healthy'
       },
       system: {

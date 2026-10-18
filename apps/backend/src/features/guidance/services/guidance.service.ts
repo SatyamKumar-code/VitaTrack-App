@@ -91,4 +91,43 @@ export class GuidanceService {
 
     return payload;
   }
+
+  /**
+   * Retrieves public dietary food lists and bioavailable meal suggestions.
+   * Cached in Redis with 86400s (24 hours) TTL (Spec §6.1 / content:diet:{category})
+   */
+  public static async getPublicDietContent(category: DietaryPreference) {
+    const { RedisManager } = await import('../../../core/cache/redisClient');
+    const cacheKey = RedisManager.getDietContentKey(category);
+
+    try {
+      const cached = await RedisManager.get(cacheKey);
+      if (cached) {
+        return { ...cached, cached: true };
+      }
+    } catch (err: any) {
+      logger.warn(`Failed reading diet cache for ${category}: ${err.message}`);
+    }
+
+    // Generate static content without database dependency
+    const nutrition = NutritionalEngine.generateNutritionalGuidance(category, 'moderate', []);
+    const payload = {
+      dietaryPreference: category,
+      targetDailyIU: nutrition.targetDailyIU,
+      priorityFoods: nutrition.priorityFoods,
+      coFactors: nutrition.coFactors,
+      absorptionTips: nutrition.absorptionTips,
+      supplementGuidance: nutrition.supplementGuidance,
+      cached: false,
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      await RedisManager.set(cacheKey, payload, 86400); // 24 hours TTL
+    } catch (err: any) {
+      logger.warn(`Failed caching diet content for ${category}: ${err.message}`);
+    }
+
+    return payload;
+  }
 }

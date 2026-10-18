@@ -26,6 +26,14 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     }
 
     const token = authHeader.split(' ')[1];
+
+    // Redis Token Blacklist check (Spec §6.1 / token:blacklist:{jti})
+    const { RedisManager } = await import('../cache/redisClient');
+    const isRevoked = await RedisManager.isTokenBlacklisted(token);
+    if (isRevoked) {
+      throw new AppError('Session has been revoked. Please log in again.', 401);
+    }
+
     let payload: TokenPayload;
 
     try {

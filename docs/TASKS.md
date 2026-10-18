@@ -291,6 +291,29 @@
 
 ---
 
+## Phase E: High-Availability Backend Redis Caching & Reverse Proxy Load Balancing (**COMPLETED**)
+
+- [x] **TASK-PE-01: Redis Caching Manager & Standby Memory Fallback Engine**  
+  *Description:* Implement `RedisManager` with ioredis client, automatic reconnection, and zero-downtime in-memory fallback.  
+  *Status:* `Completed`
+- [x] **TASK-PE-02: Open-Meteo UV Solar Weather Cache Service & Endpoints**  
+  *Description:* Build `UvWeatherCacheService` caching solar forecasts under `uv:cache:{lat}:{lon}` with 1-hour TTL and fallback calculations.  
+  *Status:* `Completed`
+- [x] **TASK-PE-03: Distributed Adaptive Rate Limiting via RedisStore**  
+  *Description:* Implement `AdaptiveRedisRateLimitStore` with `rate-limit-redis` delegating to Redis `rate:ip:{ip}` with memory store fallback.  
+  *Status:* `Completed`
+- [x] **TASK-PE-04: Session Revocation Token Blacklist Invariant**  
+  *Description:* Wire JWT access token revocation to Redis under `token:blacklist:{jti}` with fast pre-auth evaluation in `authenticate.ts`.  
+  *Status:* `Completed`
+- [x] **TASK-PE-05: Public Dietary Content 24-Hour Cache**  
+  *Description:* Serve static dietary recommendations directly from RAM via `content:diet:{category}` with 24-hour TTL, saving MongoDB queries.  
+  *Status:* `Completed`
+- [x] **TASK-PE-06: Nginx Reverse Proxy Load Balancer & High-Availability Docker Compose**  
+  *Description:* Create `nginx/nginx.conf` and `nginx/conf.d/vitatrack.conf` with least-connection load balancing, TLS 1.3 offloading, and updated `docker-compose.yml`.  
+  *Status:* `Completed`
+
+---
+
 ## Future Phase: Privacy-Preserving Ethical Advertising (DEFERRED)
 
 - [ ] **TASK-FUT-01: Ethical Advertising Policy & Compliance Document**  

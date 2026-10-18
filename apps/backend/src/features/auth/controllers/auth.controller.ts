@@ -93,6 +93,14 @@ export class AuthController {
       const refreshToken = req.body?.refreshToken;
       const userId = req.user?.userId;
 
+      // Revoke access token immediately in Redis (Spec §6.1 / token:blacklist:{jti})
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        const { RedisManager } = await import('../../../core/cache/redisClient');
+        await RedisManager.blacklistToken(token, 900); // 15-minute access token lifespan
+      }
+
       await AuthService.logout(refreshToken, userId);
 
       res.status(200).json({

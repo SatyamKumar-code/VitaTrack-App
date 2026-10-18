@@ -110,34 +110,85 @@ EXPOSE 4000
 CMD ["node", "dist/server.js"]
 ```
 
-### 3.2 Docker Compose for Local & Staging Environments (`docker-compose.yml`)
+### 3.2 Docker Compose for High-Availability Production Stack (`docker-compose.yml`)
 ```yaml
 version: '3.8'
+
 services:
+  # 1. High-Performance Redis 7.x In-Memory Cache & Distributed Rate Limiter
+  redis:
+    image: redis:7.2-alpine
+    container_name: vitatrack-redis
+    restart: always
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save ""
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - vitatrack-network
+
+  # 2. VitaTrack Express REST API Backend (Multi-Instance Scalable)
   backend:
     build:
       context: ./apps/backend
-    ports:
-      - "4000:4000"
-    environment:
-      - NODE_ENV=production
-      - PORT=4000
-      - MONGO_URI=mongodb://mongo:27017/vitatrack
-      - JWT_ACCESS_SECRET=changeme_in_prod
-      - JWT_REFRESH_SECRET=changeme_in_prod
-    depends_on:
-      - mongo
-
-  mongo:
-    image: mongo:7.0
+      dockerfile: Dockerfile
+    container_name: vitatrack-backend
     restart: always
     ports:
-      - "27017:27017"
+      - "4000:4000"
+    env_file:
+      - .env
+    environment:
+      - PORT=4000
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - vitatrack-network
+
+  # 3. Nginx Reverse Proxy & Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: vitatrack-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - mongo_data:/data/db
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - backend
+    networks:
+      - vitatrack-network
+
+  # 4. VitaTrack Admin Operations Web Portal
+  admin:
+    build:
+      context: ./apps/admin
+      dockerfile: Dockerfile
+    container_name: vitatrack-admin
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - vitatrack-network
 
 volumes:
-  mongo_data:
+  redis_data:
+
+networks:
+  vitatrack-network:
+    driver: bridge
 ```
 
 ---
@@ -148,7 +199,8 @@ volumes:
 |:---|:---:|:---|:---|
 | `NODE_ENV` | All | Runtime environment (`development`, `staging`, `production`) | `production` |
 | `PORT` | Backend | HTTP listening port | `4000` |
-| `MONGO_URI` | Backend | Connection string to MongoDB database / cluster | `mongodb+srv://app_user:***@cluster0.mongodb.net/vitatrack` |
+| `MONGO_URI` | Backend | Connection string to MongoDB cluster | `mongodb+srv://app_user:***@cluster0.mongodb.net/vitatrack` |
+| `REDIS_URL` | Backend | High-availability Redis connection string (Phase E) | `redis://redis:6379` |
 | `JWT_ACCESS_SECRET` | Backend | High-entropy secret for signing 15-minute access tokens | `256-bit cryptographically secure string` |
 | `JWT_REFRESH_SECRET`| Backend | High-entropy secret for signing 7-day refresh tokens | `256-bit cryptographically secure string` |
 | `GEMINI_API_KEY` | Backend | Server-side API key for Google Gemini AI risk explanations | `AIzaSy...` |

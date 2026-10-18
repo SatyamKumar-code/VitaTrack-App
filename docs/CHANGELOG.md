@@ -2,6 +2,36 @@
 
 All notable changes to the VitaTrack platform are documented in this file in adherence to the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-10-18
+
+### Added
+- **Phase E Implementation: High-Availability Backend Redis Caching & Reverse Proxy Load Balancing (`TASK-PE-01` to `TASK-PE-06`):**
+  - **Redis Cache Manager & Standby Memory Fallback (`TASK-PE-01`):**
+    - Created `RedisManager` (`apps/backend/src/core/cache/redisClient.ts`) providing robust ioredis connection management, connection lifecycle events, automatic reconnection backoff, and transparent in-memory TTL cache fallback when Redis is offline or degraded.
+    - Integrated startup connection in `apps/backend/src/server.ts` and graceful connection shutdown.
+    - Added dynamic Redis cluster status reporting (`'active'` | `'standby'`) to `AdminTelemetryService.getHealth()`.
+  - **Open-Meteo UV Solar Weather Cache Service & Endpoints (`TASK-PE-02`):**
+    - Built `UvWeatherCacheService` (`apps/backend/src/features/guidance/services/uvWeatherCache.service.ts`) storing external Open-Meteo UV solar readings under `uv:cache:{lat}:{lon}` with 3600-second (1-hour) TTL.
+    - Added deterministic diurnal solar calculation fallback ensuring uninterrupted availability during upstream outages.
+    - Added public API endpoints `GET /api/v1/recommendations/solar-forecast` and `GET /api/v1/recommendations/uv-forecast` with coordinate validation.
+  - **Distributed Adaptive Rate Limiting via RedisStore (`TASK-PE-03`):**
+    - Implemented `AdaptiveRedisRateLimitStore` in `apps/backend/src/core/security/rateLimiter.ts` using `rate-limit-redis`.
+    - Routes IP rate limits to Redis distributed keys (`rate:ip:api:{ip}`, `rate:ip:auth:{ip}`) when active, with automatic in-memory fallback.
+  - **Session Revocation Token Blacklist Invariant (`TASK-PE-04`):**
+    - Implemented fast pre-auth evaluation in `apps/backend/src/core/middleware/authenticate.ts` rejecting revoked tokens under `token:blacklist:{jti}` with HTTP 401.
+    - Wired `AuthController.logout` to automatically add bearer tokens to the Redis blacklist with a 15-minute expiration.
+  - **Public Dietary Content 24-Hour Cache (`TASK-PE-05`):**
+    - Implemented `GuidanceService.getPublicDietContent` caching static nutrition advice and recipes under `content:diet:{category}` with 86400s (24-hour) TTL, serving thousands of guest users without touching MongoDB.
+    - Added `GET /api/v1/recommendations/diet/:category` route.
+  - **Nginx Reverse Proxy Load Balancer & High-Availability Docker Compose (`TASK-PE-06`):**
+    - Authored `nginx/nginx.conf` and `nginx/conf.d/vitatrack.conf` implementing `least_conn` routing across backend instances, TLS 1.3 termination, rate limit header forwarding, client IP preservation (`X-Forwarded-For`), and health check probes.
+    - Updated `docker-compose.yml` adding `redis:7.2-alpine` (with healthcheck and 256MB LRU policy) and `nginx:alpine` reverse proxy container.
+    - Updated `docs/DEPLOYMENT.md` with complete container topology and high-availability architecture.
+  - **Automated Verification:**
+    - Authored unit test suite `apps/backend/tests/unit/redisCache.test.ts` (8 tests).
+    - Authored integration test suite `apps/backend/tests/integration/uvCache.test.ts` (7 tests).
+    - Executed all 19 test suites with 100% pass rate (161/161 tests passing).
+
 ## [1.0.0] — 2026-10-18
 
 ### Added

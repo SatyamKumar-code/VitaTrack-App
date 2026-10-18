@@ -1,7 +1,25 @@
 version: '3.8'
 
 services:
-  # 1. VitaTrack Express REST API Backend (Connected to MongoDB Atlas)
+  # 1. High-Performance Redis 7.x In-Memory Cache & Distributed Rate Limiter (Phase E)
+  redis:
+    image: redis:7.2-alpine
+    container_name: vitatrack-redis
+    restart: always
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save ""
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - vitatrack-network
+
+  # 2. VitaTrack Express REST API Backend (Connected to MongoDB Atlas & Redis)
   backend:
     build:
       context: ./apps/backend
@@ -10,15 +28,36 @@ services:
     restart: always
     ports:
       - "4000:4000"
-    # Sabhi sensitive keys aur Atlas MONGO_URI seedhe .env file se load honge
     env_file:
       - .env
     environment:
       - PORT=4000
+      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      redis:
+        condition: service_healthy
     networks:
       - vitatrack-network
 
-  # 2. VitaTrack Admin Operations Web Portal
+  # 3. Nginx Reverse Proxy & Load Balancer (Phase E)
+  nginx:
+    image: nginx:alpine
+    container_name: vitatrack-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - backend
+    networks:
+      - vitatrack-network
+
+  # 4. VitaTrack Admin Operations Web Portal
   admin:
     build:
       context: ./apps/admin
@@ -31,6 +70,10 @@ services:
       - backend
     networks:
       - vitatrack-network
+
+volumes:
+  redis_data:
+    driver: local
 
 networks:
   vitatrack-network:
