@@ -35,6 +35,13 @@ export class RedisManager {
       }
     }
 
+    // If no explicit Redis URL or host is specified in environment, operate immediately in standby mode
+    if (!config.redisUrl && !process.env.REDIS_HOST && !process.env.REDIS_URL) {
+      logger.info('No REDIS_URL configured. Operating in High-Performance Standby Memory Mode (100% Free).');
+      this.status = 'standby';
+      return false;
+    }
+
     try {
       const redisOptions: RedisOptions = customOptions || {
         host: config.redisHost,
@@ -53,11 +60,13 @@ export class RedisManager {
       };
 
       if (config.redisUrl) {
+        const isTls = config.redisUrl.startsWith('rediss://');
         this.client = new Redis(config.redisUrl, {
           lazyConnect: true,
           enableOfflineQueue: false,
-          maxRetriesPerRequest: 1,
-          connectTimeout: 2500
+          maxRetriesPerRequest: 2,
+          connectTimeout: 7500,
+          ...(isTls ? { tls: { rejectUnauthorized: false } } : {})
         });
       } else {
         this.client = new Redis(redisOptions);

@@ -1,50 +1,40 @@
 # ==============================================================================
-# VitaTrack Render Infrastructure as Code (Blueprint Specification)
-# Docs Reference: docs/DEPLOYMENT.md & docs/HUMAN_UI_GUEST_REVAMP_SPEC.md
+# VitaTrack Render Blueprint — 100% FREE TIER (No Credit Card / Payment Required)
 # ==============================================================================
 
 services:
   # ----------------------------------------------------------------------------
-  # 1. VitaTrack Express REST API Backend (Multi-Instance Load Balanced)
+  # 1. VitaTrack Express REST API Backend (100% Free Plan)
   # ----------------------------------------------------------------------------
   - type: web
     name: vitatrack-backend
     runtime: node
-    plan: starter
+    plan: free # 100% Free Tier — Zero Credit Card Required
     rootDir: apps/backend
     buildCommand: npm ci && npm run build
     startCommand: npm run start
     healthCheckPath: /health
     autoDeploy: true
-    # Render Built-in Layer 7 Load Balancing & Auto-scaling
-    scaling:
-      minInstances: 2
-      maxInstances: 4
-      targetCPUPercent: 75
-      targetMemoryPercent: 80
     envVars:
       - key: NODE_ENV
         value: production
       - key: API_PREFIX
         value: /api/v1
       - key: MONGO_URI
-        sync: false # Set securely in Render Dashboard (e.g., MongoDB Atlas URI)
+        sync: false # Paste your MongoDB Atlas URI in Render dashboard
       - key: JWT_ACCESS_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
       - key: ADMIN_JWT_SECRET
         generateValue: true
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vitatrack-redis
-          property: connectionString
       - key: CORS_ORIGIN
         value: "*"
+      - key: REDIS_URL
+        sync: false # Paste free Upstash Redis URL: rediss://default:...@...upstash.io:6379
 
   # ----------------------------------------------------------------------------
-  # 2. VitaTrack Admin Operations Web Portal (Static SPA)
+  # 2. VitaTrack Admin Operations Web Portal (100% Free Static Site)
   # ----------------------------------------------------------------------------
   - type: web
     name: vitatrack-admin
@@ -56,18 +46,12 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+      - type: rewrite
+        source: /admin/*
+        destination: /index.html
     envVars:
       - key: VITE_API_URL
         fromService:
           type: web
           name: vitatrack-backend
           property: host
-
-  # ----------------------------------------------------------------------------
-  # 3. VitaTrack Managed In-Memory Redis Cache (Phase E)
-  # ----------------------------------------------------------------------------
-  - type: redis
-    name: vitatrack-redis
-    plan: free
-    ipAllowList: [] # Strict internal VPC security (Only backend can connect)
-    maxmemoryPolicy: allkeys-lru
