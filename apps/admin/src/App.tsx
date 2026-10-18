@@ -43,7 +43,7 @@ export default function App() {
   const [serverIncident, setServerIncident] = useState<ServerIncidentDetails | null>(null);
   const [showBypassCache, setShowBypassCache] = useState(false);
 
-  const pollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const retryCountRef = useRef(0);
 
   const loadData = useCallback(async (isSilent = false) => {
