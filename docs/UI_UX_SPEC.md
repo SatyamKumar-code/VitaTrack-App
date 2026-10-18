@@ -164,3 +164,71 @@ stateDiagram-v2
 - **Error States:** Friendly error messaging with a prominent "Retry" button.
 - **Offline Banner:** Non-intrusive amber banner at top of viewport: *"You are currently offline. Recent data is cached and new entries will sync automatically."*
 - **Haptic Feedback:** Subtle vibration ticks on segmented slider changes, button presses, and survey completion.
+
+---
+
+## 5. Human-Stylist Aesthetics & Anti-AI Template Guidelines
+
+VitaTrack's UI must look and feel like an ultra-realistic, thoughtfully crafted consumer health product designed by top-tier human product designers, not a robotic developer checklist or generic AI scaffolding.
+
+### 5.1 Eradication of Developer Artifacts from UI
+- **Zero Phase Announcements:** All developer phase tags (e.g. `Phase 8 Smartwatch Ingestion Active`, `Phase 4 Deterministic Engine`) must be strictly stripped from all mobile screens.
+- **Zero Raw Technical Jargon:** End-users should never see terminology like `Hardware Keystore Token Rotation`, `Zero-PHI Cryptographic Vault`, `Deterministic Risk Scorer`, or `Mongoose Connection Timeout`.
+- **Human-Centric Friendly Copy:**
+  - *Hero Title:* "Daily Solar Vitality & Wellness"
+  - *Checkup:* "3-Minute Health Checkup"
+  - *Guidance:* "Personalized Sunshine & Nutrition Plan"
+  - *Trends:* "Your Health Journey & Trends"
+  - *Connected Devices:* "Wearable & Activity Sync"
+
+### 5.2 Visual Rhythm & Card Composition
+- Clean visual breathing room (minimum 16dp margins, 12dp internal card padding).
+- Glassmorphism surfaces (`rgba(30, 41, 59, 0.70)`) with subtle amber glows and rounded radii (`border-radius: 20px`).
+- Realistic preview numbers for guest/initial states (e.g., Steps: 6,420 / 10,000, Resting HR: 68 bpm, UV Index: 4.2).
+
+---
+
+## 6. Native Mobile Bottom Navigation Bar (`/(tabs)`)
+
+The core navigation pattern is a persistent native mobile **Bottom Navigation Tab Bar** with 5 primary destinations:
+
+```mermaid
+graph LR
+    T1["🏠 Home<br/>Dashboard & UV Tracker"] --- T2["📝 Checkup<br/>Symptom Survey"]
+    T2 --- T3["☀️ Guidance<br/>Sunlight & Diet"]
+    T3 --- T4["📊 Trends<br/>Progress & Reports"]
+    T4 --- T5["👤 Profile<br/>Account & Devices"]
+```
+
+1. **Home (`/(tabs)/index`):** Daily wellness overview, sunlight exposure ring, local UV gauge, rotating daily tip.
+2. **Checkup (`/(tabs)/assessment`):** 4-step interactive self-assessment wizard with instant feedback.
+3. **Guidance (`/(tabs)/guidance`):** Dietary food directory, live sunlight countdown timer, bone-health routines.
+4. **Trends (`/(tabs)/history`):** Longitudinal assessment scores, biomarker trajectory charts, clinician PDF export.
+5. **Profile (`/(tabs)/profile`):** User preferences, wearable Health Connect sync status, security/privacy, and sign-in modal for guests.
+
+---
+
+## 7. Anonymous Guest Mode & Zero-Database Storage Policy
+
+VitaTrack permits unauthenticated guest exploration with strict privacy boundaries:
+
+### 7.1 What Guests Can Access ("Bina Login Use")
+- **Explore UI & Education:** Full access to Home overview, nutrition directory, and educational articles.
+- **Live Sunlight Calculator:** Real-time UV lookup and outdoor exposure timer based on selected skin phototype.
+- **Checkup Preview:** Guests can complete the 4-step symptom survey and receive an instant local risk evaluation score.
+
+### 7.2 Strict Invariant: Zero Database Storage for Guests
+- **No Database Writes:** Guest data is **NEVER** sent to or stored in MongoDB.
+- **Local Ephemeral State:** Guest survey inputs and scores exist only in client-side memory or temporary `AsyncStorage`.
+- **Conversion Touchpoints:** When attempting to save longitudinal history, view multi-month trend charts, download a doctor PDF, or sync a smartwatch, a warm, non-intrusive modal appears:  
+  *“Save your health journey — Sign in or create a free account to track your progress over time and share reports with your doctor.”*
+- **Database Persistence:** Only registered, authenticated users have their records stored in the cloud database.
+
+---
+
+## 8. Sensitive Error Shield & User-Facing Safety
+
+- **Production Error Masking:** Raw stack traces, database exceptions, internal HTTP status codes, and server hostnames are trapped by client error boundaries and replaced with reassuring human language.
+- **Contextual Fallbacks:** If the device loses internet connectivity during an action, display: *"We're having trouble reaching the network. Please check your connection."*
+- **Privacy Assurance:** Clearly display on the profile and checkup screens: *"Your data is stored securely and never shared with third parties without your explicit consent."*
+

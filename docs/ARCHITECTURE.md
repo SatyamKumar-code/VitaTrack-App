@@ -423,3 +423,72 @@ flowchart LR
     style Ops_Realm fill:#e6f7ff,stroke:#1890ff,stroke-width:2px
     style Wall fill:#fffbe6,stroke:#faad14,stroke-width:3px
 ```
+
+---
+
+## 7. Scalability Architecture: Reverse Proxy Load Balancing & Redis Layer
+
+To guarantee high availability, sub-100ms response times, and resilience against sudden traffic spikes, the backend application incorporates a reverse proxy load balancer and a high-performance Redis cache:
+
+```mermaid
+graph TB
+    subgraph Ingress ["Internet Ingress"]
+        C_GUEST["Guest Mobile Users"]
+        C_AUTH["Authenticated Patients"]
+        C_ADMIN["DevOps / Admins"]
+    end
+
+    subgraph ReverseProxy ["Edge Load Balancer (Nginx / ALB)"]
+        LB["Reverse Proxy Load Balancer<br/><i>SSL Offload • Least-Connection Routing • DDOS Shield</i>"]
+    end
+
+    subgraph NodeCluster ["Application Cluster (Multi-Instance Node.js)"]
+        NODE1["VitaTrack API Node 1"]
+        NODE2["VitaTrack API Node 2"]
+    end
+
+    subgraph Caching ["In-Memory Caching (Redis 7.x)"]
+        RED_RATE["Sliding-Window Rate Limiter"]
+        RED_UV["Open-Meteo Solar Cache (1h TTL)"]
+        RED_TOKEN["Revoked Token Blacklist"]
+        RED_GUIDE["Public Diet & Lifestyle Content"]
+    end
+
+    subgraph Storage ["Persistent Storage"]
+        MDB[("MongoDB Replica Set<br/><i>Writes for Authenticated Users Only</i>")]
+    end
+
+    C_GUEST --> LB
+    C_AUTH --> LB
+    C_ADMIN --> LB
+
+    LB --> NODE1
+    LB --> NODE2
+
+    NODE1 <--> Caching
+    NODE2 <--> Caching
+
+    NODE1 -->|Authenticated Writes Only| MDB
+    NODE2 -->|Authenticated Writes Only| MDB
+```
+
+### 7.1 Redis Cache Policies
+1. **Solar / UV Weather Cache (`uv:cache:{lat}:{lon}`):** External Open-Meteo API responses are cached for 3,600 seconds (1 hour). Prevents rate-limit exhaustion and accelerates home screen load times.
+2. **Distributed Rate Limiting (`rate:ip:{ip}`):** Redis sliding-window algorithm enforcing max 100 requests per minute per IP address.
+3. **Session Revocation Blacklist (`token:blacklist:{jti}`):** Instantaneous invalidation of JWT tokens on logout without querying disk storage.
+4. **Public Guidance Cache (`content:guidance:{diet}`):** Pre-compiled dietary suggestions served directly from RAM to guest and authenticated users alike.
+
+---
+
+## 8. Guest Mode Invariant & Sensitive Error Shield
+
+### 8.1 Zero-DB Storage Invariant for Unauthenticated Guests
+- **Architectural Policy:** Unauthenticated guest users never produce write operations against MongoDB.
+- **Client-Side Scoring:** Guest symptom assessments are evaluated locally on device.
+- **Protection of Core Data Store:** Prevents database bloat, spam submissions, and unauthorized storage of personal health inputs.
+- **Conversion Gateway:** Persistent cloud history, clinician reports, and smartwatch syncing strictly require user registration and JWT authentication.
+
+### 8.2 Sensitive Error Sanitization
+- Production middleware catches all internal exceptions (Node.js stack traces, Mongoose connection details, internal microservice addresses).
+- The client receives safe, human-readable error messages with unique correlation IDs (`errorId: "ERR_92817"`) for telemetry logging.
+

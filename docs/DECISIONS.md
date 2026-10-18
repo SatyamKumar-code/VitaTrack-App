@@ -17,6 +17,9 @@
 - [ADR-007: Deferment of Advertising Subsystem to Future Explicit Phase](#adr-007-deferment-of-advertising-subsystem)
 - [ADR-008: Client-Side Clinician PDF Generation via `expo-print`](#adr-008-client-side-clinician-pdf-generation)
 - [ADR-009: Feature-Based (Vertical Slice) Directory Organization](#adr-009-feature-based-directory-organization)
+- [ADR-010: Guest Mode Architecture with Zero-Database Persistence for Unauthenticated Users](#adr-010-guest-mode-architecture-with-zero-database-persistence-for-unauthenticated-users)
+- [ADR-011: Human-Centric UI/UX Standards and Sensitive Technical Shield](#adr-011-human-centric-uiux-standards-and-sensitive-technical-shield)
+- [ADR-012: High-Availability Architecture: Redis In-Memory Caching & Reverse Proxy Load Balancing](#adr-012-high-availability-architecture-redis-in-memory-caching--reverse-proxy-load-balancing)
 
 ---
 
@@ -112,4 +115,43 @@
 - **Consequences:**
   - *Positive:* High cohesion, low coupling, easier incremental phase-by-phase implementation and testing, clean deletion or refactoring of features, improved cognitive clarity for developers and AI agents.
   - *Negative:* Cross-cutting utilities and shared types must be maintained disciplined in designated `shared/` or `core/` directories.
+
+---
+
+### ADR-010: Guest Mode Architecture with Zero-Database Persistence for Unauthenticated Users
+- **Status:** Accepted
+- **Context:** Requiring mandatory account registration before allowing users to experience the application increases drop-off and frustrates users. However, allowing unauthenticated writes to MongoDB causes database bloat, spam vulnerability, and potential privacy liabilities.
+- **Decision:** Implement an **Anonymous Guest Mode ("Bina Login")** allowing complete interactive preview of the application (Home overview, Sunlight calculator, bioavailable diet guides, and local 4-step checkup calculation). Under this policy:
+  1. Unauthenticated guest interactions run 100% on the client device (in-memory Zustand state and local ephemeral cache).
+  2. The mobile client is strictly forbidden from executing write operations (`POST /api/v1/assessments`, `POST /api/v1/wearables`) when unauthenticated.
+  3. Zero bytes are written into MongoDB for guest users.
+  4. Non-intrusive upgrade sheets prompt the user to register or log in when attempting to save multi-month history, export clinician PDF reports, or sync wearable biometrics.
+- **Consequences:**
+  - *Positive:* Instant time-to-value for curious users, zero friction on app launch, zero junk data in the cloud database, full compliance with privacy mandates.
+  - *Negative:* Guest user's unauthenticated checkup inputs will be lost if the app process is terminated without saving or registering.
+
+---
+
+### ADR-011: Human-Centric UI/UX Standards and Sensitive Technical Shield
+- **Status:** Accepted
+- **Context:** Developer phase indicators ("Phase 8 Smartwatch Ingestion Active", "Hardware Keystore Vault") and raw backend error messages make the application look like an AI-generated prototype rather than a warm, trustworthy consumer healthcare app.
+- **Decision:** Establish **Human-Centric UI/UX Standards** and a **Sensitive Technical Shield**:
+  1. Strip all phase numbers, engineering architecture badges, and technical jargon from all user screens.
+  2. Implement a standard native mobile **Bottom Navigation Tab Bar** (`Home`, `Checkup`, `Guidance`, `Trends`, `Profile`).
+  3. Mask all technical stack traces, Mongoose errors, and network codes behind reassuring, patient-friendly copy and toast banners.
+- **Consequences:**
+  - *Positive:* High visual polish, intuitive navigation, emotional comfort for users experiencing health concerns, zero risk of leaking infrastructure internals.
+  - *Negative:* Developer debugging must rely on structured console logs or admin telemetry rather than on-screen visual banners.
+
+---
+
+### ADR-012: High-Availability Architecture: Redis In-Memory Caching & Reverse Proxy Load Balancing
+- **Status:** Accepted
+- **Context:** Rapid traffic growth, concurrent guest user access, and repetitive external API calls (e.g. Open-Meteo solar UV lookups) can saturate backend compute and database connections.
+- **Decision:** Introduce a **High-Availability Production Layer** consisting of:
+  1. **Nginx Reverse Proxy / Load Balancer:** Distributing incoming HTTPS traffic across multiple Node.js application instances with SSL termination, connection pooling, and DDoS throttling.
+  2. **Redis In-Memory Cache (Redis 7.x):** Caching external UV solar forecasts (1-hour TTL), maintaining a distributed sliding-window rate limit store, serving static dietary recommendations, and holding revoked JWT token blacklists.
+- **Consequences:**
+  - *Positive:* Low API latency (<50ms for cached responses), reduced load on MongoDB, protection against external weather API rate limit penalties, horizontal scaling capability.
+  - *Negative:* Adds Redis and Nginx container dependencies to the production infrastructure.
 
