@@ -15,7 +15,6 @@ RUN npm install
 COPY app ./app
 COPY src ./src
 COPY assets ./assets
-COPY expo-env.d.ts ./
 
 # Export static Progressive Web App bundle
 RUN npx expo export -p web
